@@ -11,6 +11,6 @@ export const createUser = async (email, password, name, phone) => {
   return await user.save();
 };
 
-export const getUser = async (email) => {
-  return await User.findOne({ email });
+export const getUser = async (options) => {
+  return await User.findOne(options);
 };

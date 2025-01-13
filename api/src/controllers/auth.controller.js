@@ -1,10 +1,17 @@
 import bcrypt from "bcryptjs";
-import { validateSignin, validateSignup } from "../utils/validator.util.js";
+import {
+  validateSignin,
+  validateSignup,
+  validatePasswordReset,
+  validateRequestReset,
+} from "../utils/validator.util.js";
 import { createUser, getUser } from "../services/user.services.js";
 import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
 import jwt from "jsonwebtoken";
 import { createCart } from "../services/cart.service.js";
+import crypto from "crypto";
+import { sendEmails } from "../utils/emailer.util.js";
 
 export const signup = async (req, res, next) => {
   const { error, value } = validateSignup(req.body);
@@ -43,7 +50,7 @@ export const signin = async (req, res, next) => {
   const { email, password } = value;
 
   try {
-    const user = await getUser(email);
+    const user = await getUser({ email });
 
     if (!user) {
       const error = customError(401, "Wrong credentials");
@@ -85,6 +92,86 @@ export const signout = async (req, res, next) => {
     return res.status(200).json({ message: "User signed out." });
   } catch (error) {
     logger.error("Couldn't sign out user: ", error);
+    return next(error);
+  }
+};
+
+export const requestPasswordReset = async (req, res, next) => {
+  const { error, value } = validateRequestReset(req.body);
+
+  if (error) return next(error);
+
+  const { email } = value;
+
+  try {
+    const user = await getUser({ email });
+
+    if (!user) {
+      const error = customError(404, "User not found");
+      logger.error(`User with email ${email} not found: `, error);
+      return next(error);
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpire = Date.now() + 300000;
+
+    await user.save();
+
+    await sendEmails(
+      email,
+      "Reset your password",
+      `<a href="${process.env.RESET_PASSWORD_URL}?token=${token}">Reset password</a>`
+    );
+
+    logger.info(`Password reset link sent for ${email}`);
+    return res
+      .status(200)
+      .json({ message: "Password reset link was sent to your email" });
+  } catch (error) {
+    logger.error(`Couldn't request password reset for ${email}: `, error);
+    return next(error);
+  }
+};
+
+export const resetPassword = async (req, res, next) => {
+  const { error, value } = validatePasswordReset(req.body);
+
+  if (error) return next(error);
+
+  const { password, token } = value;
+
+  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+  try {
+    const user = await getUser({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      const error = customError(401, "Invalid or expired token");
+      logger.error(`Token error: `, error);
+      return next(error);
+    }
+
+    const encryptPass = await bcrypt.hash(password, 10);
+
+    user.password = encryptPass;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    logger.info(`Password reset for user with token ${token}`);
+    return res.status(200).json({ message: "Password was reset successfully" });
+  } catch (error) {
+    logger.error(
+      `Couldn't reset password for user with token ${token}: `,
+      error
+    );
     return next(error);
   }
 };
