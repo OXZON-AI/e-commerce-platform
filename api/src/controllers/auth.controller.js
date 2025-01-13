@@ -11,7 +11,15 @@ export const signup = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { email, password, name, phone } = value;
+  const { email, password, name, phone, token } = value;
+
+  const human = await validateCaptcha(token);
+
+  if (!human) {
+    const error = customError(400, "Failed captcha verification");
+    logger.error("Failed captcha verification: ", error);
+    return next(error);
+  }
 
   const encryptPass = await bcrypt.hash(password, 10);
 
