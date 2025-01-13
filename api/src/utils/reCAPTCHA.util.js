@@ -11,5 +11,6 @@ export const validateCaptcha = async (token) => {
     return data.success;
   } catch (error) {
     logger.error("Couldn't validate captcha: ", error);
+    return false;
   }
 };
