@@ -21,7 +21,7 @@ const LoginRegister = () => {
       // Concatenating name
       setName(`${firstName} ${lastName}`);
 
-      const response = await axios.post("http://localhost:5000/signup", {
+      const response = await axios.post("http://localhost:3000/v1/auth/signup", {
         email,
         password,
         name,
@@ -99,27 +99,37 @@ const LoginRegister = () => {
                                 type="text"
                                 name="first-name"
                                 placeholder="First Name"
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
                               />
                               <input
                                 type="text"
                                 name="last-name"
                                 placeholder="Last Name"
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
                               />
                               <input
                                 type="password"
                                 name="user-password"
                                 placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                               />
                               <input
                                 name="user-email"
                                 placeholder="Email"
                                 type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                               />
 
                               <input
-                                type="text"
-                                name="address"
-                                placeholder="Address"
+                                type="tel"
+                                name="phone"
+                                placeholder="Phone Number"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
                               />
 
                               <div className="button-box flex justify-center">
