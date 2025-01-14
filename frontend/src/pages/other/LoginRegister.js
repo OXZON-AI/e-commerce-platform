@@ -2,7 +2,7 @@ import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
-import axios from '../../axiosConfig';
+import axios from "../../axiosConfig";
 import LayoutOne from "../../layouts/LayoutOne";
 
 const LoginRegister = () => {
@@ -11,37 +11,41 @@ const LoginRegister = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState(0);
+  const [phone, setPhone] = useState("");
 
   const handleRegSubmit = async (e) => {
     e.preventDefault();
 
     try {
-
       // Concatenating name
       setName(`${firstName} ${lastName}`);
 
-      const response = await axios.post("http://localhost:3000/v1/auth/signup", {
-        email,
-        password,
-        name,
-        phone,
-      });
+      const response = await axios.post(
+        "http://localhost:3000/v1/auth/signup",
+        {
+          email,
+          password,
+          name,
+          phone,
+        }
+      );
       alert(response.data.message);
     } catch (err) {
       alert(err.response.data.message);
     }
   };
 
-
   const handleLogSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost:3000/v1/auth/signin", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:3000/v1/auth/signin",
+        {
+          email,
+          password,
+        }
+      );
       alert(response.data.message);
       console.log("User signed in:", response.data.user);
     } catch (err) {
