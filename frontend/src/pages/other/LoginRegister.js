@@ -33,6 +33,22 @@ const LoginRegister = () => {
     }
   };
 
+
+  const handleLogSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post("http://localhost:3000/v1/auth/signin", {
+        email,
+        password,
+      });
+      alert(response.data.message);
+      console.log("User signed in:", response.data.user);
+    } catch (err) {
+      alert(err.response.data.message);
+    }
+  };
+
   return (
     <Fragment>
       <LayoutOne>
