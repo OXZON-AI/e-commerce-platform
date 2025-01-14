@@ -2,7 +2,7 @@ import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
-import axios from 'axios';
+import axios from '../../axiosConfig';
 import LayoutOne from "../../layouts/LayoutOne";
 
 const LoginRegister = () => {
