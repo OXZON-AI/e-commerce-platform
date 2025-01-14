@@ -74,16 +74,20 @@ const LoginRegister = () => {
                       <Tab.Pane eventKey="login">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            <form>
+                            <form onSubmit={handleLogSubmit}>
                               <input
-                                type="text"
-                                name="user-name"
-                                placeholder="Username"
+                                type="email"
+                                name="user-email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                               />
                               <input
                                 type="password"
                                 name="user-password"
                                 placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                               />
                               <div className="button-box">
                                 <div className="login-toggle-btn">
