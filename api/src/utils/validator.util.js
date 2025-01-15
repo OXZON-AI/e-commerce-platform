@@ -7,6 +7,7 @@ import {
 } from "./validationSchemas/auth.schema.js";
 import {
   createProductSchema,
+  createVariantSchema,
   deleteProductSchema,
   deleteVariantSchema,
   updateProductSchema,
@@ -22,6 +23,7 @@ export const validateRequestReset = validate(requestResetSchema);
 export const validatePasswordReset = validate(resetPasswordSchema);
 export const validateUpdateUser = validate(updateUserSchema);
 export const validateCreateProduct = validate(createProductSchema);
-export const validateDeleteProduct = validate(deleteProductSchema);
-export const validateDeleteVariant = validate(deleteVariantSchema);
 export const validateUpdateProduct = validate(updateProductSchema);
+export const validateDeleteProduct = validate(deleteProductSchema);
+export const validateCreateVariant = validate(createVariantSchema);
+export const validateDeleteVariant = validate(deleteVariantSchema);

@@ -4,6 +4,7 @@ import { Variant } from "../models/variant.model.js";
 import { logger } from "../utils/logger.util.js";
 import {
   validateCreateProduct,
+  validateCreateVariant,
   validateDeleteProduct,
   validateDeleteVariant,
   validateUpdateProduct,
@@ -135,6 +136,43 @@ export const deleteProduct = async (req, res, next) => {
     await session.endSession();
 
     logger.error(`Error deleting product with id ${pid}: `, error);
+    return next(error);
+  }
+};
+
+export const createVariant = async (req, res, next) => {
+  const { error, value } = validateCreateVariant({
+    pid: req.params.pid,
+    ...req.body,
+  });
+
+  if (error) return next(error);
+
+  const { pid, attributes, price, compareAtPrice, images } = value;
+
+  try {
+    const productExists = await Product.exists({ _id: pid });
+
+    if (!productExists) {
+      const error = customError(404, "Product not found");
+      logger.error(`Product with id ${pid} not found: `, error);
+      return next(error);
+    }
+
+    const variant = new Variant({
+      product: pid,
+      attributes,
+      price,
+      compareAtPrice,
+      images,
+    });
+
+    const { _id } = await variant.save();
+
+    logger.info(`Variant with id ${_id} created successfully.`);
+    return res.status(201).json({ message: "Variant created successfully" });
+  } catch (error) {
+    logger.error("Error creating variant: ", error);
     return next(error);
   }
 };

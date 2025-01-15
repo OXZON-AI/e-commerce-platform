@@ -73,6 +73,37 @@ export const deleteProductSchema = Joi.object({
     }),
 });
 
+export const createVariantSchema = Joi.object({
+  pid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Product id must be a valid ObjectId",
+    }),
+  attributes: Joi.array()
+    .items(
+      Joi.object({
+        name: Joi.string().required(),
+        value: Joi.string().required(),
+      })
+    )
+    .min(1)
+    .required(),
+  price: Joi.number().min(0).less(Joi.ref("compareAtPrice")).required(),
+  compareAtPrice: Joi.number().required(),
+  images: Joi.array()
+    .items(
+      Joi.object({
+        url: Joi.string().required(),
+        alt: Joi.string(),
+        isDefault: Joi.boolean(),
+      })
+    )
+    .min(1)
+    .required(),
+  isDefault: Joi.boolean(),
+});
+
 export const deleteVariantSchema = Joi.object({
   pid: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
