@@ -19,8 +19,8 @@ export const createProductSchema = Joi.object({
         attributes: Joi.array()
           .items(
             Joi.object({
-              name: Joi.string().required(),
-              value: Joi.string().required(),
+              name: Joi.string().lowercase().required(),
+              value: Joi.string().lowercase().required(),
             })
           )
           .min(1)
@@ -83,8 +83,8 @@ export const createVariantSchema = Joi.object({
   attributes: Joi.array()
     .items(
       Joi.object({
-        name: Joi.string().required(),
-        value: Joi.string().required(),
+        name: Joi.string().lowercase().required(),
+        value: Joi.string().lowercase().required(),
       })
     )
     .min(1)
@@ -101,6 +101,92 @@ export const createVariantSchema = Joi.object({
     )
     .min(1)
     .required(),
+  isDefault: Joi.boolean(),
+});
+
+export const updateVariantSchema = Joi.object({
+  pid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Product id must be a valid ObjectId",
+    }),
+  vid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Variant id must be a valid ObjectId",
+    }),
+  toAdd: Joi.object({
+    attributes: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string().lowercase().required(),
+          value: Joi.string().lowercase().required(),
+        })
+      )
+      .default([]),
+    images: Joi.array()
+      .items(
+        Joi.object({
+          url: Joi.string().required(),
+          alt: Joi.string(),
+          isDefault: Joi.boolean(),
+        })
+      )
+      .default([]),
+  }),
+  toChange: Joi.object({
+    attributes: Joi.array().items(
+      Joi.object({
+        name: Joi.string().lowercase().required(),
+        value: Joi.string().lowercase().required(),
+        id: Joi.string()
+          .regex(/^[0-9a-fA-F]{24}$/)
+          .required()
+          .messages({
+            "string.pattern.base": "Attribute id must be a valid ObjectId",
+          }),
+      })
+    ),
+    images: Joi.array().items(
+      Joi.object({
+        url: Joi.string().required(),
+        alt: Joi.string(),
+        isDefault: Joi.boolean(),
+        id: Joi.string()
+          .regex(/^[0-9a-fA-F]{24}$/)
+          .required()
+          .messages({
+            "string.pattern.base": "Image id must be a valid ObjectId",
+          }),
+      })
+    ),
+  }),
+  toRemove: Joi.object({
+    attributes: Joi.array()
+      .items(
+        Joi.string()
+          .regex(/^[0-9a-fA-F]{24}$/)
+          .required()
+          .messages({
+            "string.pattern.base": "Attribute id must be a valid ObjectId",
+          })
+      )
+      .default([]),
+    images: Joi.array()
+      .items(
+        Joi.string()
+          .regex(/^[0-9a-fA-F]{24}$/)
+          .required()
+          .messages({
+            "string.pattern.base": "Image id must be a valid ObjectId",
+          })
+      )
+      .default([]),
+  }),
+  price: Joi.number().min(0).less(Joi.ref("compareAtPrice")),
+  compareAtPrice: Joi.number(),
   isDefault: Joi.boolean(),
 });
 

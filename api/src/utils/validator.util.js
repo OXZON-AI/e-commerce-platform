@@ -11,6 +11,7 @@ import {
   deleteProductSchema,
   deleteVariantSchema,
   updateProductSchema,
+  updateVariantSchema,
 } from "./validationSchemas/product.schema.js";
 
 const validate = (schema) => (payload) => {
@@ -26,4 +27,5 @@ export const validateCreateProduct = validate(createProductSchema);
 export const validateUpdateProduct = validate(updateProductSchema);
 export const validateDeleteProduct = validate(deleteProductSchema);
 export const validateCreateVariant = validate(createVariantSchema);
+export const validateUpdateVariant = validate(updateVariantSchema);
 export const validateDeleteVariant = validate(deleteVariantSchema);

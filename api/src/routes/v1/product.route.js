@@ -6,6 +6,7 @@ import {
   deleteVariant,
   getProducts,
   updateProduct,
+  updateVariant,
 } from "../../controllers/product.controller.js";
 import { optionalAuth } from "../../middleware/optionalAuth.middleware.js";
 import { verifyToken } from "../../middleware/verifyToken.middleware.js";
@@ -17,6 +18,7 @@ router.post("/", verifyToken, verifyAdmin, createProduct);
 router.post("/:pid/variants", verifyToken, verifyAdmin, createVariant);
 router.get("/", optionalAuth, getProducts);
 router.put("/:pid", verifyToken, verifyAdmin, updateProduct);
+router.put("/:pid/variants/:vid", verifyToken, verifyAdmin, updateVariant);
 router.delete("/:pid", verifyToken, verifyAdmin, deleteProduct);
 router.delete("/:pid/variants/:vid", verifyToken, verifyAdmin, deleteVariant);
 

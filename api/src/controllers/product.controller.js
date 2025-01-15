@@ -8,6 +8,7 @@ import {
   validateDeleteProduct,
   validateDeleteVariant,
   validateUpdateProduct,
+  validateUpdateVariant,
 } from "../utils/validator.util.js";
 import { customError } from "../utils/error.util.js";
 
@@ -56,7 +57,7 @@ export const createProduct = async (req, res, next) => {
   }
 };
 
-export const getProduct = async (req, res, next) => {};
+export const getProduct = async () => {};
 
 export const getProducts = async (req, res, next) => {
   try {
@@ -173,6 +174,138 @@ export const createVariant = async (req, res, next) => {
     return res.status(201).json({ message: "Variant created successfully" });
   } catch (error) {
     logger.error("Error creating variant: ", error);
+    return next(error);
+  }
+};
+
+export const updateVariant = async (req, res, next) => {
+  const { error, value } = validateUpdateVariant({
+    pid: req.params.pid,
+    vid: req.params.vid,
+    ...req.body,
+  });
+
+  if (error) return next(error);
+
+  const {
+    pid,
+    vid,
+    toAdd,
+    toChange,
+    toRemove,
+    price,
+    compareAtPrice,
+    isDefault,
+  } = value;
+
+  const bulkOperations = [];
+
+  bulkOperations.push({
+    updateOne: {
+      filter: {
+        _id: vid,
+        product: pid,
+      },
+      update: {
+        $set: {
+          price,
+          compareAtPrice,
+          isDefault,
+        },
+      },
+    },
+  });
+
+  if (toAdd) {
+    bulkOperations.push({
+      updateOne: {
+        filter: {
+          _id: vid,
+          product: pid,
+        },
+        update: {
+          $addToSet: {
+            attributes: {
+              $each: toAdd.attributes,
+            },
+            images: {
+              $each: toAdd.images,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  if (toRemove) {
+    bulkOperations.push({
+      updateOne: {
+        filter: {
+          _id: vid,
+          product: pid,
+        },
+        update: {
+          $pull: {
+            attributes: {
+              _id: {
+                $in: toRemove.attributes,
+              },
+            },
+            images: {
+              _id: {
+                $in: toRemove.images,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  if (toChange) {
+    for (const attribute of toChange.attributes) {
+      bulkOperations.push({
+        updateOne: {
+          filter: { _id: vid, "attributes._id": attribute._id },
+          update: {
+            $set: {
+              "attributes.$.name": attribute.name,
+              "attributes.$.value": attribute.value,
+            },
+          },
+        },
+      });
+    }
+
+    for (const image of toChange.images) {
+      bulkOperations.push({
+        updateOne: {
+          filter: { _id: vid, "images._id": image._id },
+          update: {
+            $set: {
+              "images.$.url": image.url,
+              "images.$.alt": image.alt,
+              "images.$.isDefault": image.isDefault,
+            },
+          },
+        },
+      });
+    }
+  }
+
+  try {
+    const { matchedCount } = await Variant.bulkWrite(bulkOperations);
+
+    if (!matchedCount) {
+      const error = customError(404, "Variant not found");
+      logger.error(`Variant with id ${vid} not found: `, error);
+      return next(error);
+    }
+
+    logger.info(`Variant with id ${vid} updated successfully.`);
+    return res.status(200).json({ message: "Variant updated successfully" });
+  } catch (error) {
+    logger.error(`Error updating variant with id ${vid}: `, error);
     return next(error);
   }
 };
