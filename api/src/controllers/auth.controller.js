@@ -12,6 +12,7 @@ import jwt from "jsonwebtoken";
 import { createCart } from "../services/cart.service.js";
 import crypto from "crypto";
 import { sendEmails } from "../utils/emailer.util.js";
+import { validateCaptcha } from "../utils/reCAPTCHA.util.js";
 
 export const signup = async (req, res, next) => {
   const { error, value } = validateSignup(req.body);
@@ -69,9 +70,13 @@ export const signin = async (req, res, next) => {
       return next(error);
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "24h",
-    });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "24h",
+      }
+    );
 
     const { password: pass, role, ...rest } = user._doc;
 
