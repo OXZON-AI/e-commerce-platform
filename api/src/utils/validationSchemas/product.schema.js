@@ -44,6 +44,26 @@ export const createProductSchema = Joi.object({
     .required(),
 });
 
+export const updateProductSchema = Joi.object({
+  pid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Product id must be a valid ObjectId",
+    }),
+  name: Joi.string(),
+  description: Joi.object({
+    short: Joi.string(),
+    detailed: Joi.string(),
+  }),
+  category: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .messages({
+      "string.pattern.base": "Category must be a valid ObjectId",
+    }),
+  brand: Joi.string(),
+});
+
 export const deleteProductSchema = Joi.object({
   pid: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)

@@ -9,6 +9,7 @@ import {
   createProductSchema,
   deleteProductSchema,
   deleteVariantSchema,
+  updateProductSchema,
 } from "./validationSchemas/product.schema.js";
 
 const validate = (schema) => (payload) => {
@@ -23,3 +24,4 @@ export const validateUpdateUser = validate(updateUserSchema);
 export const validateCreateProduct = validate(createProductSchema);
 export const validateDeleteProduct = validate(deleteProductSchema);
 export const validateDeleteVariant = validate(deleteVariantSchema);
+export const validateUpdateProduct = validate(updateProductSchema);

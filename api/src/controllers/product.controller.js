@@ -6,6 +6,7 @@ import {
   validateCreateProduct,
   validateDeleteProduct,
   validateDeleteVariant,
+  validateUpdateProduct,
 } from "../utils/validator.util.js";
 import { customError } from "../utils/error.util.js";
 
@@ -64,7 +65,45 @@ export const getProducts = async (req, res, next) => {
   }
 };
 
-export const updateProduct = async (req, res, next) => {};
+export const updateProduct = async (req, res, next) => {
+  const { error, value } = validateUpdateProduct({
+    pid: req.params.pid,
+    ...req.body,
+  });
+
+  if (error) return next(error);
+
+  const { pid, name, description, category, brand } = value;
+
+  try {
+    const product = await Product.findByIdAndUpdate(
+      { _id: pid },
+      {
+        $set: {
+          name,
+          description,
+          category,
+          brand,
+        },
+      },
+      { new: true }
+    );
+
+    if (!product) {
+      const error = customError(404, "Product not found");
+      logger.error(`Product with id ${pid} not found: `, error);
+      return next(error);
+    }
+
+    logger.info(`Product with id ${pid} updated successfully.`);
+    return res
+      .status(200)
+      .json({ message: "Product updated successfully", product });
+  } catch (error) {
+    logger.error(`Error updating product with id ${pid}: `, error);
+    return next(error);
+  }
+};
 
 export const deleteProduct = async (req, res, next) => {
   const { error, value } = validateDeleteProduct({ pid: req.params.pid });

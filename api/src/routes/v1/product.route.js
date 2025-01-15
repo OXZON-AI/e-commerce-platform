@@ -4,6 +4,7 @@ import {
   deleteProduct,
   deleteVariant,
   getProducts,
+  updateProduct,
 } from "../../controllers/product.controller.js";
 import { optionalAuth } from "../../middleware/optionalAuth.middleware.js";
 import { verifyToken } from "../../middleware/verifyToken.middleware.js";
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.post("/", verifyToken, verifyAdmin, createProduct);
 router.get("/", optionalAuth, getProducts);
+router.put("/:pid", verifyToken, verifyAdmin, updateProduct);
 router.delete("/:pid", verifyToken, verifyAdmin, deleteProduct);
 router.delete("/:pid/variants/:vid", verifyToken, verifyAdmin, deleteVariant);
 
