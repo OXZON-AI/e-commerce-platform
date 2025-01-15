@@ -4,7 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
-
+const ForgotPassword = lazy(() => import("./pages/other/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/other/ResetPassword"));
 
 
 const App = () => {
@@ -27,6 +28,14 @@ const App = () => {
                 path={process.env.PUBLIC_URL + "/login-register"}
                 element={<LoginRegister/>}
               />
+              <Route
+              path={process.env.PUBLIC_URL + "/forgot-password"}
+              element={<ForgotPassword />}
+            />
+            <Route
+              path={process.env.PUBLIC_URL + "/reset-password"}
+              element={<ResetPassword />}
+            />
 
               
             </Routes>
