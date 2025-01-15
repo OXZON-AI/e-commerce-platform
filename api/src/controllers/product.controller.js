@@ -5,6 +5,7 @@ import { logger } from "../utils/logger.util.js";
 import {
   validateCreateProduct,
   validateDeleteProduct,
+  validateDeleteVariant,
 } from "../utils/validator.util.js";
 import { customError } from "../utils/error.util.js";
 
@@ -43,7 +44,7 @@ export const createProduct = async (req, res, next) => {
     await session.endSession();
 
     logger.info("Product created successfully.");
-    res.status(201).json({ message: "Product created successfully" });
+    return res.status(201).json({ message: "Product created successfully" });
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
@@ -66,35 +67,62 @@ export const getProducts = async (req, res, next) => {
 export const updateProduct = async (req, res, next) => {};
 
 export const deleteProduct = async (req, res, next) => {
-  const { error, value } = validateDeleteProduct({ id: req.params.id });
+  const { error, value } = validateDeleteProduct({ pid: req.params.pid });
 
   if (error) return next(error);
 
-  const { id } = value;
+  const { pid } = value;
 
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const product = await Product.findByIdAndDelete(id).session(session);
+    const product = await Product.findByIdAndDelete(pid).session(session);
 
     if (!product) {
       const error = customError(404, "Product not found");
-      logger.error(`Product with id ${id} not found: `, error);
+      logger.error(`Product with id ${pid} not found: `, error);
       return next(error);
     }
 
-    await Variant.deleteMany({ product: id }).session(session);
+    await Variant.deleteMany({ product: pid }).session(session);
 
     await session.commitTransaction();
     await session.endSession();
 
-    logger.info(`Product with id ${id} deleted successfully.`);
-    res.status(200).json({ message: "Product deleted successfully" });
+    logger.info(`Product with id ${pid} deleted successfully.`);
+    return res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
 
-    logger.error(`Error deleting product with id ${id}: `, error);
+    logger.error(`Error deleting product with id ${pid}: `, error);
+    return next(error);
+  }
+};
+
+export const deleteVariant = async (req, res, next) => {
+  const { error, value } = validateDeleteVariant({
+    pid: req.params.pid,
+    vid: req.params.vid,
+  });
+
+  if (error) return next(error);
+
+  const { pid, vid } = value;
+
+  try {
+    const variant = await Variant.findOneAndDelete({ _id: vid, product: pid });
+
+    if (!variant) {
+      const error = customError(404, "Variant not found");
+      logger.error(`Variant with id ${vid} not found: `, error);
+      return next(error);
+    }
+
+    logger.info(`Variant with id ${vid} deleted successfully.`);
+    return res.status(200).json({ message: "Variant deleted successfully" });
+  } catch (error) {
+    logger.error(`Error deleting variant with id ${vid}: `, error);
     return next(error);
   }
 };

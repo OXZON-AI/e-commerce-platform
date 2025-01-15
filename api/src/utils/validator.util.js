@@ -1,12 +1,15 @@
 import {
-  createProductSchema,
-  deleteProductSchema,
   requestResetSchema,
   resetPasswordSchema,
   signinSchema,
   signupSchema,
   updateUserSchema,
-} from "./schemas.util.js";
+} from "./validationSchemas/auth.schema.js";
+import {
+  createProductSchema,
+  deleteProductSchema,
+  deleteVariantSchema,
+} from "./validationSchemas/product.schema.js";
 
 const validate = (schema) => (payload) => {
   return schema.validate(payload, { abortEarly: false });
@@ -19,3 +22,4 @@ export const validatePasswordReset = validate(resetPasswordSchema);
 export const validateUpdateUser = validate(updateUserSchema);
 export const validateCreateProduct = validate(createProductSchema);
 export const validateDeleteProduct = validate(deleteProductSchema);
+export const validateDeleteVariant = validate(deleteVariantSchema);
