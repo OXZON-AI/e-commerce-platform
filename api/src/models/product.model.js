@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
+import { generateSlug } from "../utils/generateSlug.util.js";
+import { logger } from "../utils/logger.util.js";
 
 const productSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
-      index: true,
     },
     slug: {
       type: String,
-      required: true,
       unique: true,
     },
     description: {
@@ -21,12 +21,6 @@ const productSchema = new mongoose.Schema(
       ref: "Category",
       required: true,
     },
-    variants: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Variant",
-      },
-    ],
     ratings: {
       average: { type: Number, default: 0 },
       count: { type: Number, default: 0 },
@@ -41,8 +35,25 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-// Indexes
-productSchema.index({ name: "text" });
-productSchema.index({ slug: 1 });
+productSchema.index({ name: "text", "description.short": "text" });
+
+productSchema.pre("save", async function (next) {
+  let generatedSlug = generateSlug(this.name);
+
+  try {
+    const exists = await mongoose
+      .model("Product")
+      .findOne({ slug: generatedSlug, _id: { $ne: this._id } });
+
+    if (exists) generatedSlug = `${generatedSlug}-${Date.now()}`;
+
+    this.slug = generatedSlug;
+
+    next();
+  } catch (error) {
+    logger.error("Error generating slug: ", error);
+    next(error);
+  }
+});
 
 export const Product = mongoose.model("Product", productSchema);
