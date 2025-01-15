@@ -18,20 +18,22 @@ const LoginRegister = () => {
 
     try {
       // Concatenating name
-      setName(`${firstName} ${lastName}`);
+      const fullName = `${firstName} ${lastName}`;
 
       const response = await axios.post(
         "http://localhost:3000/v1/auth/signup",
         {
           email,
           password,
-          name,
+          name: fullName, //using concatenated value for name
           phone,
         }
       );
       alert(response.data.message);
     } catch (err) {
-      alert(err.response.data.message);
+      const errorMessage =
+        err.response?.data?.message || "An error occurred during signup.";
+      alert(errorMessage);
     }
   };
 
