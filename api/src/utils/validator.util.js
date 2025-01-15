@@ -1,5 +1,6 @@
 import {
   createProductSchema,
+  deleteProductSchema,
   requestResetSchema,
   resetPasswordSchema,
   signinSchema,
@@ -17,3 +18,4 @@ export const validateRequestReset = validate(requestResetSchema);
 export const validatePasswordReset = validate(resetPasswordSchema);
 export const validateUpdateUser = validate(updateUserSchema);
 export const validateCreateProduct = validate(createProductSchema);
+export const validateDeleteProduct = validate(deleteProductSchema);

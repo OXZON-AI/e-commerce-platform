@@ -72,3 +72,12 @@ export const createProductSchema = Joi.object({
     .min(1)
     .required(),
 });
+
+export const deleteProductSchema = Joi.object({
+  id: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Product id must be a valid ObjectId",
+    }),
+});
