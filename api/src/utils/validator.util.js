@@ -5,6 +5,7 @@ import {
   signupSchema,
   updateUserSchema,
 } from "./validationSchemas/auth.schema.js";
+import { createCategorySchema } from "./validationSchemas/category.schema.js";
 import {
   createProductSchema,
   createVariantSchema,
@@ -33,3 +34,4 @@ export const validateDeleteProduct = validate(deleteProductSchema);
 export const validateCreateVariant = validate(createVariantSchema);
 export const validateUpdateVariant = validate(updateVariantSchema);
 export const validateDeleteVariant = validate(deleteVariantSchema);
+export const validateCreateCategory = validate(createCategorySchema);
