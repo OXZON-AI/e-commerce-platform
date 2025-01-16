@@ -1,9 +1,10 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
 import axios from "../../axiosConfig";
 import LayoutOne from "../../layouts/LayoutOne";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const LoginRegister = () => {
   const [email, setEmail] = useState("");
@@ -12,13 +13,20 @@ const LoginRegister = () => {
   const [lastName, setLastName] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const loginCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is login form ReCaptcha element
+  const registerCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is register form ReCaptcha element
 
-  const handleRegSubmit = async (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
 
     try {
       // Concatenating name
       const fullName = `${firstName} ${lastName}`;
+
+      // ReCaptcha Token
+      const token = await loginCaptchaRef.current.executeAsync();
+      loginCaptchaRef.current.reset(); // allow to re-excute the reCapture check
+      console.log("ReCaptcha Token : ", token);
 
       const response = await axios.post(
         "http://localhost:3000/v1/auth/signup",
@@ -27,6 +35,7 @@ const LoginRegister = () => {
           password,
           name: fullName, //using concatenated value for name
           phone,
+          token,
         }
       );
       alert(response.data.message);
@@ -37,10 +46,15 @@ const LoginRegister = () => {
     }
   };
 
-  const handleLogSubmit = async (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // ReCaptcha Token
+      const token = await registerCaptchaRef.current.executeAsync();
+      registerCaptchaRef.current.reset(); // allow to re-excute the reCapture check
+      console.log("ReCaptcha Token : ", token);
+
       const response = await axios.post(
         "http://localhost:3000/v1/auth/signin",
         {
@@ -80,7 +94,7 @@ const LoginRegister = () => {
                       <Tab.Pane eventKey="login">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            <form onSubmit={handleLogSubmit}>
+                            <form onSubmit={handleLoginSubmit}>
                               <input
                                 type="email"
                                 name="user-email"
@@ -104,6 +118,12 @@ const LoginRegister = () => {
                                   </Link>
                                 </div>
 
+                                <ReCAPTCHA
+                                  sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                                  size="invisible"
+                                  ref={loginCaptchaRef}
+                                />
+
                                 <div className="button-box flex justify-center">
                                   <button
                                     type="submit"
@@ -120,7 +140,7 @@ const LoginRegister = () => {
                       <Tab.Pane eventKey="register">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            <form onSubmit={handleRegSubmit}>
+                            <form onSubmit={handleRegisterSubmit}>
                               <input
                                 type="text"
                                 name="first-name"
@@ -156,6 +176,12 @@ const LoginRegister = () => {
                                 placeholder="Phone Number"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
+                              />
+
+                              <ReCAPTCHA
+                                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                                size="invisible"
+                                ref={registerCaptchaRef}
                               />
 
                               <div className="button-box flex justify-center">
