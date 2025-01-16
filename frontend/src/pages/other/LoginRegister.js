@@ -1,11 +1,60 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
-
+import axios from "../../axiosConfig";
 import LayoutOne from "../../layouts/LayoutOne";
 
 const LoginRegister = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const handleRegSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      // Concatenating name
+      const fullName = `${firstName} ${lastName}`;
+
+      const response = await axios.post(
+        "http://localhost:3000/v1/auth/signup",
+        {
+          email,
+          password,
+          name: fullName, //using concatenated value for name
+          phone,
+        }
+      );
+      alert(response.data.message);
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "An error occurred during signup.";
+      alert(errorMessage);
+    }
+  };
+
+  const handleLogSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/v1/auth/signin",
+        {
+          email,
+          password,
+        }
+      );
+      alert(response.data.message);
+      console.log("User signed in:", response.data.user);
+    } catch (err) {
+      alert(err.response.data.message);
+    }
+  };
+
   return (
     <Fragment>
       <LayoutOne>
@@ -31,16 +80,20 @@ const LoginRegister = () => {
                       <Tab.Pane eventKey="login">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            <form>
+                            <form onSubmit={handleLogSubmit}>
                               <input
-                                type="text"
-                                name="user-name"
-                                placeholder="Username"
+                                type="email"
+                                name="user-email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                               />
                               <input
                                 type="password"
                                 name="user-password"
                                 placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                               />
                               <div className="button-box">
                                 <div className="login-toggle-btn">
@@ -67,32 +120,42 @@ const LoginRegister = () => {
                       <Tab.Pane eventKey="register">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            <form>
+                            <form onSubmit={handleRegSubmit}>
                               <input
                                 type="text"
                                 name="first-name"
                                 placeholder="First Name"
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
                               />
                               <input
                                 type="text"
                                 name="last-name"
                                 placeholder="Last Name"
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
                               />
                               <input
                                 type="password"
                                 name="user-password"
                                 placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                               />
                               <input
                                 name="user-email"
                                 placeholder="Email"
                                 type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                               />
 
                               <input
-                                type="text"
-                                name="address"
-                                placeholder="Address"
+                                type="tel"
+                                name="phone"
+                                placeholder="Phone Number"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
                               />
 
                               <div className="button-box flex justify-center">
