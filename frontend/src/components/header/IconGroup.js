@@ -55,6 +55,11 @@ const IconGroup = ({ iconWhiteClass }) => {
                 my account
               </Link>
             </li>
+            <li>
+              <Link to={process.env.PUBLIC_URL + "/"}>
+                Log out
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
