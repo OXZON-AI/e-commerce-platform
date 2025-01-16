@@ -218,3 +218,23 @@
   level: 'info',
   timestamp: '2025-01-15T13:32:30.450Z'
 }
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-16T11:25:57.141Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-16T11:25:59.877Z'
+}
+{
+  statusCode: 400,
+  level: 'error',
+  message: 'Failed captcha verification:  Failed captcha verification',
+  stack: 'Error: Failed captcha verification\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at signup (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:27:19)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)',
+  timestamp: '2025-01-16T11:41:14.239Z'
+}

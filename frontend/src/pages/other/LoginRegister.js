@@ -26,7 +26,6 @@ const LoginRegister = () => {
       // ReCaptcha Token
       const token = await loginCaptchaRef.current.executeAsync();
       loginCaptchaRef.current.reset(); // allow to re-excute the reCapture check
-      console.log("ReCaptcha Token : ", token);
 
       const response = await axios.post(
         "http://localhost:3000/v1/auth/signup",
@@ -53,7 +52,6 @@ const LoginRegister = () => {
       // ReCaptcha Token
       const token = await registerCaptchaRef.current.executeAsync();
       registerCaptchaRef.current.reset(); // allow to re-excute the reCapture check
-      console.log("ReCaptcha Token : ", token);
 
       const response = await axios.post(
         "http://localhost:3000/v1/auth/signin",
@@ -62,7 +60,7 @@ const LoginRegister = () => {
           password,
         }
       );
-      alert(response.data.message);
+      alert("User signed in as " + response.data.user.name);
       console.log("User signed in:", response.data.user);
     } catch (err) {
       alert(err.response.data.message);
