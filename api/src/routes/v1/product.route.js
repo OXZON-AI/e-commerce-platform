@@ -4,11 +4,11 @@ import {
   createVariant,
   deleteProduct,
   deleteVariant,
+  getProduct,
   getProducts,
   updateProduct,
   updateVariant,
 } from "../../controllers/product.controller.js";
-import { optionalAuth } from "../../middleware/optionalAuth.middleware.js";
 import { verifyToken } from "../../middleware/verifyToken.middleware.js";
 import { verifyAdmin } from "../../middleware/verifyAdmin.middleware.js";
 
@@ -16,7 +16,8 @@ const router = express.Router();
 
 router.post("/", verifyToken, verifyAdmin, createProduct);
 router.post("/:pid/variants", verifyToken, verifyAdmin, createVariant);
-router.get("/", optionalAuth, getProducts);
+router.get("/", getProducts);
+router.get("/:slug", getProduct);
 router.put("/:pid", verifyToken, verifyAdmin, updateProduct);
 router.put("/:pid/variants/:vid", verifyToken, verifyAdmin, updateVariant);
 router.delete("/:pid", verifyToken, verifyAdmin, deleteProduct);

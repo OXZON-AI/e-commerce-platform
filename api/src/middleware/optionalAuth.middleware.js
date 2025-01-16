@@ -6,7 +6,8 @@ export const optionalAuth = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    req.user.role = "customer";
+    req.user = { role: "customer" };
+
     logger.info(
       "No token provided, passing as a guest user to the next middleware."
     );

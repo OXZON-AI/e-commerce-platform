@@ -44,6 +44,26 @@ export const createProductSchema = Joi.object({
     .required(),
 });
 
+export const getProductSchema = Joi.object({
+  slug: Joi.string().required(),
+});
+
+export const getProductsSchema = Joi.object({
+  search: Joi.string(),
+  category: Joi.string(),
+  brand: Joi.string(),
+  sortBy: Joi.string().valid("ratings", "price"),
+  sortOrder: Joi.string().valid("asc", "desc"),
+  minPrice: Joi.when("maxPrice", {
+    is: Joi.exist(),
+    then: Joi.number().less(Joi.ref("maxPrice")),
+    otherwise: Joi.number().min(1),
+  }),
+  maxPrice: Joi.number().min(1),
+  page: Joi.number().min(1),
+  limit: Joi.number().min(1),
+});
+
 export const updateProductSchema = Joi.object({
   pid: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)

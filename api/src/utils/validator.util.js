@@ -10,6 +10,8 @@ import {
   createVariantSchema,
   deleteProductSchema,
   deleteVariantSchema,
+  getProductSchema,
+  getProductsSchema,
   updateProductSchema,
   updateVariantSchema,
 } from "./validationSchemas/product.schema.js";
@@ -24,6 +26,8 @@ export const validateRequestReset = validate(requestResetSchema);
 export const validatePasswordReset = validate(resetPasswordSchema);
 export const validateUpdateUser = validate(updateUserSchema);
 export const validateCreateProduct = validate(createProductSchema);
+export const validateGetProduct = validate(getProductSchema);
+export const validateGetProducts = validate(getProductsSchema);
 export const validateUpdateProduct = validate(updateProductSchema);
 export const validateDeleteProduct = validate(deleteProductSchema);
 export const validateCreateVariant = validate(createVariantSchema);

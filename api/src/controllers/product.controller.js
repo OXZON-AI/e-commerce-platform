@@ -7,6 +7,8 @@ import {
   validateCreateVariant,
   validateDeleteProduct,
   validateDeleteVariant,
+  validateGetProduct,
+  validateGetProducts,
   validateUpdateProduct,
   validateUpdateVariant,
 } from "../utils/validator.util.js";
@@ -46,7 +48,7 @@ export const createProduct = async (req, res, next) => {
     await session.commitTransaction();
     await session.endSession();
 
-    logger.info("Product created successfully.");
+    logger.info(`Product with id ${_id} created successfully.`);
     return res.status(201).json({ message: "Product created successfully" });
   } catch (error) {
     await session.abortTransaction();
@@ -57,10 +59,265 @@ export const createProduct = async (req, res, next) => {
   }
 };
 
-export const getProduct = async () => {};
+export const getProduct = async (req, res, next) => {
+  const { error, value } = validateGetProduct({ slug: req.params.slug });
+
+  if (error) return next(error);
+
+  const { slug } = value;
+
+  try {
+    const product = await Product.aggregate([
+      {
+        $match: {
+          slug,
+        },
+      },
+      {
+        $lookup: {
+          from: "variants",
+          localField: "_id",
+          foreignField: "product",
+          as: "variants",
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          slug: 1,
+          description: 1,
+          category: {
+            $arrayElemAt: [
+              {
+                $map: {
+                  input: "$category",
+                  as: "category",
+                  in: {
+                    _id: "$$category._id",
+                    name: "$$category.name",
+                    slug: "$$category.slug",
+                  },
+                },
+              },
+
+              0,
+            ],
+          },
+          ratings: 1,
+          brand: 1,
+          variants: {
+            attributes: 1,
+            price: 1,
+            compareAtPrice: 1,
+            stock: 1,
+            images: 1,
+            isDefault: 1,
+            sku: 1,
+          },
+        },
+      },
+    ]);
+
+    if (!product.length) {
+      const error = customError(404, "Product not found");
+      logger.error(`Product with slug ${slug} not found: `, error);
+      return next(error);
+    }
+
+    logger.info(`Product with slug ${slug} fetched successfully.`);
+    return res.status(200).json(product[0]);
+  } catch (error) {
+    logger.error(`Error fetching product with slug ${slug}: `, error);
+    return next(error);
+  }
+};
 
 export const getProducts = async (req, res, next) => {
+  const { error, value } = validateGetProducts(req.query);
+
+  if (error) return next(error);
+
+  const {
+    search,
+    category,
+    brand,
+    sortBy,
+    sortOrder,
+    minPrice,
+    maxPrice,
+    page,
+    limit,
+  } = value;
+  const skip = (page - 1) * limit;
+  const sortByField =
+    sortBy === "ratings" ? "ratings.average" : "defaultVariant.price";
+
+  const pipeline = [];
+
+  if (search) {
+    pipeline.push({
+      $search: {
+        index: "default",
+        text: {
+          query: search,
+          path: ["name", "description.short", "brand"],
+          fuzzy: {
+            maxEdits: 2,
+            prefixLength: 0,
+            maxExpansions: 50,
+          },
+        },
+        count: {
+          type: "total",
+        },
+      },
+    });
+  } else {
+    pipeline.push({
+      $match: {
+        _id: { $exists: true },
+      },
+    });
+  }
+
+  pipeline.push({
+    $lookup: {
+      from: "variants",
+      localField: "_id",
+      foreignField: "product",
+      as: "variants",
+    },
+  });
+
+  pipeline.push({
+    $lookup: {
+      from: "categories",
+      localField: "category",
+      foreignField: "_id",
+      as: "category",
+    },
+  });
+
+  if (category || brand) {
+    pipeline.push({
+      $match: {
+        ...(category && { "category.slug": category }),
+        ...(brand && { brand }),
+      },
+    });
+  }
+
+  pipeline.push({
+    $project: {
+      name: 1,
+      slug: 1,
+      "description.short": 1,
+      category: {
+        $arrayElemAt: [
+          {
+            $map: {
+              input: "$category",
+              as: "category",
+              in: {
+                _id: "$$category._id",
+                name: "$$category.name",
+                slug: "$$category.slug",
+              },
+            },
+          },
+          0,
+        ],
+      },
+      ratings: 1,
+      brand: 1,
+      defaultVariant: {
+        $arrayElemAt: [
+          {
+            $map: {
+              input: {
+                $filter: {
+                  input: "$variants",
+                  as: "variant",
+                  cond: {
+                    $eq: ["$$variant.isDefault", true],
+                  },
+                },
+              },
+              as: "variant",
+              in: {
+                _id: "$$variant._id",
+                price: "$$variant.price",
+                stock: "$$variant.stock",
+                image: {
+                  $arrayElemAt: [
+                    {
+                      $map: {
+                        input: {
+                          $filter: {
+                            input: "$$variant.images",
+                            as: "image",
+                            cond: {
+                              $eq: ["$$image.isDefault", true],
+                            },
+                          },
+                        },
+                        as: "image",
+                        in: {
+                          url: "$$image.url",
+                          alt: "$$image.alt",
+                        },
+                      },
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
+          },
+          0,
+        ],
+      },
+    },
+  });
+
+  if (minPrice || maxPrice) {
+    pipeline.push({
+      $match: {
+        "defaultVariant.price": {
+          ...(minPrice && { $gte: minPrice }),
+          ...(maxPrice && { $lte: maxPrice }),
+        },
+      },
+    });
+  }
+
+  pipeline.push({
+    $sort: {
+      [sortByField]: sortOrder === "asc" ? 1 : -1,
+    },
+  });
+
+  pipeline.push({
+    $skip: skip,
+  });
+
+  pipeline.push({
+    $limit: limit,
+  });
+
   try {
+    const products = await Product.aggregate(pipeline);
+
+    logger.info("Products fetched successfully.");
+    return res.status(200).json(products);
   } catch (error) {
     logger.error("Error fetching products: ", error);
     return next(error);
