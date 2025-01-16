@@ -238,3 +238,63 @@
     '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)',
   timestamp: '2025-01-16T11:41:14.239Z'
 }
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-16T12:12:40.394Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-16T12:12:41.866Z'
+}
+{
+  message: 'User with email test@gmail.com registered successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:13:16.891Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:19:28.390Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:20:14.362Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:20:32.485Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:20:38.665Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:20:48.963Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:21:07.168Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:37:36.633Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:37:43.682Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:38:56.522Z'
+}
