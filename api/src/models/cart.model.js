@@ -6,9 +6,12 @@ const cartSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    guestId: {
+      type: String,
+    },
     items: [
       {
-        varient: {
+        variant: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Variant",
           required: true,
@@ -33,5 +36,6 @@ const cartSchema = new mongoose.Schema(
 );
 
 cartSchema.index({ user: 1 });
+cartSchema.index({ guestId: 1 }, { sparse: true });
 
 export const Cart = mongoose.model("Cart", cartSchema);
