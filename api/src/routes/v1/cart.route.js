@@ -12,6 +12,7 @@ const route = express.Router();
 
 route.post("/items", optionalAuth, addToCart);
 route.get("/", optionalAuth, getCart);
+route.put("/items/:vid", verifyToken, updateCart);
 route.delete("/items/:vid", verifyToken, removeFromCart);
 
 export default route;

@@ -147,3 +147,75 @@ export const removeFromCart = async (req, res, next) => {
   }
 };
 
+export const updateCart = async (req, res, next) => {
+  const { id, role } = req.user;
+  const { error, value } = validateUpdateCart({
+    vid: req.params.vid,
+    quantity: req.body.quantity,
+  });
+
+  if (error) return next(error);
+
+  const { vid, quantity } = value;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    let cart = await findOrCreateCart(id, role, session);
+
+    const item = cart.items.find((item) => item.variant._id == vid);
+
+    if (!item) {
+      const error = customError(404, "Item not found in cart");
+      logger.error(
+        `Item with variant id ${vid} not found in cart with id ${cart._id}: `,
+        error
+      );
+      return next(error);
+    }
+
+    const variant = await Variant.findById(vid)
+      .select("price stock")
+      .lean()
+      .session(session);
+
+    if (!variant) {
+      const error = customError(404, "Variant not found");
+      logger.error(`Variant with id ${vid} not found: `, error);
+      return next(error);
+    }
+
+    const diff = quantity - item.quantity;
+
+    if (diff > 0 && variant.stock < diff) {
+      const error = customError(400, "Insufficient stock");
+      logger.error(`Insufficient stock for variant with id ${vid}: `, error);
+      return next(error);
+    }
+
+    item.quantity = quantity;
+    item.subTotal = quantity * variant.price;
+
+    cart.total += diff * variant.price;
+
+    await Variant.findByIdAndUpdate(vid, {
+      $inc: { stock: -diff },
+    }).session(session);
+
+    await cart.save({ session });
+
+    await session.commitTransaction();
+
+    logger.info(
+      `Cart with id ${cart._id} updated successfully for user ${id}.`
+    );
+    return res.status(200).json({ message: "Cart updated successfully" });
+  } catch (error) {
+    await session.abortTransaction();
+
+    logger.error(`Error updating cart: `, error);
+    return next(error);
+  } finally {
+    await session.endSession();
+  }
+};

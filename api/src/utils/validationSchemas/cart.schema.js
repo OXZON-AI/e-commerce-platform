@@ -19,3 +19,13 @@ export const removeFromCartSchema = Joi.object({
     .required(),
 });
 
+export const updateCartSchema = Joi.object({
+  vid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .messages({
+      "string.pattern.base": "Variant must be a valid ObjectId",
+      "any.required": "Variant is required",
+    })
+    .required(),
+  quantity: Joi.number().min(1).required(),
+});

@@ -42,3 +42,4 @@ export const validateDeleteVariant = validate(deleteVariantSchema);
 export const validateCreateCategory = validate(createCategorySchema);
 export const validateAddToCart = validate(addToCartSchema);
 export const validateRemoveFromCart = validate(removeFromCartSchema);
+export const validateUpdateCart = validate(updateCartSchema);
