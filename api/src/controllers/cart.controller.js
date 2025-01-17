@@ -97,3 +97,53 @@ export const addToCart = async (req, res, next) => {
   }
 };
 
+export const removeFromCart = async (req, res, next) => {
+  const { id, role } = req.user;
+  const { error, value } = validateRemoveFromCart(req.params);
+
+  if (error) return next(error);
+
+  const { vid } = value;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    let cart = await findOrCreateCart(id, role, session);
+
+    const item = cart.items.find((item) => item.variant._id == vid);
+
+    if (!item) {
+      const error = customError(404, "Item not found in cart");
+      logger.error(
+        `Item with variant id ${vid} not found in cart with id ${cart._id}: `,
+        error
+      );
+      return next(error);
+    }
+
+    cart.total -= item.subTotal;
+
+    await Variant.findByIdAndUpdate(vid, {
+      $inc: { stock: item.quantity },
+    }).session(session);
+
+    cart.items = cart.items.filter((item) => item.variant._id != vid);
+
+    await cart.save({ session });
+
+    await session.commitTransaction();
+
+    logger.info(
+      `Variant with id ${vid} removed from cart with id ${cart._id} for user ${id}.`
+    );
+    return res.status(200).json({ message: "Item removed successfully" });
+  } catch (error) {
+    await session.abortTransaction();
+
+    logger.error(`Error removing item from cart: `, error);
+    return next(error);
+  } finally {
+    await session.endSession();
+  }
+};
+
