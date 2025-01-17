@@ -1,14 +1,23 @@
 import { customError } from "../utils/error.util.js";
 import jwt from "jsonwebtoken";
 import { logger } from "../utils/logger.util.js";
+import { v4 as uuidv4 } from "uuid";
 
 export const optionalAuth = (req, res, next) => {
-  const token = req.cookies.token;
+  let token = req.cookies.token;
 
   if (!token) {
-    req.user.role = "customer";
+    const id = uuidv4();
+
+    token = jwt.sign({ id, role: "guest" }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
+    req.user = { id, role: "guest" };
+    res.cookie("token", token, { httpOnly: true });
+
     logger.info(
-      "No token provided, passing as a guest user to the next middleware."
+      `No token provided, created a guest token for ${id} and passing to the next middleware.`
     );
     return next();
   }

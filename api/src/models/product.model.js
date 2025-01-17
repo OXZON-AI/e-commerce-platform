@@ -35,8 +35,6 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-productSchema.index({ name: "text", "description.short": "text" });
-
 productSchema.pre("save", async function (next) {
   let generatedSlug = generateSlug(this.name);
 
