@@ -13,6 +13,7 @@ import { createCart } from "../services/cart.service.js";
 import crypto from "crypto";
 import { sendEmails } from "../utils/emailer.util.js";
 import { validateCaptcha } from "../utils/reCAPTCHA.util.js";
+import mongoose from "mongoose";
 
 export const signup = async (req, res, next) => {
   const { error, value } = validateSignup(req.body);
@@ -31,15 +32,29 @@ export const signup = async (req, res, next) => {
 
   const encryptPass = await bcrypt.hash(password, 10);
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const user = await createUser(email, encryptPass, name, phone);
-    await createCart(user._id);
+    const user = await createUser(email, encryptPass, name, phone, session);
+    await createCart({ user: user._id }, session);
+
+    await session.commitTransaction();
 
     logger.info(`User with email ${email} registered successfully.`);
     return res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
+    await session.abortTransaction();
+
+    if (error.code === 11000) {
+      const error = customError(400, "Email already exists");
+      logger.error(`Email ${email} already exists: `, error);
+      return next(error);
+    }
+
     logger.error("Couldn't register user: ", error);
     return next(error);
+  } finally {
+    await session.endSession();
   }
 };
 
