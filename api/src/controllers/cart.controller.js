@@ -23,3 +23,77 @@ export const getCart = async (req, res, next) => {
   }
 };
 
+export const addToCart = async (req, res, next) => {
+  const { id, role } = req.user;
+  const { error, value } = validateAddToCart(req.body);
+
+  if (error) return next(error);
+
+  const { variant: vid, quantity } = value;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const variant = await Variant.findById(vid)
+      .select("price stock")
+      .lean()
+      .session(session);
+
+    if (!variant) {
+      const error = customError(404, "Variant not found");
+      logger.error(`Variant with id ${vid} not found: `, error);
+      return next(error);
+    }
+
+    if (variant.stock < quantity) {
+      const error = customError(400, "Insufficient stock");
+      logger.error(`Insufficient stock for variant with id ${vid}: `, error);
+      return next(error);
+    }
+
+    let cart = await findOrCreateCart(id, role, session);
+
+    const item = cart.items.find((item) => item.variant._id == vid);
+
+    let subTotal = 0;
+
+    if (item) {
+      item.quantity += quantity;
+      subTotal = quantity * item.variant.price;
+      item.subTotal += subTotal;
+    } else {
+      subTotal = quantity * variant.price;
+      cart.items.push({
+        variant: vid,
+        quantity,
+        subTotal,
+      });
+    }
+
+    await Variant.findByIdAndUpdate(vid, {
+      $inc: { stock: -quantity },
+    }).session(session);
+
+    cart.total += subTotal;
+
+    await cart.save({ session });
+
+    await session.commitTransaction();
+
+    logger.info(
+      `Variant with id ${vid} added to cart with id ${cart._id} for user ${id}.`
+    );
+    return res.status(201).json({ message: "Item added successfully" });
+  } catch (error) {
+    await session.abortTransaction();
+
+    logger.error(
+      `Error adding variant with id ${vid} to cart for user ${id}: `,
+      error
+    );
+    return next(error);
+  } finally {
+    await session.endSession();
+  }
+};
+

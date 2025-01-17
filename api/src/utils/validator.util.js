@@ -5,6 +5,11 @@ import {
   signupSchema,
   updateUserSchema,
 } from "./validationSchemas/auth.schema.js";
+import {
+  addToCartSchema,
+  removeFromCartSchema,
+  updateCartSchema,
+} from "./validationSchemas/cart.schema.js";
 import { createCategorySchema } from "./validationSchemas/category.schema.js";
 import {
   createProductSchema,
@@ -35,3 +40,4 @@ export const validateCreateVariant = validate(createVariantSchema);
 export const validateUpdateVariant = validate(updateVariantSchema);
 export const validateDeleteVariant = validate(deleteVariantSchema);
 export const validateCreateCategory = validate(createCategorySchema);
+export const validateAddToCart = validate(addToCartSchema);

@@ -10,6 +10,7 @@ import { verifyToken } from "../../middleware/verifyToken.middleware.js";
 
 const route = express.Router();
 
+route.post("/items", optionalAuth, addToCart);
 route.get("/", optionalAuth, getCart);
 
 export default route;
