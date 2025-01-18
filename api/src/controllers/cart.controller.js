@@ -14,9 +14,10 @@ export const getCart = async (req, res, next) => {
 
   try {
     let cart = await findOrCreateCart(id, role);
+    const { _id, total, items } = cart._doc;
 
     logger.info(`Cart for user ${id} retrieved successfully.`);
-    return res.status(200).json(cart);
+    return res.status(200).json({ _id, total, items });
   } catch (error) {
     logger.error(`Error getting the cart for id ${id}: `, error);
     return next(error);
