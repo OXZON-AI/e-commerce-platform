@@ -8,5 +8,6 @@ import {
 const router = express.Router();
 
 router.post("/process", verifyToken, processCheckout);
+router.post("/complete", verifyToken, completeCheckout);
 
 export default router;

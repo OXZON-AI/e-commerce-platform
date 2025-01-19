@@ -11,6 +11,7 @@ import {
   updateCartSchema,
 } from "./validationSchemas/cart.schema.js";
 import { createCategorySchema } from "./validationSchemas/category.schema.js";
+import { completeCheckoutSchema } from "./validationSchemas/checkout.schema.js";
 import {
   createProductSchema,
   createVariantSchema,
@@ -43,3 +44,4 @@ export const validateCreateCategory = validate(createCategorySchema);
 export const validateAddToCart = validate(addToCartSchema);
 export const validateRemoveFromCart = validate(removeFromCartSchema);
 export const validateUpdateCart = validate(updateCartSchema);
+export const validateCompleteCheckout = validate(completeCheckoutSchema);

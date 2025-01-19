@@ -71,3 +71,85 @@ export const processCheckout = async (req, res, next) => {
   }
 };
 
+export const completeCheckout = async (req, res, next) => {
+  const { id, role } = req.user;
+  const { error, value } = validateCompleteCheckout(req.body);
+
+  if (error) return next(error);
+
+  const { session_id } = value;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const stripe = new Stripe(process.env.STRIPE_SECRET);
+
+    const stripeSession = await stripe.checkout.sessions.retrieve(session_id, {
+      expand: ["payment_intent"],
+    });
+
+    const { billing_details, card } = await stripe.paymentMethods.retrieve(
+      stripeSession.payment_intent.payment_method
+    );
+
+    if (stripeSession.payment_status !== "paid") {
+      const error = customError(400, "Payment not completed");
+      logger.error(`Payment not completed for session ${session_id}: `, error);
+      return next(error);
+    }
+
+    const cart = await findOrCreateCart(id, role, session);
+
+    const items = cart.items.map((item) => ({
+      variant: item.variant._id,
+      quantity: item.quantity,
+      subTotal: item.subTotal,
+    }));
+
+    await clearCart(id, role, session);
+
+    const earnedPoints = convertToPoints(
+      stripeSession.payment_intent.amount_received
+    );
+
+    const order = new Order({
+      user: role === "customer" ? id : undefined,
+      isGuest: role === "customer" ? false : true,
+      items,
+      billing: { address: billing_details.address },
+      shipping: { address: stripeSession.shipping_details.address },
+      payment: {
+        transactionId: stripeSession.payment_intent.id,
+        amount: stripeSession.payment_intent.amount_received,
+        brand: card.brand,
+        expMonth: card.exp_month,
+        expYear: card.exp_year,
+        last4: card.last4,
+      },
+      earnedPoints,
+    });
+
+    await order.save({ session });
+
+    await session.commitTransaction();
+
+    logger.info(`Checkout completed successfully for user ${id}.`);
+    return res.status(200).json({ message: "Checkout completed successfully" });
+  } catch (error) {
+    await session.abortTransaction();
+
+    if (error.code === 11000) {
+      const err = customError(400, "Checkout is already completed");
+      logger.error(
+        `Tried to save the order with payment id ${error.keyValue["payment.transactionId"]} again: `,
+        err
+      );
+      return next(err);
+    }
+
+    logger.error(`Error completing checkout for user ${id}: `, error);
+    return next(error);
+  } finally {
+    await session.endSession();
+  }
+};
