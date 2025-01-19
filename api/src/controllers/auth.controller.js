@@ -110,7 +110,7 @@ export const signin = async (req, res, next) => {
 
     logger.info(`User with email ${email} signed in successfully.`);
     return res
-      .cookie("token", token, { httpOnly: true })
+      .cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
       .status(200)
       .json({ user: rest });
   } catch (error) {
