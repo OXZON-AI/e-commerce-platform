@@ -1,10 +1,7 @@
 import { clearCart, findOrCreateCart } from "../services/cart.service.js";
 import Stripe from "stripe";
 import { User } from "../models/user.model.js";
-import {
-  convertToPoints,
-  getDiscountCode,
-} from "../services/checkout.service.js";
+import { convertToPoints, getDiscount } from "../services/checkout.service.js";
 import { logger } from "../utils/logger.util.js";
 import { validateCompleteCheckout } from "../utils/validator.util.js";
 import { Order } from "../models/order.model.js";
@@ -24,11 +21,11 @@ export const processCheckout = async (req, res, next) => {
     }
 
     let user = null;
-    let discountCode = null;
+    let discount = null;
 
     if (role === "customer") {
       user = await User.findById(id).select("email loyaltyPoints").lean();
-      discountCode = getDiscountCode(user.loyaltyPoints, cart.total);
+      discount = getDiscount(user.loyaltyPoints, cart.total);
     }
 
     const stripe = new Stripe(process.env.STRIPE_SECRET);
@@ -52,11 +49,12 @@ export const processCheckout = async (req, res, next) => {
       shipping_address_collection: {
         allowed_countries: ["MV"],
       },
-      discounts: discountCode ? [{ coupon: discountCode }] : [],
+      discounts: discount.code ? [{ coupon: discount.code }] : [],
       success_url: process.env.PAYMENT_SUCCESS_URL,
       cancel_url: process.env.PAYMENT_CANCEL_URL,
       metadata: {
         cartId: cart._id.toString(),
+        usedPoints: discount && discount.usedPoints,
       },
     });
 
@@ -106,8 +104,6 @@ export const completeCheckout = async (req, res, next) => {
       subTotal: item.subTotal,
     }));
 
-    await clearCart(id, role, session);
-
     const earnedPoints = convertToPoints(
       stripeSession.payment_intent.amount_received
     );
@@ -115,21 +111,34 @@ export const completeCheckout = async (req, res, next) => {
     const order = new Order({
       user: role === "customer" ? id : undefined,
       isGuest: role === "customer" ? false : true,
+      email: stripeSession.customer_email,
       items,
       billing: { address: billing_details.address },
       shipping: { address: stripeSession.shipping_details.address },
       payment: {
         transactionId: stripeSession.payment_intent.id,
-        amount: stripeSession.payment_intent.amount_received,
+        amount: stripeSession.payment_intent.amount_received / 100,
         brand: card.brand,
         expMonth: card.exp_month,
         expYear: card.exp_year,
         last4: card.last4,
+        discount: stripeSession.total_details.amount_discount / 100,
       },
       earnedPoints,
     });
 
     await order.save({ session });
+    if (role === "customer") {
+      const updatedPoints = earnedPoints - stripeSession.metadata.usedPoints;
+      console.log(updatedPoints);
+
+      await User.findByIdAndUpdate(id, {
+        $inc: {
+          loyaltyPoints: updatedPoints,
+        },
+      }).session(session);
+    }
+    await clearCart(id, role, session);
 
     await session.commitTransaction();
 
