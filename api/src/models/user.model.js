@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema(
       enum: ["customer", "admin"],
       default: "customer",
     },
-    loyaltyPoint: {
+    loyaltyPoints: {
       type: Number,
       default: 0,
       min: 0,

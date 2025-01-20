@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Cart } from "../models/cart.model.js";
 import { logger } from "../utils/logger.util.js";
+import { Variant } from "../models/variant.model.js";
 
 export const createCart = async (options, session = null) => {
   const cart = new Cart(options);
@@ -20,7 +21,12 @@ export const findOrCreateCart = async (id, role, session = null) => {
 
   let cart = await query;
 
-  if (!cart) {
+  if (cart) {
+    await Variant.populate(cart, {
+      path: "items.variant.product",
+      select: "name",
+    });
+  } else {
     cart = await createCart(options, session);
     logger.info(`Cart created for user ${id}.`);
   }
@@ -28,14 +34,14 @@ export const findOrCreateCart = async (id, role, session = null) => {
   return cart;
 };
 
-export const clearCart = async (id, role) => {
+export const clearCart = async (id, role, session = null) => {
   try {
-    let cart = await findOrCreateCart(id, role);
+    let cart = await findOrCreateCart(id, role, session);
 
     cart.items = [];
     cart.total = 0;
 
-    await cart.save();
+    await cart.save(session ? session : undefined);
 
     logger.info(`Cart with id ${cart._id} cleared for user ${id}.`);
   } catch (error) {
