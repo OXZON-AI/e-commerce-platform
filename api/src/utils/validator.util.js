@@ -22,6 +22,7 @@ import {
   updateProductSchema,
   updateVariantSchema,
 } from "./validationSchemas/product.schema.js";
+import { createReviewSchema } from "./validationSchemas/review.schema.js";
 
 const validate = (schema) => (payload) => {
   return schema.validate(payload, { abortEarly: false });
@@ -45,3 +46,4 @@ export const validateAddToCart = validate(addToCartSchema);
 export const validateRemoveFromCart = validate(removeFromCartSchema);
 export const validateUpdateCart = validate(updateCartSchema);
 export const validateCompleteCheckout = validate(completeCheckoutSchema);
+export const validateCreateReview = validate(createReviewSchema);
