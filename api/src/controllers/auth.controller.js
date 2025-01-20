@@ -9,7 +9,7 @@ import { createUser, getUser } from "../services/user.services.js";
 import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
 import jwt from "jsonwebtoken";
-import { createCart } from "../services/cart.service.js";
+import { cartMigration, createCart } from "../services/cart.service.js";
 import crypto from "crypto";
 import { sendEmails } from "../utils/emailer.util.js";
 import { validateCaptcha } from "../utils/reCAPTCHA.util.js";
@@ -85,7 +85,21 @@ export const signin = async (req, res, next) => {
       return next(error);
     }
 
-    const token = jwt.sign(
+    let token = req.cookies.token;
+
+    if (token) {
+      jwt.verify(token, process.env.JWT_SECRET, async (error, decodedUser) => {
+        if (error) {
+          logger.error("Unauthorized access, invalid token: ", error);
+          return next(customError(401, "Unauthorized access"));
+        }
+
+        if (decodedUser.role === "guest")
+          await cartMigration(decodedUser.id, user._id);
+      });
+    }
+
+    token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       {
@@ -97,7 +111,7 @@ export const signin = async (req, res, next) => {
 
     logger.info(`User with email ${email} signed in successfully.`);
     return res
-      .cookie("token", token, { httpOnly: true })
+      .cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
       .status(200)
       .json({ user: rest });
   } catch (error) {
@@ -143,7 +157,10 @@ export const requestPasswordReset = async (req, res, next) => {
     await sendEmails(
       email,
       "Reset your password",
-      `<a href="${process.env.RESET_PASSWORD_URL}?token=${token}">Reset password</a>`
+      {
+        link: `${process.env.RESET_PASSWORD_URL}?token=${token}`,
+      },
+      "reset-password"
     );
 
     logger.info(`Password reset link sent for ${email}`);
@@ -151,8 +168,12 @@ export const requestPasswordReset = async (req, res, next) => {
       .status(200)
       .json({ message: "Password reset link was sent to your email" });
   } catch (error) {
-    logger.error(`Couldn't request password reset for ${email}: `, error);
-    return next(error);
+    const err = customError(
+      500,
+      `Couldn't request password reset for ${email}`
+    );
+    logger.error(`${err.message}:  `, error);
+    return next(err);
   }
 };
 

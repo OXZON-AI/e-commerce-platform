@@ -551,6 +551,42 @@ export const updateVariant = async (req, res, next) => {
   }
 
   try {
+    if ((price && !compareAtPrice) || (!price && compareAtPrice)) {
+      const variant = await Variant.findOne({ _id: vid, product: pid })
+        .select("price compareAtPrice")
+        .lean();
+
+      if (!variant) {
+        const error = customError(404, "Variant not found");
+        logger.error(`Variant with id ${vid} not found: `, error);
+        return next(error);
+      }
+
+      if (price) {
+        if (price > variant.compareAtPrice) {
+          const error = customError(
+            400,
+            "Price cannot be greater than compareAtPrice"
+          );
+
+          logger.error("Price error: ", error);
+          return next(error);
+        }
+      }
+
+      if (compareAtPrice) {
+        if (compareAtPrice < variant.price) {
+          const error = customError(
+            400,
+            "CompareAtPrice cannot be less than price"
+          );
+
+          logger.error("CompareAtPrice error: ", error);
+          return next(error);
+        }
+      }
+    }
+
     const { matchedCount } = await Variant.bulkWrite(bulkOperations);
 
     if (!matchedCount) {
