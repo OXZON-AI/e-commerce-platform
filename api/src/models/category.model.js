@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { generateSlug } from "../utils/generateSlug.util.js";
+import { logger } from "../utils/logger.util.js";
 
 const categorySchema = new mongoose.Schema(
   {
@@ -8,7 +10,6 @@ const categorySchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      required: true,
       unique: true,
     },
     description: {
@@ -32,6 +33,21 @@ const categorySchema = new mongoose.Schema(
   }
 );
 
-categorySchema.index({ slug: 1 });
+categorySchema.pre("save", async function (next) {
+  const generatedSlug = generateSlug(this.name);
+  try {
+    const exists = await mongoose
+      .model("Category")
+      .findOne({ slug: generatedSlug, _id: { $ne: this._id } });
+
+    if (exists) generatedSlug = `${generatedSlug}-${Date.now()}`;
+
+    this.slug = generatedSlug;
+    next();
+  } catch (error) {
+    logger.error("Error generating slug: ", error);
+    next(error);
+  }
+});
 
 export const Category = mongoose.model("Category", categorySchema);

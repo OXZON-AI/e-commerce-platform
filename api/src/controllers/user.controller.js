@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import { User } from "../models/user.model.js";
 import { logger } from "../utils/logger.util.js";
 import { validateUpdateUser } from "../utils/validator.util.js";
@@ -9,11 +10,18 @@ export const updateUser = async (req, res, next) => {
 
   const { email, password, name, phone } = value;
 
+  const updateFields = { email, name, phone };
+
+  if (password) {
+    const encryptPass = await bcrypt.hash(password, 10);
+    updateFields.password = encryptPass;
+  }
+
   try {
     const user = await User.findByIdAndUpdate(
       req.params.id,
       {
-        $set: { email, password, name, phone },
+        $set: updateFields,
       },
       { new: true }
     );
