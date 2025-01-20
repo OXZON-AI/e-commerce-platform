@@ -7,9 +7,28 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState("");
+
+  // Regular expression for validating email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setEmailError("");
+    setMessage("");
+
+    // check email empty
+    if (!email) {
+      setError("Email can't be empty!");
+      return;
+    }
+
+    // check email is valid pattern
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address!");
+      return;
+    }
 
     try {
       const response = await axios.post(
@@ -39,8 +58,11 @@ const ForgotPassword = () => {
                   <div className="login-form-container">
                     <h3 className="text-center mb-4">Forgot Password</h3>
                     <div className="login-register-form">
-                      {message && <p className="text-green-600 mb-3">{message}</p>}
+                      {message && (
+                        <p className="text-green-600 mb-3">{message}</p>
+                      )}
                       {error && <p className="text-red-600 mb-3">{error}</p>}
+                      {emailError && <p className="text-red-600 mb-3">{emailError}</p>}
                       <form onSubmit={handleEmailSubmit}>
                         <input
                           type="email"
