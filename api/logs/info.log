@@ -238,3 +238,227 @@
     '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)',
   timestamp: '2025-01-16T11:41:14.239Z'
 }
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-16T12:12:40.394Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-16T12:12:41.866Z'
+}
+{
+  message: 'User with email test@gmail.com registered successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:13:16.891Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:19:28.390Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:20:14.362Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:20:32.485Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:20:38.665Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:20:48.963Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:21:07.168Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:37:36.633Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:37:43.682Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T12:38:56.522Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T13:15:04.557Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-20T04:24:39.251Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-20T04:24:40.907Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T04:25:53.542Z'
+}
+{
+  message: 'User with email test2@gmail.com registered successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T04:47:37.203Z'
+}
+{
+  message: 'User with email test2@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T04:48:22.426Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-20T04:53:30.969Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-20T04:53:33.183Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-20T06:56:38.848Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-20T06:56:40.206Z'
+}
+{
+  message: 'User with email kaninel558@kurbieh.com registered successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T07:00:25.247Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T07:00:38.439Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T07:00:41.760Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-20T07:05:58.304Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-20T07:05:59.556Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T07:06:27.920Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T07:06:30.466Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T07:39:14.546Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T07:39:17.870Z'
+}
+{
+  message: 'Password reset for user with token f35ae4f768733da6ab98472c5b3a7ab22b2bd796e27ca71442dc5599817276fc',
+  level: 'info',
+  timestamp: '2025-01-20T07:41:19.620Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: 'User with email: kaninel558@kurbieh.com attempt signin with wrong password:  Wrong credentials',
+  stack: 'Error: Wrong credentials\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at signin (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:65:21)',
+  timestamp: '2025-01-20T07:41:35.560Z'
+}
+{
+  message: 'User with email kaninel558@kurbieh.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T07:41:45.526Z'
+}
+{
+  statusCode: 404,
+  level: 'error',
+  message: 'User with email test@gg.com not found:  User not found',
+  stack: 'Error: User not found\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at requestPasswordReset (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:115:21)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)',
+  timestamp: '2025-01-20T08:38:49.102Z'
+}
+{
+  statusCode: 404,
+  level: 'error',
+  message: 'User with email test@gg.com not found:  User not found',
+  stack: 'Error: User not found\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at requestPasswordReset (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:115:21)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)',
+  timestamp: '2025-01-20T08:39:24.491Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T08:41:26.997Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T08:41:30.144Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T08:41:53.438Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T08:41:55.601Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T08:42:30.423Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T08:42:32.650Z'
+}
