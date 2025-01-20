@@ -14,6 +14,7 @@ export const signupSchema = Joi.object({
 export const signinSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(6).required(),
+  rememberMe: Joi.boolean().default(false),
 });
 
 export const requestResetSchema = Joi.object({
@@ -31,5 +32,5 @@ export const updateUserSchema = Joi.object({
   name: Joi.string().trim(),
   phone: Joi.string()
     .regex(/^[0-9]{7}$/)
-    .messages({ "string.pattern.base": `Phone number must have 7 digits.` })
+    .messages({ "string.pattern.base": `Phone number must have 7 digits.` }),
 });
