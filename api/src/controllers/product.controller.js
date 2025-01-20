@@ -46,21 +46,21 @@ export const createProduct = async (req, res, next) => {
     );
 
     await session.commitTransaction();
-    await session.endSession();
 
     logger.info(`Product with id ${_id} created successfully.`);
     return res.status(201).json({ message: "Product created successfully" });
   } catch (error) {
     await session.abortTransaction();
-    await session.endSession();
 
     logger.error("Error creating product: ", error);
     return next(error);
+  } finally {
+    await session.endSession();
   }
 };
 
 export const getProduct = async (req, res, next) => {
-  const { error, value } = validateGetProduct({ slug: req.params.slug });
+  const { error, value } = validateGetProduct(req.params);
 
   if (error) return next(error);
 
@@ -385,16 +385,16 @@ export const deleteProduct = async (req, res, next) => {
     await Variant.deleteMany({ product: pid }).session(session);
 
     await session.commitTransaction();
-    await session.endSession();
 
     logger.info(`Product with id ${pid} deleted successfully.`);
     return res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
     await session.abortTransaction();
-    await session.endSession();
 
     logger.error(`Error deleting product with id ${pid}: `, error);
     return next(error);
+  } finally {
+    await session.endSession();
   }
 };
 
@@ -551,6 +551,42 @@ export const updateVariant = async (req, res, next) => {
   }
 
   try {
+    if ((price && !compareAtPrice) || (!price && compareAtPrice)) {
+      const variant = await Variant.findOne({ _id: vid, product: pid })
+        .select("price compareAtPrice")
+        .lean();
+
+      if (!variant) {
+        const error = customError(404, "Variant not found");
+        logger.error(`Variant with id ${vid} not found: `, error);
+        return next(error);
+      }
+
+      if (price) {
+        if (price > variant.compareAtPrice) {
+          const error = customError(
+            400,
+            "Price cannot be greater than compareAtPrice"
+          );
+
+          logger.error("Price error: ", error);
+          return next(error);
+        }
+      }
+
+      if (compareAtPrice) {
+        if (compareAtPrice < variant.price) {
+          const error = customError(
+            400,
+            "CompareAtPrice cannot be less than price"
+          );
+
+          logger.error("CompareAtPrice error: ", error);
+          return next(error);
+        }
+      }
+    }
+
     const { matchedCount } = await Variant.bulkWrite(bulkOperations);
 
     if (!matchedCount) {

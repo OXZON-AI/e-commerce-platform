@@ -9,10 +9,11 @@ import { createUser, getUser } from "../services/user.services.js";
 import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
 import jwt from "jsonwebtoken";
-import { createCart } from "../services/cart.service.js";
+import { cartMigration, createCart } from "../services/cart.service.js";
 import crypto from "crypto";
 import { sendEmails } from "../utils/emailer.util.js";
 import { validateCaptcha } from "../utils/reCAPTCHA.util.js";
+import mongoose from "mongoose";
 
 export const signup = async (req, res, next) => {
   const { error, value } = validateSignup(req.body);
@@ -31,15 +32,29 @@ export const signup = async (req, res, next) => {
 
   const encryptPass = await bcrypt.hash(password, 10);
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const user = await createUser(email, encryptPass, name, phone);
-    await createCart(user._id);
+    const user = await createUser(email, encryptPass, name, phone, session);
+    await createCart({ user: user._id }, session);
+
+    await session.commitTransaction();
 
     logger.info(`User with email ${email} registered successfully.`);
     return res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
+    await session.abortTransaction();
+
+    if (error.code === 11000) {
+      const error = customError(400, "Email already exists");
+      logger.error(`Email ${email} already exists: `, error);
+      return next(error);
+    }
+
     logger.error("Couldn't register user: ", error);
     return next(error);
+  } finally {
+    await session.endSession();
   }
 };
 
@@ -48,7 +63,7 @@ export const signin = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { email, password } = value;
+  const { email, password, rememberMe } = value;
 
   try {
     const user = await getUser({ email });
@@ -70,7 +85,21 @@ export const signin = async (req, res, next) => {
       return next(error);
     }
 
-    const token = jwt.sign(
+    let token = req.cookies.token;
+
+    if (token) {
+      jwt.verify(token, process.env.JWT_SECRET, async (error, decodedUser) => {
+        if (error) {
+          logger.error("Unauthorized access, invalid token: ", error);
+          return next(customError(401, "Unauthorized access"));
+        }
+
+        if (decodedUser.role === "guest")
+          await cartMigration(decodedUser.id, user._id);
+      });
+    }
+
+    token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
       {
@@ -82,7 +111,10 @@ export const signin = async (req, res, next) => {
 
     logger.info(`User with email ${email} signed in successfully.`);
     return res
-      .cookie("token", token, { httpOnly: true })
+      .cookie("token", token, {
+        httpOnly: true,
+        ...(rememberMe && { maxAge: 24 * 60 * 60 * 1000 }),
+      })
       .status(200)
       .json({ user: rest });
   } catch (error) {
@@ -128,7 +160,10 @@ export const requestPasswordReset = async (req, res, next) => {
     await sendEmails(
       email,
       "Reset your password",
-      `<a href="${process.env.RESET_PASSWORD_URL}?token=${token}">Reset password</a>`
+      {
+        link: `${process.env.RESET_PASSWORD_URL}?token=${token}`,
+      },
+      "reset-password"
     );
 
     logger.info(`Password reset link sent for ${email}`);
@@ -136,8 +171,12 @@ export const requestPasswordReset = async (req, res, next) => {
       .status(200)
       .json({ message: "Password reset link was sent to your email" });
   } catch (error) {
-    logger.error(`Couldn't request password reset for ${email}: `, error);
-    return next(error);
+    const err = customError(
+      500,
+      `Couldn't request password reset for ${email}`
+    );
+    logger.error(`${err.message}:  `, error);
+    return next(err);
   }
 };
 

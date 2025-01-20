@@ -17,10 +17,11 @@ const variantSchema = new mongoose.Schema(
     ],
     price: {
       type: Number,
-      min: 0,
+      min: 1,
     },
     compareAtPrice: {
       type: Number,
+      min: 1,
     },
     stock: {
       type: Number,
