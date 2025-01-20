@@ -412,3 +412,53 @@
   level: 'info',
   timestamp: '2025-01-20T07:41:45.526Z'
 }
+{
+  statusCode: 404,
+  level: 'error',
+  message: 'User with email test@gg.com not found:  User not found',
+  stack: 'Error: User not found\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at requestPasswordReset (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:115:21)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)',
+  timestamp: '2025-01-20T08:38:49.102Z'
+}
+{
+  statusCode: 404,
+  level: 'error',
+  message: 'User with email test@gg.com not found:  User not found',
+  stack: 'Error: User not found\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at requestPasswordReset (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:115:21)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)',
+  timestamp: '2025-01-20T08:39:24.491Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T08:41:26.997Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T08:41:30.144Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T08:41:53.438Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T08:41:55.601Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T08:42:30.423Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T08:42:32.650Z'
+}
