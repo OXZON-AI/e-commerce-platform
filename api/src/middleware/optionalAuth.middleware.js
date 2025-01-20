@@ -14,7 +14,7 @@ export const optionalAuth = (req, res, next) => {
     });
 
     req.user = { id, role: "guest" };
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
 
     logger.info(
       `No token provided, created a guest token for ${id} and passing to the next middleware.`
