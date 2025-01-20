@@ -24,6 +24,10 @@ const paymentSchema = new mongoose.Schema({
   brand: {
     type: String,
   },
+  discount: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const orderSchema = new mongoose.Schema(
@@ -35,6 +39,10 @@ const orderSchema = new mongoose.Schema(
     isGuest: {
       type: Boolean,
       default: false,
+    },
+    email: {
+      type: String,
+      required: true,
     },
     items: [
       {
