@@ -298,3 +298,117 @@
   level: 'info',
   timestamp: '2025-01-16T12:38:56.522Z'
 }
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-16T13:15:04.557Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-20T04:24:39.251Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-20T04:24:40.907Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T04:25:53.542Z'
+}
+{
+  message: 'User with email test2@gmail.com registered successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T04:47:37.203Z'
+}
+{
+  message: 'User with email test2@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T04:48:22.426Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-20T04:53:30.969Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-20T04:53:33.183Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-20T06:56:38.848Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-20T06:56:40.206Z'
+}
+{
+  message: 'User with email kaninel558@kurbieh.com registered successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T07:00:25.247Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T07:00:38.439Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T07:00:41.760Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-20T07:05:58.304Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-20T07:05:59.556Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T07:06:27.920Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T07:06:30.466Z'
+}
+{
+  message: 'Password reset link sent for kaninel558@kurbieh.com',
+  level: 'info',
+  timestamp: '2025-01-20T07:39:14.546Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to kaninel558@kurbieh.com: ',
+  timestamp: '2025-01-20T07:39:17.870Z'
+}
+{
+  message: 'Password reset for user with token f35ae4f768733da6ab98472c5b3a7ab22b2bd796e27ca71442dc5599817276fc',
+  level: 'info',
+  timestamp: '2025-01-20T07:41:19.620Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: 'User with email: kaninel558@kurbieh.com attempt signin with wrong password:  Wrong credentials',
+  stack: 'Error: Wrong credentials\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at signin (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:65:21)',
+  timestamp: '2025-01-20T07:41:35.560Z'
+}
+{
+  message: 'User with email kaninel558@kurbieh.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T07:41:45.526Z'
+}

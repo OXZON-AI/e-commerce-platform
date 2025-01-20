@@ -53,3 +53,12 @@
     '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)',
   timestamp: '2025-01-16T11:41:14.239Z'
 }
+{
+  statusCode: 401,
+  level: 'error',
+  message: 'User with email: kaninel558@kurbieh.com attempt signin with wrong password:  Wrong credentials',
+  stack: 'Error: Wrong credentials\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at signin (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:65:21)',
+  timestamp: '2025-01-20T07:41:35.560Z'
+}
