@@ -23,3 +23,16 @@ export const getOrdersSchema = Joi.object({
   page: Joi.number().min(1).default(1),
   limit: Joi.number().min(1).default(10),
 });
+
+export const updateStatusSchema = Joi.object({
+  oid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Order id must be a valid ObjectId",
+    }),
+  status: Joi.string()
+    .trim()
+    .valid("pending", "processing", "shipped", "delivered", "cancelled")
+    .required(),
+});

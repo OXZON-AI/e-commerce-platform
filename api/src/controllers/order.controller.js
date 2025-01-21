@@ -1,7 +1,10 @@
 import { Order } from "../models/order.model.js";
 import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
-import { validateGetOrders } from "../utils/validator.util.js";
+import {
+  validateGetOrders,
+  validateUpdateStatus,
+} from "../utils/validator.util.js";
 import mongoose from "mongoose";
 
 export const getOrders = async (req, res, next) => {
@@ -89,6 +92,43 @@ export const getOrders = async (req, res, next) => {
     return res.status(200).json(orders);
   } catch (error) {
     logger.error(`Error fetching orders for user ${id}: `, error);
+    return next(error);
+  }
+};
+
+export const updateOrderStatus = async (req, res, next) => {
+  const { error, value } = validateUpdateStatus({
+    oid: req.params.oid,
+    ...req.body,
+  });
+
+  if (error) return next(error);
+
+  const { oid, status } = value;
+
+  try {
+    const order = await Order.findByIdAndUpdate(
+      oid,
+      {
+        $set: {
+          status,
+        },
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      const error = customError(404, "Order not found");
+      logger.error(`Order with id ${oid} not found: `, error);
+      return next(error);
+    }
+
+    logger.info(`Status of the order with id ${oid} updated successfully.`);
+    return res
+      .status(200)
+      .json({ message: "Status updated successfully", order });
+  } catch (error) {
+    logger.error(`Error updating status for order ${oid}: `, error);
     return next(error);
   }
 };

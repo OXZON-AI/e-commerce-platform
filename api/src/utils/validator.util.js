@@ -12,7 +12,10 @@ import {
 } from "./validationSchemas/cart.schema.js";
 import { createCategorySchema } from "./validationSchemas/category.schema.js";
 import { completeCheckoutSchema } from "./validationSchemas/checkout.schema.js";
-import { getOrdersSchema } from "./validationSchemas/order.schema.js";
+import {
+  getOrdersSchema,
+  updateStatusSchema,
+} from "./validationSchemas/order.schema.js";
 import {
   createProductSchema,
   createVariantSchema,
@@ -53,3 +56,4 @@ export const validateCompleteCheckout = validate(completeCheckoutSchema);
 export const validateCreateReview = validate(createReviewSchema);
 export const validateGetReviews = validate(getReviewsSchema);
 export const validateGetOrders = validate(getOrdersSchema);
+export const validateUpdateStatus = validate(updateStatusSchema);
