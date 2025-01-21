@@ -1,10 +1,14 @@
 import express from "express";
 import { verifyToken } from "../../middleware/verifyToken.middleware.js";
 import { verifyAdmin } from "../../middleware/verifyAdmin.middleware.js";
-import { createCategory } from "../../controllers/category.controller.js";
+import {
+  createCategory,
+  getCategories,
+} from "../../controllers/category.controller.js";
 
-const router = express.Router();
+const route = express.Router();
 
-router.post("/", verifyToken, verifyAdmin, createCategory);
+route.post("/", verifyToken, verifyAdmin, createCategory);
+route.get("/", getCategories);
 
-export default router;
+export default route;

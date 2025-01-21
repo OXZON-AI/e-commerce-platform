@@ -34,7 +34,7 @@ const categorySchema = new mongoose.Schema(
 );
 
 categorySchema.pre("save", async function (next) {
-  const generatedSlug = generateSlug(this.name);
+  let generatedSlug = generateSlug(this.name);
   try {
     const exists = await mongoose
       .model("Category")
