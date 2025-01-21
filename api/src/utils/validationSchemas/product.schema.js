@@ -56,7 +56,11 @@ export const getProductsSchema = Joi.object({
   category: Joi.string().trim(),
   brand: Joi.string().trim(),
   sortBy: Joi.string().trim().valid("ratings", "price"),
-  sortOrder: Joi.string().trim().valid("asc", "desc"),
+  sortOrder: Joi.when("sortBy", {
+    is: Joi.exist(),
+    then: Joi.string().trim().valid("asc", "desc"),
+    otherwise: Joi.forbidden(),
+  }),
   minPrice: Joi.when("maxPrice", {
     is: Joi.exist(),
     then: Joi.number().less(Joi.ref("maxPrice")),
