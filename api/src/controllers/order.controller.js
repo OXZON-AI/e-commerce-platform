@@ -1,6 +1,8 @@
 import { Order } from "../models/order.model.js";
+import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
 import { validateGetOrders } from "../utils/validator.util.js";
+import mongoose from "mongoose";
 
 export const getOrders = async (req, res, next) => {
   const { id, role } = req.user;
@@ -9,16 +11,25 @@ export const getOrders = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { user, guestOnly, status, sortBy, sortOrder, page, limit } = value;
+  const { customer, guestOnly, status, sortBy, sortOrder, page, limit } = value;
   const skip = (page - 1) * limit;
   const sortByField = sortBy === "total" ? "payment.amount" : "createdAt";
+
+  if (role === "customer" && customer && id !== customer) {
+    const error = customError(403, "Action is forbidden");
+    logger.error(
+      `User ${id} tried to access the orders of the user ${customer}: `,
+      error
+    );
+    return next(error);
+  }
 
   const pipeline = [];
 
   pipeline.push({
     $match: {
-      ...((user || role === "customer") && {
-        user: new ObjectId(user ? user : id),
+      ...((customer || role === "customer") && {
+        user: new mongoose.Types.ObjectId(`${customer ? customer : id}`),
       }),
       ...(status && { status }),
       isGuest: guestOnly,
