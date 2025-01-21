@@ -7,6 +7,7 @@ import categoryRouter from "./routes/v1/category.route.js";
 import cartRouter from "./routes/v1/cart.route.js";
 import checkoutRouter from "./routes/v1/checkout.route.js";
 import reviewRouter from "./routes/v1/review.route.js";
+import orderRouter from "./routes/v1/order.route.js";
 import helmet from "helmet";
 import { errorMiddleware } from "./middleware/error.middleware.js";
 import dotenv from "dotenv";
@@ -41,6 +42,7 @@ app.use("/v1/categories", categoryRouter);
 app.use("/v1/carts", cartRouter);
 app.use("/v1/checkout", checkoutRouter);
 app.use("/v1/reviews", reviewRouter);
+app.use("/v1/orders", orderRouter);
 
 app.use(errorMiddleware);
 
