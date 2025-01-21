@@ -462,3 +462,188 @@
   message: 'Email sent to kaninel558@kurbieh.com: ',
   timestamp: '2025-01-20T08:42:32.650Z'
 }
+{
+  errorResponse: {
+    index: 0,
+    code: 11000,
+    errmsg: 'E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }',
+    keyPattern: { email: 1 },
+    keyValue: { email: 'kaninel558@kurbieh.com' }
+  },
+  index: 0,
+  code: 11000,
+  keyPattern: { email: 1 },
+  keyValue: { email: 'kaninel558@kurbieh.com' },
+  level: 'error',
+  message: `Couldn't register user:  E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }`,
+  stack: 'MongoServerError: E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }\n' +
+    '    at InsertOneOperation.execute (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\insert.js:51:19)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async tryOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:203:20)\n' +
+    '    at async executeOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:73:16)\n' +
+    '    at async Collection.insertOne (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\collection.js:157:16)',
+  timestamp: '2025-01-20T09:54:35.603Z',
+  [Symbol(errorLabels)]: Set(0) {}
+}
+{
+  errorResponse: {
+    index: 0,
+    code: 11000,
+    errmsg: 'E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }',
+    keyPattern: { email: 1 },
+    keyValue: { email: 'kaninel558@kurbieh.com' }
+  },
+  index: 0,
+  code: 11000,
+  keyPattern: { email: 1 },
+  keyValue: { email: 'kaninel558@kurbieh.com' },
+  level: 'error',
+  message: `Couldn't register user:  E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }`,
+  stack: 'MongoServerError: E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }\n' +
+    '    at InsertOneOperation.execute (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\insert.js:51:19)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async tryOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:203:20)\n' +
+    '    at async executeOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:73:16)\n' +
+    '    at async Collection.insertOne (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\collection.js:157:16)',
+  timestamp: '2025-01-20T09:56:05.388Z',
+  [Symbol(errorLabels)]: Set(0) {}
+}
+{
+  errorResponse: {
+    index: 0,
+    code: 11000,
+    errmsg: 'E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }',
+    keyPattern: { email: 1 },
+    keyValue: { email: 'kaninel558@kurbieh.com' }
+  },
+  index: 0,
+  code: 11000,
+  keyPattern: { email: 1 },
+  keyValue: { email: 'kaninel558@kurbieh.com' },
+  level: 'error',
+  message: `Couldn't register user:  E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }`,
+  stack: 'MongoServerError: E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }\n' +
+    '    at InsertOneOperation.execute (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\insert.js:51:19)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async tryOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:203:20)\n' +
+    '    at async executeOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:73:16)\n' +
+    '    at async Collection.insertOne (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\collection.js:157:16)',
+  timestamp: '2025-01-20T09:58:21.561Z',
+  [Symbol(errorLabels)]: Set(0) {}
+}
+{
+  errorResponse: {
+    index: 0,
+    code: 11000,
+    errmsg: 'E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }',
+    keyPattern: { email: 1 },
+    keyValue: { email: 'kaninel558@kurbieh.com' }
+  },
+  index: 0,
+  code: 11000,
+  keyPattern: { email: 1 },
+  keyValue: { email: 'kaninel558@kurbieh.com' },
+  level: 'error',
+  message: `Couldn't register user:  E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }`,
+  stack: 'MongoServerError: E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "kaninel558@kurbieh.com" }\n' +
+    '    at InsertOneOperation.execute (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\insert.js:51:19)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async tryOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:203:20)\n' +
+    '    at async executeOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:73:16)\n' +
+    '    at async Collection.insertOne (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\collection.js:157:16)',
+  timestamp: '2025-01-20T10:05:36.592Z',
+  [Symbol(errorLabels)]: Set(0) {}
+}
+{
+  message: 'User with email bagiw25160@fundapk.com registered successfully.',
+  level: 'info',
+  timestamp: '2025-01-20T10:07:49.701Z'
+}
+{
+  errorResponse: {
+    index: 0,
+    code: 11000,
+    errmsg: 'E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "bagiw25160@fundapk.com" }',
+    keyPattern: { email: 1 },
+    keyValue: { email: 'bagiw25160@fundapk.com' }
+  },
+  index: 0,
+  code: 11000,
+  keyPattern: { email: 1 },
+  keyValue: { email: 'bagiw25160@fundapk.com' },
+  level: 'error',
+  message: `Couldn't register user:  E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "bagiw25160@fundapk.com" }`,
+  stack: 'MongoServerError: E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "bagiw25160@fundapk.com" }\n' +
+    '    at InsertOneOperation.execute (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\insert.js:51:19)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n' +
+    '    at async tryOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:203:20)\n' +
+    '    at async executeOperation (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\operations\\execute_operation.js:73:16)\n' +
+    '    at async Collection.insertOne (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\mongodb\\lib\\collection.js:157:16)',
+  timestamp: '2025-01-20T10:08:45.413Z',
+  [Symbol(errorLabels)]: Set(0) {}
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: 'User with email: kaninel558@kurbieh.com attempt signin with wrong password:  Wrong credentials',
+  stack: 'Error: Wrong credentials\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at signin (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:65:21)',
+  timestamp: '2025-01-20T10:10:08.504Z'
+}
+{
+  statusCode: 404,
+  level: 'error',
+  message: 'User with email test@gg.com not found:  User not found',
+  stack: 'Error: User not found\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at requestPasswordReset (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:115:21)\n' +
+    '    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)',
+  timestamp: '2025-01-20T10:11:19.090Z'
+}
+{
+  message: 'Password reset link sent for bagiw25160@fundapk.com',
+  level: 'info',
+  timestamp: '2025-01-20T10:11:28.200Z'
+}
+{
+  level: 'info',
+  message: 'Email sent to bagiw25160@fundapk.com: ',
+  timestamp: '2025-01-20T10:11:30.700Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-20T12:34:30.960Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-20T12:34:33.275Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-21T04:32:18.976Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-21T04:32:20.235Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-21T05:59:10.539Z'
+}
+{
+  errno: undefined,
+  code: 'ECONNREFUSED',
+  syscall: 'querySrv',
+  hostname: '_mongodb._tcp.ecom.1c7ii.mongodb.net',
+  level: 'error',
+  message: 'Error connecting to mongodb:  querySrv ECONNREFUSED _mongodb._tcp.ecom.1c7ii.mongodb.net',
+  stack: 'Error: querySrv ECONNREFUSED _mongodb._tcp.ecom.1c7ii.mongodb.net\n' +
+    '    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:275:17)',
+  timestamp: '2025-01-21T05:59:10.554Z'
+}

@@ -27,7 +27,7 @@ const LoginRegister = () => {
 
   // Helper function to validate phone number
   const validatePhone = (phone) => {
-    const phoneRegex = /^[0-9]{10}$/; // Matches a 10-digit phone number
+    const phoneRegex = /^[0-9]{7}$/; // Matches a 7-digit phone number
     return phoneRegex.test(phone);
   };
 
@@ -73,7 +73,7 @@ const LoginRegister = () => {
     }
 
     if (!validatePhone(phone)) {
-      newErrors.phone = "Please enter a valid 10-digit phone number.";
+      newErrors.phone = "Please enter a valid 7-digit phone number.";
     }
 
     setErrors(newErrors);
