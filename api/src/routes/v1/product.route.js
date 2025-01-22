@@ -7,6 +7,7 @@ import {
   getProduct,
   getProducts,
   productRecommendations,
+  relatedProducts,
   updateProduct,
   updateVariant,
 } from "../../controllers/product.controller.js";
@@ -19,6 +20,7 @@ route.post("/", verifyToken, verifyAdmin, createProduct);
 route.post("/:pid/variants", verifyToken, verifyAdmin, createVariant);
 route.get("/", getProducts);
 route.get("/recommendations", verifyToken, productRecommendations);
+route.get("/related", relatedProducts);
 route.get("/:slug", getProduct);
 route.put("/:pid", verifyToken, verifyAdmin, updateProduct);
 route.put("/:pid/variants/:vid", verifyToken, verifyAdmin, updateVariant);

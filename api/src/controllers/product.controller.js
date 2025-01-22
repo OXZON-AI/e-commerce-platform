@@ -10,6 +10,7 @@ import {
   validateGetProduct,
   validateGetProducts,
   validateRecommendations,
+  validateRelatedProducts,
   validateUpdateProduct,
   validateUpdateVariant,
 } from "../utils/validator.util.js";
@@ -68,65 +69,67 @@ export const getProduct = async (req, res, next) => {
 
   const { slug } = value;
 
-  try {
-    const product = await Product.aggregate([
-      {
-        $match: {
-          slug,
-        },
+  const pipeline = [
+    {
+      $match: {
+        slug,
       },
-      {
-        $lookup: {
-          from: "variants",
-          localField: "_id",
-          foreignField: "product",
-          as: "variants",
-        },
+    },
+    {
+      $lookup: {
+        from: "variants",
+        localField: "_id",
+        foreignField: "product",
+        as: "variants",
       },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "category",
-        },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
       },
-      {
-        $project: {
-          name: 1,
-          slug: 1,
-          description: 1,
-          category: {
-            $arrayElemAt: [
-              {
-                $map: {
-                  input: "$category",
-                  as: "category",
-                  in: {
-                    _id: "$$category._id",
-                    name: "$$category.name",
-                    slug: "$$category.slug",
-                  },
+    },
+    {
+      $project: {
+        name: 1,
+        slug: 1,
+        description: 1,
+        category: {
+          $arrayElemAt: [
+            {
+              $map: {
+                input: "$category",
+                as: "category",
+                in: {
+                  _id: "$$category._id",
+                  name: "$$category.name",
+                  slug: "$$category.slug",
                 },
               },
+            },
 
-              0,
-            ],
-          },
-          ratings: 1,
-          brand: 1,
-          variants: {
-            attributes: 1,
-            price: 1,
-            compareAtPrice: 1,
-            stock: 1,
-            images: 1,
-            isDefault: 1,
-            sku: 1,
-          },
+            0,
+          ],
+        },
+        ratings: 1,
+        brand: 1,
+        variants: {
+          attributes: 1,
+          price: 1,
+          compareAtPrice: 1,
+          stock: 1,
+          images: 1,
+          isDefault: 1,
+          sku: 1,
         },
       },
-    ]);
+    },
+  ];
+
+  try {
+    const product = await Product.aggregate(pipeline);
 
     if (!product.length) {
       const error = customError(404, "Product not found");
@@ -826,6 +829,124 @@ export const productRecommendations = async (req, res, next) => {
   } catch (error) {
     logger.error(
       `Error fetching product recommendations for user ${id}: `,
+      error
+    );
+    return next(error);
+  }
+};
+
+export const relatedProducts = async (req, res, next) => {
+  const { error, value } = validateRelatedProducts(req.query);
+
+  if (error) return next(error);
+
+  const { cid, limit } = value;
+
+  const pipeline = [
+    {
+      $match: {
+        category: new mongoose.Types.ObjectId(`${cid}`),
+      },
+    },
+    {
+      $lookup: {
+        from: "variants",
+        localField: "_id",
+        foreignField: "product",
+        as: "variants",
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        slug: 1,
+        "description.short": 1,
+        ratings: 1,
+        brand: 1,
+        category: {
+          $arrayElemAt: [
+            {
+              $map: {
+                input: "$category",
+                as: "category",
+                in: {
+                  _id: "$$category._id",
+                  name: "$$category.name",
+                },
+              },
+            },
+            0,
+          ],
+        },
+        defaultVariant: {
+          $arrayElemAt: [
+            {
+              $map: {
+                input: {
+                  $filter: {
+                    input: "$variants",
+                    as: "variant",
+                    cond: {
+                      $eq: ["$$variant.isDefault", true],
+                    },
+                  },
+                },
+                as: "variant",
+                in: {
+                  _id: "$$variant._id",
+                  price: "$$variant.price",
+                  stock: "$$variant.stock",
+                  image: {
+                    $arrayElemAt: [
+                      {
+                        $map: {
+                          input: {
+                            $filter: {
+                              input: "$$variant.images",
+                              as: "image",
+                              cond: {
+                                $eq: ["$$image.isDefault", true],
+                              },
+                            },
+                          },
+                          as: "image",
+                          in: {
+                            url: "$$image.url",
+                            alt: "$$image.alt",
+                          },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                },
+              },
+            },
+            0,
+          ],
+        },
+      },
+    },
+    {
+      $limit: limit,
+    },
+  ];
+  try {
+    const products = await Product.aggregate(pipeline);
+
+    logger.info(`Fetched related products for category ${cid}.`);
+    return res.status(200).json(products);
+  } catch (error) {
+    logger.error(
+      `Error fetching related products for category ${cid}: `,
       error
     );
     return next(error);
