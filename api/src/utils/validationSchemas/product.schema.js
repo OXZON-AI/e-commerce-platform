@@ -245,3 +245,7 @@ export const deleteVariantSchema = Joi.object({
       "string.pattern.base": "Variant id must be a valid ObjectId",
     }),
 });
+
+export const recommendationsSchema = Joi.object({
+  limit: Joi.number().min(1).default(10),
+});
