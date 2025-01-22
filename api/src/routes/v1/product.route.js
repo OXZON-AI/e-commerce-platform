@@ -1,18 +1,18 @@
 import express from "express";
-import {
-  createProduct,
-  createVariant,
-  deleteProduct,
-  deleteVariant,
-  getProduct,
-  getProducts,
-  productRecommendations,
-  relatedProducts,
-  updateProduct,
-  updateVariant,
-} from "../../controllers/product.controller.js";
 import { verifyToken } from "../../middleware/verifyToken.middleware.js";
 import { verifyAdmin } from "../../middleware/verifyAdmin.middleware.js";
+import {
+  createProduct,
+  deleteProduct,
+  getProduct,
+  getProducts,
+  updateProduct,
+  createVariant,
+  deleteVariant,
+  updateVariant,
+  productRecommendations,
+  relatedProducts,
+} from "../../controllers/product/index.js";
 
 const route = express.Router();
 
