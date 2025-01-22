@@ -5,6 +5,8 @@ import Nav from "react-bootstrap/Nav";
 import axios from "../../axiosConfig";
 import LayoutOne from "../../layouts/LayoutOne";
 import ReCAPTCHA from "react-google-recaptcha";
+import { setUser } from '../../store/slices/user-slice'
+import { useDispatch } from "react-redux";
 
 const LoginRegister = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +20,7 @@ const LoginRegister = () => {
   const [serverSuccess, setServerSuccess] = useState("");
   const loginCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is login form ReCaptcha element
   const registerCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is register form ReCaptcha element
+  const dispatch = useDispatch(); // Get the dispatch function
 
   // Helper function to validate email
   const validateEmail = (email) => {
@@ -136,10 +139,14 @@ const LoginRegister = () => {
           password,
         }
       );
+
+      const userData = response.data.user; // catching user data from response
+      dispatch(setUser(userData)); // save user data to redux
+
       setServerSuccess("User signed in as " + response.data.user.name);
       console.log("User signed in:", response.data.user);
     } catch (err) {
-      setServerError(err.response.data.message);
+      setServerError(err.response?.data?.message || "Something went wrong about login!");
     }
   };
 
