@@ -24,6 +24,7 @@ import {
   getProductSchema,
   getProductsSchema,
   recommendationsSchema,
+  relatedProductsSchema,
   updateProductSchema,
   updateVariantSchema,
 } from "./validationSchemas/product.schema.js";
@@ -59,3 +60,4 @@ export const validateGetReviews = validate(getReviewsSchema);
 export const validateGetOrders = validate(getOrdersSchema);
 export const validateUpdateStatus = validate(updateStatusSchema);
 export const validateRecommendations = validate(recommendationsSchema);
+export const validateRelatedProducts = validate(relatedProductsSchema);

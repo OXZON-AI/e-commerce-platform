@@ -249,3 +249,13 @@ export const deleteVariantSchema = Joi.object({
 export const recommendationsSchema = Joi.object({
   limit: Joi.number().min(1).default(10),
 });
+
+export const relatedProductsSchema = Joi.object({
+  cid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Category id must be a valid ObjectId",
+    }),
+  limit: Joi.number().min(1).default(10),
+});
