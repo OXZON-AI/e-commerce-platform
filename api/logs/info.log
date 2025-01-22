@@ -647,3 +647,357 @@
     '    at QueryReqWrap.onresolve [as oncomplete] (node:internal/dns/promises:275:17)',
   timestamp: '2025-01-21T05:59:10.554Z'
 }
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-21T08:37:59.839Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-21T08:38:01.470Z'
+}
+{
+  message: 'User with email batman@gmail.com registered successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T08:53:47.306Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-21T14:31:47.602Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-21T14:31:49.079Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-21T14:32:45.952Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-21T14:32:47.086Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-21T17:30:50.958Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-21T17:30:52.546Z'
+}
+{
+  message: 'User with email batman@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T17:30:58.813Z'
+}
+{
+  message: 'User with email batman@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T17:35:11.882Z'
+}
+{
+  message: 'User with email batman@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T17:40:14.318Z'
+}
+{
+  message: 'User with email batman@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T17:40:17.630Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: 'Unauthorized access, token is missing:  Token is required',
+  stack: 'Error: Token is required\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:9:19)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at Route.dispatch (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:119:3)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\index.js:284:15\n' +
+    '    at param (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\index.js:365:14)\n' +
+    '    at param (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\index.js:376:14)\n' +
+    '    at Function.process_params (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\index.js:421:3)',
+  timestamp: '2025-01-21T17:40:44.326Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678f609ac601e331cf85e4f2 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:01:39.032Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: 'User with email: batman@gmail.com attempt signin with wrong password:  Wrong credentials',
+  stack: 'Error: Wrong credentials\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at signin (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:80:21)',
+  timestamp: '2025-01-21T18:02:21.783Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: 'User with email: batman@gmail.com attempt signin with wrong password:  Wrong credentials',
+  stack: 'Error: Wrong credentials\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at signin (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/controllers/auth.controller.js:80:21)',
+  timestamp: '2025-01-21T18:02:32.792Z'
+}
+{
+  message: 'User with email batman@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T18:02:44.376Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678f609ac601e331cf85e4f2 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:03:15.554Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678f609ac601e331cf85e4f2 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:06:14.369Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678f609ac601e331cf85e4f2 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:06:16.403Z'
+}
+{
+  message: 'User with email test3@gmail.com registered successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T18:07:38.541Z'
+}
+{
+  message: 'User with email test3@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T18:07:52.761Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678fe26a0869306bddc6fe31 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:10:51.019Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678fe26a0869306bddc6fe31 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:13:19.388Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678fe26a0869306bddc6fe31 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:13:58.061Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678fe26a0869306bddc6fe31 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:17:17.229Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678fe26a0869306bddc6fe31 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:17:56.746Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678fe26a0869306bddc6fe31 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:18:17.649Z'
+}
+{
+  message: 'User with id 678fe26a0869306bddc6fe31 updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T18:34:11.351Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678fe26a0869306bddc6fe31 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:35:17.857Z'
+}
+{
+  message: 'User with email batman@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T18:36:56.267Z'
+}
+{
+  message: 'User with email test3@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T18:37:07.594Z'
+}
+{
+  message: 'User with email batman@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T18:38:01.570Z'
+}
+{
+  message: 'User with id 678f609ac601e331cf85e4f2 updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-21T18:38:23.013Z'
+}
+{
+  statusCode: 401,
+  level: 'error',
+  message: "Token error. JWT user_id 678f609ac601e331cf85e4f2 doesn't match params user_id undefined:  Unauthorized access",
+  stack: 'Error: Unauthorized access\n' +
+    '    at customError (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/utils/error.util.js:2:17)\n' +
+    '    at verifyUser (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyUser.middleware.js:7:21)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)\n' +
+    '    at next (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\route.js:149:13)\n' +
+    '    at file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:21:5\n' +
+    '    at C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:261:12\n' +
+    '    at getSecret (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:97:14)\n' +
+    '    at module.exports [as verify] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\jsonwebtoken\\verify.js:101:10)\n' +
+    '    at verifyToken (file:///C:/Yasiru_Panduka/Oxzon_AI/2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling/Auth_Branch/e-commerce-platform/api/src/middleware/verifyToken.middleware.js:14:7)\n' +
+    '    at Layer.handle [as handle_request] (C:\\Yasiru_Panduka\\Oxzon_AI\\2025-Jan-6-E-Commerce_Platform_for_Electronics_Selling\\Auth_Branch\\e-commerce-platform\\api\\node_modules\\express\\lib\\router\\layer.js:95:5)',
+  timestamp: '2025-01-21T18:38:57.110Z'
+}
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-22T09:30:56.342Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-22T09:30:58.192Z'
+}
