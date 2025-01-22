@@ -1,6 +1,10 @@
 import { Fragment, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateUser, clearSuccess } from "../../store/slices/user-slice";
+import {
+  updateUser,
+  clearSuccess,
+  setUser,
+} from "../../store/slices/user-slice";
 import Accordion from "react-bootstrap/Accordion";
 import LayoutOne from "../../layouts/LayoutOne";
 
@@ -12,8 +16,8 @@ const MyAccount = () => {
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState(userInfo.email || "");
-  const [phone, setPhone] = useState(userInfo.phone || "");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -22,23 +26,34 @@ const MyAccount = () => {
       alert("Profile updated successfully!");
       dispatch(clearSuccess());
     }
-    if (userInfo.name) {
-      const [first, ...rest] = userInfo.name.split(" "); // Split by space
-      setFirstName(first || "");
-      setLastName(rest.join(" ") || ""); // join the rest as lastName
+  }, [success]);
+
+  useEffect(() => {
+    // If Redux userInfo is empty, try fetching from localStorage
+    if (!userInfo || Object.keys(userInfo).length === 0) {
+      const persistedData = localStorage.getItem("persist:frontend");
+      if (persistedData) {
+        const parsedData = JSON.parse(persistedData);
+        const user = JSON.parse(parsedData.user);
+        if (user) dispatch(setUser(user));
+      }
     }
-  }, [success, dispatch, userInfo]);
+
+    // Populate form fields if user data exists
+    if (userInfo && userInfo.name) {
+      const [first, ...rest] = userInfo.name.split(" ");
+      setFirstName(first || "");
+      setLastName(rest.join(" ") || "");
+      setEmail(userInfo.email || "");
+      setPhone(userInfo.phone || "");
+    }
+  }, [dispatch, userInfo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Combine firstName and lastName for the server
     const fullName = `${firstName} ${lastName}`.trim();
-
-    // if (!password || !confirmPassword) {
-    //   alert("Both password fields are required!");
-    //   return;
-    // }
 
     const updatedData = {
       name: fullName,
@@ -47,7 +62,7 @@ const MyAccount = () => {
       password: password || undefined, // Only send password if provided
       token: userInfo.token,
     };
-    
+
     dispatch(updateUser({ userId: userInfo._id, userData: updatedData }));
   };
 
@@ -75,7 +90,7 @@ const MyAccount = () => {
                         Edit Your Profile Information
                       </Accordion.Header>
                       <Accordion.Body className="bg-white p-6">
-                      {error && <p className="text-red-600 mb-3">{error}</p>}
+                        {error && <p className="text-red-600 mb-3">{error}</p>}
                         <form onSubmit={handleSubmit} className="space-y-6">
                           <div>
                             <h4 className="text-lg font-semibold text-gray-700">
@@ -85,6 +100,7 @@ const MyAccount = () => {
                               Your Personal Details
                             </p>
                           </div>
+                          {/* {userInfo ? ( */}
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div>
                               <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -166,6 +182,9 @@ const MyAccount = () => {
                               )} */}
                             </div>
                           </div>
+                          {/* ) : (
+                            <div>Loading...</div>
+                          )} */}
                           <div className="flex justify-end">
                             <button
                               type="submit"
@@ -208,7 +227,7 @@ const MyAccount = () => {
                               <input
                                 type="password"
                                 name="password"
-                                value={password}
+                                value={password || ""}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full border border-gray-300 rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                               />
@@ -220,7 +239,7 @@ const MyAccount = () => {
                               <input
                                 type="password"
                                 name="confirmPassword"
-                                value={confirmPassword}
+                                value={confirmPassword || ""}
                                 onChange={(e) =>
                                   setConfirmPassword(e.target.value)
                                 }

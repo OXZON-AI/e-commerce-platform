@@ -13,7 +13,7 @@ const LoginRegister = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
@@ -144,9 +144,8 @@ const LoginRegister = () => {
       dispatch(setUser(userData)); // save user data to redux
 
       setServerSuccess("User signed in as " + response.data.user.name);
-      console.log("User signed in:", response.data.user);
     } catch (err) {
-      setServerError(err.response?.data?.message || "Something went wrong about login!");
+      setServerError(err.response?.data?.message || "Login failed!");
     }
   };
 

@@ -4,17 +4,14 @@ import axios from "../../axiosConfig";
 // Async thunk to update user details
 export const updateUser = createAsyncThunk(
   "user/updateUser",
-  async ({userId, userData}, { rejectWithValue }) => {
+  async ({ userId, userData }, { rejectWithValue }) => {
     try {
       const response = await axios.put(
         `http://localhost:3000/v1/users/${userId}`, // Add user ID dynamically
-        userData, // Send user data in the request body
-        {
-          headers: { "Content-Type": "application/json" },
-        }
+        userData // Send user data in the request body
       );
-      
-      return response.data;
+
+      return response.data.user; // Return updated user info
     } catch (error) {
       return rejectWithValue(
         error.response && error.response.data.message
@@ -25,20 +22,28 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+const initialState = {
+  userInfo: null, // Store the logged-in user data
+  loading: false,
+  error: null,
+  success: false, // Track success state
+};
+
 const userSlice = createSlice({
   name: "user",
-  initialState: {
-    userInfo: {}, // Store the logged-in user data
-    loading: false,
-    error: null,
-    success: false, // To track update success
-  },
+  initialState,
   reducers: {
     setUser: (state, action) => {
       state.userInfo = action.payload; // Set user info on login
     },
+    clearUser(state) {
+      state.userInfo = null; // Clear user data
+    },
     clearSuccess(state) {
       state.success = false; // Clear success state after update
+    },
+    clearError: (state) => {
+      state.error = null; // Clear error state after update
     },
   },
   extraReducers: (builder) => {
@@ -60,5 +65,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, clearSuccess } = userSlice.actions;
+export const { setUser, clearUser, clearSuccess, clearError } = userSlice.actions;
 export default userSlice.reducer;
