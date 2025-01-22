@@ -10,7 +10,8 @@ const MyAccount = () => {
     (state) => state.user
   );
 
-  const [name, setName] = useState(userInfo.name || "");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState(userInfo.email || "");
   const [phone, setPhone] = useState(userInfo.phone || "");
   const [password, setPassword] = useState("");
@@ -21,10 +22,18 @@ const MyAccount = () => {
       alert("Profile updated successfully!");
       dispatch(clearSuccess());
     }
-  }, [success, dispatch]);
+    if (userInfo.name) {
+      const [first, ...rest] = userInfo.name.split(" "); // Split by space
+      setFirstName(first || "");
+      setLastName(rest.join(" ") || ""); // join the rest as lastName
+    }
+  }, [success, dispatch, userInfo]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Combine firstName and lastName for the server
+    const fullName = `${firstName} ${lastName}`.trim();
 
     // if (!password || !confirmPassword) {
     //   alert("Both password fields are required!");
@@ -32,7 +41,7 @@ const MyAccount = () => {
     // }
 
     const updatedData = {
-      name,
+      name: fullName,
       email,
       phone,
       password: password || undefined, // Only send password if provided
@@ -84,8 +93,8 @@ const MyAccount = () => {
                               <input
                                 type="text"
                                 name="firstName"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
                                 className="w-full border border-gray-300 rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                               />
                               {/* {errors.firstName && (
@@ -101,7 +110,8 @@ const MyAccount = () => {
                               <input
                                 type="text"
                                 name="lastName"
-                                value={"Ignore for now"}
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
                                 className="w-full border border-gray-300 rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                               />
                               {/* {errors.lastName && (

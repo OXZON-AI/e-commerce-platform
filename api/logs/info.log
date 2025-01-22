@@ -1001,3 +1001,13 @@
   level: 'info',
   timestamp: '2025-01-22T09:30:58.192Z'
 }
+{
+  message: 'Server is running on 3000',
+  level: 'info',
+  timestamp: '2025-01-22T11:04:07.805Z'
+}
+{
+  message: 'Connected to mongodb',
+  level: 'info',
+  timestamp: '2025-01-22T11:04:10.072Z'
+}
