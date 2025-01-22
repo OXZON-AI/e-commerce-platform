@@ -4,6 +4,7 @@ import {
   updateUser,
   clearSuccess,
   setUser,
+  clearError,
 } from "../../store/slices/user-slice";
 import Accordion from "react-bootstrap/Accordion";
 import LayoutOne from "../../layouts/LayoutOne";
@@ -25,6 +26,9 @@ const MyAccount = () => {
     if (success) {
       alert("Profile updated successfully!");
       dispatch(clearSuccess());
+    }
+    if(error){
+      dispatch(clearError());
     }
   }, [success]);
 
@@ -51,6 +55,9 @@ const MyAccount = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(error){
+      dispatch(clearError());
+    }
 
     // Combine firstName and lastName for the server
     const fullName = `${firstName} ${lastName}`.trim();

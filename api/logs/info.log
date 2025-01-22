@@ -1162,3 +1162,58 @@
   level: 'info',
   timestamp: '2025-01-22T14:28:52.925Z'
 }
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T14:57:07.125Z'
+}
+{
+  message: 'User with id 6788f7dcb1105b1bb2f1a89b updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T14:57:23.352Z'
+}
+{
+  message: 'User with id 6788f7dcb1105b1bb2f1a89b updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T15:01:33.910Z'
+}
+{
+  message: 'User with id 6788f7dcb1105b1bb2f1a89b updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T15:01:59.110Z'
+}
+{
+  message: 'User with id 6788f7dcb1105b1bb2f1a89b updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T15:02:09.735Z'
+}
+{
+  message: 'User with id 6788f7dcb1105b1bb2f1a89b updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T15:02:31.033Z'
+}
+{
+  message: 'User with id 6788f7dcb1105b1bb2f1a89b updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T15:03:20.133Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T15:04:23.342Z'
+}
+{
+  message: 'User with id 6788f7dcb1105b1bb2f1a89b updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T15:04:32.326Z'
+}
+{
+  message: 'User with email test@gmail.com signed in successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T15:10:42.591Z'
+}
+{
+  message: 'User with id 6788f7dcb1105b1bb2f1a89b updated successfully.',
+  level: 'info',
+  timestamp: '2025-01-22T15:10:54.594Z'
+}
