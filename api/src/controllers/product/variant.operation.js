@@ -1,5 +1,12 @@
 import { Product } from "../../models/product.model.js";
+import { Variant } from "../../models/variant.model.js";
 import { logger } from "../../utils/logger.util.js";
+import {
+  validateCreateVariant,
+  validateDeleteVariant,
+  validateUpdateVariant,
+} from "../../utils/validator.util.js";
+import { customError } from "../../utils/error.util.js";
 
 export const createVariant = async (req, res, next) => {
   const { error, value } = validateCreateVariant({

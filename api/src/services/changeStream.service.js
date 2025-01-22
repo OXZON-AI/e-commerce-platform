@@ -45,11 +45,13 @@ export const watchOrders = () => {
 
       await sendEmails(
         order.email,
-        "Your Order Status Has Changed",
+        order.status === "cancelled"
+          ? "Your Order is cancelled"
+          : "Your Order Status Has Changed",
         {
           order,
         },
-        "order-status"
+        order.status === "cancelled" ? "order-cancelled" : "order-status"
       );
     }
   });
