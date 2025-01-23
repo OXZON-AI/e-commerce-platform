@@ -188,7 +188,9 @@ const LoginRegister = () => {
                                   {errors.email}
                                 </p>
                               )}
+                              <label htmlFor="user-email">Email</label>
                               <input
+                                id="user-email"
                                 type="email"
                                 name="user-email"
                                 placeholder="Email"
@@ -204,7 +206,9 @@ const LoginRegister = () => {
                                   {errors.password}
                                 </p>
                               )}
+                              <label htmlFor="user-password">Password</label>
                               <input
+                                id="user-password"
                                 type="password"
                                 name="user-password"
                                 placeholder="Password"
@@ -267,7 +271,9 @@ const LoginRegister = () => {
                                   {errors.firstName}
                                 </p>
                               )}
+                              <label htmlFor="first-name">First Name</label>
                               <input
+                                id="first-name"
                                 type="text"
                                 name="first-name"
                                 placeholder="First Name"
@@ -283,7 +289,9 @@ const LoginRegister = () => {
                                   {errors.lastName}
                                 </p>
                               )}
+                              <label htmlFor="last-name">Last Name</label>
                               <input
+                                id="last-name"
                                 type="text"
                                 name="last-name"
                                 placeholder="Last Name"
@@ -299,7 +307,9 @@ const LoginRegister = () => {
                                   {errors.password}
                                 </p>
                               )}
+                              <label htmlFor="u-password">Password</label>
                               <input
+                                id="u-password"
                                 type="password"
                                 name="user-password"
                                 placeholder="Password"
@@ -315,7 +325,9 @@ const LoginRegister = () => {
                                   {errors.email}
                                 </p>
                               )}
+                              <label htmlFor="u-email">Email</label>
                               <input
+                                id="u-email"
                                 name="user-email"
                                 placeholder="Email"
                                 type="email"
@@ -331,7 +343,9 @@ const LoginRegister = () => {
                                   {errors.phone}
                                 </p>
                               )}
+                              <label htmlFor="phone">Phone Number</label>
                               <input
+                                id="phone"
                                 type="tel"
                                 name="phone"
                                 placeholder="Phone Number"
