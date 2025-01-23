@@ -18,7 +18,10 @@ export const getOrders = async (req, res, next) => {
   const skip = (page - 1) * limit;
   const sortByField = sortBy === "total" ? "payment.amount" : "createdAt";
 
-  if (role === "customer" && customer && id !== customer) {
+  if (
+    (role === "customer" && customer && id !== customer) ||
+    role === "guest"
+  ) {
     const error = customError(403, "Action is forbidden");
     logger.error(
       `User ${id} tried to access the orders of the user ${customer}: `,
