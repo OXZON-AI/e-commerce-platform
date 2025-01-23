@@ -10,7 +10,7 @@ const addressSchema = new mongoose.Schema({
 });
 
 const paymentSchema = new mongoose.Schema({
-  transactionId: { type: String, unique: true },
+  transactionId: { type: String },
   amount: { type: Number, required: true },
   expYear: {
     type: String,
@@ -28,6 +28,7 @@ const paymentSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  refundId: { type: String },
 });
 
 const orderSchema = new mongoose.Schema(

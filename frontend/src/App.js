@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import ScrollToTop from "./helpers/scroll-top";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ProtectedRoute from "./components/router-protector/ProtectedRoute";
 
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
 const ForgotPassword = lazy(() => import("./pages/other/ForgotPassword"));
@@ -22,6 +23,7 @@ const App = () => {
           }
         >
           <Routes>
+            {/* Public routes */}
             <Route
               path={process.env.PUBLIC_URL + "/login-register"}
               element={<LoginRegister />}
@@ -34,9 +36,15 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/reset-password"}
               element={<ResetPassword />}
             />
+
+            {/* Protected routes */}
             <Route
               path={process.env.PUBLIC_URL + "/my-account"}
-              element={<MyAccount />}
+              element={
+                <ProtectedRoute>
+                  <MyAccount />
+                </ProtectedRoute>
+              }
             />
           </Routes>
         </Suspense>
