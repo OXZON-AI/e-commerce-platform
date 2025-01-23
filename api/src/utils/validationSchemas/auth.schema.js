@@ -34,3 +34,29 @@ export const updateUserSchema = Joi.object({
     .regex(/^[0-9]{7}$/)
     .messages({ "string.pattern.base": `Phone number must have 7 digits.` }),
 });
+
+export const getUsersSchema = Joi.object({
+  user: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .messages({
+      "string.pattern.base": "User id must be a valid ObjectId",
+    }),
+  userType: Joi.string().trim().valid("admin", "customer").default("customer"),
+  sortBy: Joi.string().trim().valid("points", "date"),
+  sortOrder: Joi.when("sortBy", {
+    is: Joi.exist(),
+    then: Joi.string().trim().valid("asc", "desc"),
+    otherwise: Joi.forbidden(),
+  }),
+  page: Joi.number().min(1).default(1),
+  limit: Joi.number().min(1).default(10),
+});
+
+export const deleteUserSchema = Joi.object({
+  id: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "User id must be a valid ObjectId",
+    }),
+});
