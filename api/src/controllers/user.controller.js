@@ -8,6 +8,9 @@ import {
 } from "../utils/validator.util.js";
 import mongoose from "mongoose";
 import { customError } from "../utils/error.util.js";
+import { Cart } from "../models/cart.model.js";
+import { Order } from "../models/order.model.js";
+import { Review } from "../models/review.model.js";
 
 export const updateUser = async (req, res, next) => {
   const { error, value } = validateUpdateUser(req.body);
@@ -125,6 +128,9 @@ export const deleteUser = async (req, res, next) => {
   if (error) return next(error);
 
   const { id: user } = value;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     const adminDeleting = role === "admin" && id !== user;
     const selfDeleting = id === user;
@@ -135,7 +141,7 @@ export const deleteUser = async (req, res, next) => {
       return next(error);
     }
 
-    const result = await User.findByIdAndDelete(user);
+    const result = await User.findByIdAndDelete(user).session(session);
 
     if (!result) {
       const error = customError(404, "User not found");
@@ -143,10 +149,23 @@ export const deleteUser = async (req, res, next) => {
       return next(error);
     }
 
+    await Cart.findOneAndDelete({ user }).session(session);
+    await Order.updateMany(
+      { user },
+      { $set: { isGuest: true }, $unset: { user: "" } }
+    ).session(session);
+    await Review.deleteMany({ user }).session(session);
+
+    await session.commitTransaction();
+
     logger.info(`User ${user} deleted by ${id}.`);
     return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
+    await session.abortTransaction();
+
     logger.error(`Couldn't delete user ${user}: `, error);
     return next(error);
+  } finally {
+    await session.endSession();
   }
 };
