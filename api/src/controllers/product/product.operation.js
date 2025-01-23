@@ -4,18 +4,12 @@ import { Variant } from "../../models/variant.model.js";
 import { logger } from "../../utils/logger.util.js";
 import {
   validateCreateProduct,
-  validateCreateVariant,
   validateDeleteProduct,
-  validateDeleteVariant,
   validateGetProduct,
   validateGetProducts,
-  validateRecommendations,
-  validateRelatedProducts,
   validateUpdateProduct,
-  validateUpdateVariant,
 } from "../../utils/validator.util.js";
 import { customError } from "../../utils/error.util.js";
-import { Order } from "../../models/order.model.js";
 
 export const createProduct = async (req, res, next) => {
   const { error, value } = validateCreateProduct(req.body);
