@@ -56,7 +56,11 @@ export const getProductsSchema = Joi.object({
   category: Joi.string().trim(),
   brand: Joi.string().trim(),
   sortBy: Joi.string().trim().valid("ratings", "price"),
-  sortOrder: Joi.string().trim().valid("asc", "desc"),
+  sortOrder: Joi.when("sortBy", {
+    is: Joi.exist(),
+    then: Joi.string().trim().valid("asc", "desc"),
+    otherwise: Joi.forbidden(),
+  }),
   minPrice: Joi.when("maxPrice", {
     is: Joi.exist(),
     then: Joi.number().less(Joi.ref("maxPrice")),
@@ -240,4 +244,18 @@ export const deleteVariantSchema = Joi.object({
     .messages({
       "string.pattern.base": "Variant id must be a valid ObjectId",
     }),
+});
+
+export const recommendationsSchema = Joi.object({
+  limit: Joi.number().min(1).default(10),
+});
+
+export const relatedProductsSchema = Joi.object({
+  cid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Category id must be a valid ObjectId",
+    }),
+  limit: Joi.number().min(1).default(10),
 });
