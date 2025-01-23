@@ -22,15 +22,22 @@ const MyAccount = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [form1Errors, setForm1Errors] = useState({});
+  const [form2Errors, setForm2Errors] = useState({});
+  const [form1Success, setForm1Success] = useState({});
+  const [form2Success, setForm2Success] = useState({});
+
   useEffect(() => {
     if (success) {
       alert("Profile updated successfully!");
       dispatch(clearSuccess());
+      setPassword("");
+      setConfirmPassword("");
     }
-    if(error){
+    if (error) {
       dispatch(clearError());
     }
-  }, [success]);
+  }, [success, error, dispatch]);
 
   useEffect(() => {
     // If Redux userInfo is empty, try fetching from localStorage
@@ -53,10 +60,30 @@ const MyAccount = () => {
     }
   }, [dispatch, userInfo]);
 
+  // check password & confirmpasswords are same
+  const checkPasswords = async () => {
+    const newErrors = {};
+
+    if (password !== confirmPassword) {
+      newErrors.samePassword =
+        "The passwords do not match, or one of the fields is empty. Please ensure both fields are filled and contain the same password.";
+    }
+
+    setForm2Errors(newErrors);
+    return Object.keys(newErrors).length === 0; 
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(error){
+    if (error) {
       dispatch(clearError());
+    }
+
+    // if one passowrd field field then check password and confirm password is same
+    if (password || confirmPassword) {
+      if (!checkPasswords()){
+        return;
+      }
     }
 
     // Combine firstName and lastName for the server
@@ -217,6 +244,11 @@ const MyAccount = () => {
                         Change Your Password
                       </Accordion.Header>
                       <Accordion.Body className="bg-white p-6">
+                        {form2Errors.samePassword && (
+                          <p className="text-sm text-red-500 mt-1">
+                            {form2Errors.samePassword}
+                          </p>
+                        )}
                         <form onSubmit={handleSubmit} className="space-y-6">
                           <div>
                             <h4 className="text-lg font-semibold text-gray-700">
@@ -234,7 +266,7 @@ const MyAccount = () => {
                               <input
                                 type="password"
                                 name="password"
-                                value={password || ""}
+                                value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full border border-gray-300 rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
                               />
@@ -246,7 +278,7 @@ const MyAccount = () => {
                               <input
                                 type="password"
                                 name="confirmPassword"
-                                value={confirmPassword || ""}
+                                value={confirmPassword}
                                 onChange={(e) =>
                                   setConfirmPassword(e.target.value)
                                 }
