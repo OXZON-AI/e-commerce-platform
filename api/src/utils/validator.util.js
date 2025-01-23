@@ -1,4 +1,6 @@
 import {
+  deleteUserSchema,
+  getUsersSchema,
   requestResetSchema,
   resetPasswordSchema,
   signinSchema,
@@ -43,6 +45,8 @@ export const validateSignin = validate(signinSchema);
 export const validateRequestReset = validate(requestResetSchema);
 export const validatePasswordReset = validate(resetPasswordSchema);
 export const validateUpdateUser = validate(updateUserSchema);
+export const validateGetUsers = validate(getUsersSchema);
+export const validateDeleteUser = validate(deleteUserSchema);
 export const validateCreateProduct = validate(createProductSchema);
 export const validateGetProduct = validate(getProductSchema);
 export const validateGetProducts = validate(getProductsSchema);
