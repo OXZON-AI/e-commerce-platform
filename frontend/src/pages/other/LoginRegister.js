@@ -13,7 +13,6 @@ const LoginRegister = () => {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  // const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
@@ -83,6 +82,7 @@ const LoginRegister = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Register Form Handler
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setErrors({}); // clear previous error state
@@ -120,6 +120,7 @@ const LoginRegister = () => {
     }
   };
 
+  // Login Form Handler
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setServerSuccess("");

@@ -14,16 +14,13 @@ const MyAccount = () => {
   const { userInfo, loading, error, success } = useSelector(
     (state) => state.user
   );
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [successMessage, setSuccessMessage] = useState("");
-
   const [form1Errors, setForm1Errors] = useState({});
   const [form2Errors, setForm2Errors] = useState({});
 
