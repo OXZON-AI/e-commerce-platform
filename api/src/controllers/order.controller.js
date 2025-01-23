@@ -38,7 +38,7 @@ export const getOrders = async (req, res, next) => {
         user: new mongoose.Types.ObjectId(`${customer ? customer : id}`),
       }),
       ...(status && { status }),
-      isGuest: guestOnly,
+      ...(role === "admin" && { isGuest: guestOnly }),
     },
   });
 
