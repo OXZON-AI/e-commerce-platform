@@ -58,6 +58,14 @@ export const getOrders = async (req, res, next) => {
       },
     },
     {
+      $lookup: {
+        from: "products",
+        localField: "variants.product",
+        foreignField: "_id",
+        as: "products",
+      },
+    },
+    {
       $project: {
         user: 1,
         isGuest: 1,
@@ -65,13 +73,82 @@ export const getOrders = async (req, res, next) => {
         payment: 1,
         billing: 1,
         shipping: 1,
-        items: 1,
-        products: {
+        status: 1,
+        items: {
           $map: {
-            input: "$variants",
-            as: "variant",
+            input: "$items",
+            as: "item",
             in: {
-              id: "$$variant.product",
+              quantity: "$$item.quantity",
+              subTotal: "$$item.subTotal",
+              variant: {
+                $arrayElemAt: [
+                  {
+                    $map: {
+                      input: {
+                        $filter: {
+                          input: "$variants",
+                          as: "variant",
+                          cond: {
+                            $eq: ["$$variant._id", "$$item.variant"],
+                          },
+                        },
+                      },
+                      as: "variant",
+                      in: {
+                        _id: "$$variant._id",
+                        sku: "$$variant.sku",
+                        attributes: "$$variant.attributes",
+                        product: {
+                          $arrayElemAt: [
+                            {
+                              $map: {
+                                input: {
+                                  $filter: {
+                                    input: "$products",
+                                    as: "product",
+                                    cond: {
+                                      $eq: [
+                                        "$$variant.product",
+                                        "$$product._id",
+                                      ],
+                                    },
+                                  },
+                                },
+                                as: "product",
+                                in: {
+                                  _id: "$$product._id",
+                                  name: "$$product.name",
+                                  slug: "$$product.slug",
+                                  description: "$$product.description",
+                                  ratings: "$$product.ratings",
+                                  brand: "$$product.brand",
+                                },
+                              },
+                            },
+                            0,
+                          ],
+                        },
+                        image: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: "$$variant.images",
+                                as: "image",
+                                cond: {
+                                  $eq: ["$$image.isDefault", true],
+                                },
+                              },
+                            },
+                            0,
+                          ],
+                        },
+                      },
+                    },
+                  },
+                  0,
+                ],
+              },
             },
           },
         },
