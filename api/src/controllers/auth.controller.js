@@ -107,7 +107,7 @@ export const signin = async (req, res, next) => {
       }
     );
 
-    const { password: pass, role, ...rest } = user._doc;
+    const { password: pass, ...rest } = user._doc;
 
     logger.info(`User with email ${email} signed in successfully.`);
     return res
@@ -116,7 +116,7 @@ export const signin = async (req, res, next) => {
         ...(rememberMe && { maxAge: 24 * 60 * 60 * 1000 }),
       })
       .status(200)
-      .json({ user: rest });
+      .json({ message: "User signed in successfully", user: rest });
   } catch (error) {
     logger.error(`Signin error for email ${email}: `, error);
     return next(error);
