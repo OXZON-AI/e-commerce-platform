@@ -6,11 +6,12 @@ import {
   updateOrderStatus,
 } from "../../controllers/order.controller.js";
 import { verifyAdmin } from "../../middleware/verifyAdmin.middleware.js";
+import { filterGuest } from "../../middleware/filterGuest.middleware.js";
 
 const route = express.Router();
 
-route.get("/", verifyToken, getOrders);
+route.get("/", verifyToken, filterGuest, getOrders);
 route.patch("/:oid", verifyToken, verifyAdmin, updateOrderStatus);
-route.patch("/:oid/cancel", verifyToken, cancelOrder);
+route.patch("/:oid/cancel", verifyToken, filterGuest, cancelOrder);
 
 export default route;
