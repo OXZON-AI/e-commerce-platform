@@ -5,19 +5,22 @@ import Nav from "react-bootstrap/Nav";
 import axios from "../../axiosConfig";
 import LayoutOne from "../../layouts/LayoutOne";
 import ReCAPTCHA from "react-google-recaptcha";
+import { setUser } from "../../store/slices/user-slice";
+import { useDispatch } from "react-redux";
 
 const LoginRegister = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [name, setName] = useState("");
+  // const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
   const [serverSuccess, setServerSuccess] = useState("");
   const loginCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is login form ReCaptcha element
   const registerCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is register form ReCaptcha element
+  const dispatch = useDispatch(); // Get the dispatch function
 
   // Helper function to validate email
   const validateEmail = (email) => {
@@ -49,7 +52,7 @@ const LoginRegister = () => {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0; // If there are no errors (newErrors is empty), the function will return true, indicating that the form is valid.
   };
 
   // Validate Register Form
@@ -82,6 +85,9 @@ const LoginRegister = () => {
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    setErrors({}); // clear previous error state
+    setServerError(""); // clear previous server error state
+    setServerSuccess(""); // clear previous server success state
 
     // Calling register form validation to check validations
     if (!validateRegisterForm()) {
@@ -136,10 +142,13 @@ const LoginRegister = () => {
           password,
         }
       );
+
+      const userData = response.data.user; // catching user data from response
+      dispatch(setUser(userData)); // save user data to redux
+
       setServerSuccess("User signed in as " + response.data.user.name);
-      console.log("User signed in:", response.data.user);
     } catch (err) {
-      setServerError(err.response.data.message);
+      setServerError(err.response?.data?.message || "Login failed!");
     }
   };
 
@@ -182,7 +191,9 @@ const LoginRegister = () => {
                                   {errors.email}
                                 </p>
                               )}
+                              <label htmlFor="user-email">Email</label>
                               <input
+                                id="user-email"
                                 type="email"
                                 name="user-email"
                                 placeholder="Email"
@@ -198,7 +209,9 @@ const LoginRegister = () => {
                                   {errors.password}
                                 </p>
                               )}
+                              <label htmlFor="user-password">Password</label>
                               <input
+                                id="user-password"
                                 type="password"
                                 name="user-password"
                                 placeholder="Password"
@@ -261,7 +274,9 @@ const LoginRegister = () => {
                                   {errors.firstName}
                                 </p>
                               )}
+                              <label htmlFor="first-name">First Name</label>
                               <input
+                                id="first-name"
                                 type="text"
                                 name="first-name"
                                 placeholder="First Name"
@@ -277,7 +292,9 @@ const LoginRegister = () => {
                                   {errors.lastName}
                                 </p>
                               )}
+                              <label htmlFor="last-name">Last Name</label>
                               <input
+                                id="last-name"
                                 type="text"
                                 name="last-name"
                                 placeholder="Last Name"
@@ -293,7 +310,9 @@ const LoginRegister = () => {
                                   {errors.password}
                                 </p>
                               )}
+                              <label htmlFor="u-password">Password</label>
                               <input
+                                id="u-password"
                                 type="password"
                                 name="user-password"
                                 placeholder="Password"
@@ -309,7 +328,9 @@ const LoginRegister = () => {
                                   {errors.email}
                                 </p>
                               )}
+                              <label htmlFor="u-email">Email</label>
                               <input
+                                id="u-email"
                                 name="user-email"
                                 placeholder="Email"
                                 type="email"
@@ -325,7 +346,9 @@ const LoginRegister = () => {
                                   {errors.phone}
                                 </p>
                               )}
+                              <label htmlFor="phone">Phone Number</label>
                               <input
+                                id="phone"
                                 type="tel"
                                 name="phone"
                                 placeholder="Phone Number"

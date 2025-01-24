@@ -7,12 +7,6 @@ export const createReviewSchema = Joi.object({
     .messages({
       "string.pattern.base": "Variant id must be a valid ObjectId",
     }),
-  user: Joi.string()
-    .regex(/^[0-9a-fA-F]{24}$/)
-    .required()
-    .messages({
-      "string.pattern.base": "User id must be a valid ObjectId",
-    }),
   order: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .required()
