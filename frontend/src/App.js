@@ -8,6 +8,9 @@ const ForgotPassword = lazy(() => import("./pages/other/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/other/ResetPassword"));
 const MyAccount = lazy(() => import("./pages/other/MyAccount"));
 
+//Admin User Management Page
+const RegisteredUsers = lazy(() => import("./pages/admin/RegisteredUsers"));
+
 const App = () => {
   return (
     <Router>
@@ -45,6 +48,12 @@ const App = () => {
                   <MyAccount />
                 </ProtectedRoute>
               }
+            />
+
+            {/* Admin User management page */}
+            <Route
+              path={process.env.PUBLIC_URL + "/registered-users"}
+              element={<RegisteredUsers />}
             />
           </Routes>
         </Suspense>
