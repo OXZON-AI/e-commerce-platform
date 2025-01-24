@@ -2,7 +2,7 @@ import React, { Fragment, useState } from "react";
 
 import LayoutOne from "../../layouts/LayoutOne";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../axiosConfig";
 
 const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -30,10 +30,10 @@ const ResetPassword = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/v1/auth/reset-password",
-        { password, token }
-      );
+      const response = await axiosInstance.post("/v1/auth/reset-password", {
+        password,
+        token,
+      });
 
       setSuccess(response.data.message);
       setTimeout(() => {
@@ -58,7 +58,9 @@ const ResetPassword = () => {
                   <div className="login-form-container">
                     <h3 className="text-center mb-4">Reset Password</h3>
                     <div className="login-register-form">
-                      {success && <p className="text-green-600 mb-3">{success}</p>}
+                      {success && (
+                        <p className="text-green-600 mb-3">{success}</p>
+                      )}
                       {error && <p className="text-red-600 mb-3">{error}</p>}
                       <form onSubmit={handleResetSubmit}>
                         <input

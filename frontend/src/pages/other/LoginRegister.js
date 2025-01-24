@@ -2,7 +2,7 @@ import React, { Fragment, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
-import axios from "../../axiosConfig";
+import axiosInstance from "../../axiosConfig";
 import LayoutOne from "../../layouts/LayoutOne";
 import ReCAPTCHA from "react-google-recaptcha";
 import { setUser } from "../../store/slices/user-slice";
@@ -102,16 +102,13 @@ const LoginRegister = () => {
       const token = await loginCaptchaRef.current.executeAsync();
       loginCaptchaRef.current.reset(); // allow to re-excute the reCapture check
 
-      const response = await axios.post(
-        "http://localhost:3000/v1/auth/signup",
-        {
-          email,
-          password,
-          name: fullName, //using concatenated value for name
-          phone,
-          token,
-        }
-      );
+      const response = await axiosInstance.post("/v1/auth/signup", {
+        email,
+        password,
+        name: fullName, //using concatenated value for name
+        phone,
+        token,
+      });
       setServerSuccess(response.data.message);
     } catch (err) {
       const errorMessage =
@@ -136,13 +133,10 @@ const LoginRegister = () => {
       const token = await registerCaptchaRef.current.executeAsync();
       registerCaptchaRef.current.reset(); // allow to re-excute the reCapture check
 
-      const response = await axios.post(
-        "http://localhost:3000/v1/auth/signin",
-        {
-          email,
-          password,
-        }
-      );
+      const response = await axiosInstance.post("/v1/auth/signin", {
+        email,
+        password,
+      });
 
       const userData = response.data.user; // catching user data from response
       dispatch(setUser(userData)); // save user data to redux
