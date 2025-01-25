@@ -26,7 +26,8 @@ export const createProductSchema = Joi.object({
           .min(1)
           .required(),
         price: Joi.number().min(1).less(Joi.ref("compareAtPrice")).required(),
-        compareAtPrice: Joi.number().required(),
+        compareAtPrice: Joi.number().min(1).required(),
+        cost: Joi.number().min(1).required(),
         images: Joi.array()
           .items(
             Joi.object({
@@ -119,6 +120,7 @@ export const createVariantSchema = Joi.object({
     .required(),
   price: Joi.number().min(1).less(Joi.ref("compareAtPrice")).required(),
   compareAtPrice: Joi.number().required(),
+  cost: Joi.number().min(1).required(),
   images: Joi.array()
     .items(
       Joi.object({
@@ -228,6 +230,7 @@ export const updateVariantSchema = Joi.object({
     otherwise: Joi.number().min(1),
   }),
   compareAtPrice: Joi.number().min(1),
+  cost: Joi.number().min(1),
   isDefault: Joi.boolean(),
 });
 

@@ -86,7 +86,7 @@ export const getReviews = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { slug, page, limit, rating, sort } = value;
+  const { slug, page, limit, rating, sortOrder } = value;
   const skip = (page - 1) * limit;
 
   const countsPipeline = [
@@ -159,7 +159,7 @@ export const getReviews = async (req, res, next) => {
   reviewsPipeline.push(
     {
       $sort: {
-        rating: sort === "asc" ? 1 : -1,
+        rating: sortOrder === "asc" ? 1 : -1,
       },
     },
     {

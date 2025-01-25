@@ -19,7 +19,6 @@ export const getOrders = async (req, res, next) => {
 
   const { customer, guestOnly, status, sortBy, sortOrder, page, limit } = value;
   const skip = (page - 1) * limit;
-  const sortByField = sortBy === "total" ? "payment.amount" : "createdAt";
 
   if (role === "customer" && customer && id !== customer) {
     const error = customError(403, "Action is forbidden");
@@ -159,11 +158,14 @@ export const getOrders = async (req, res, next) => {
     }
   );
 
-  pipeline.push({
-    $sort: {
-      [sortByField]: sortOrder === "asc" ? 1 : -1,
-    },
-  });
+  if (sortBy) {
+    const sortByField = sortBy === "total" ? "payment.amount" : "createdAt";
+    pipeline.push({
+      $sort: {
+        [sortByField]: sortOrder === "asc" ? 1 : -1,
+      },
+    });
+  }
 
   try {
     const orders = await Order.aggregate(pipeline);

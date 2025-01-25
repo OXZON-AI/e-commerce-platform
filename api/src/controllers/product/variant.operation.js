@@ -16,12 +16,12 @@ export const createVariant = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { pid, attributes, price, compareAtPrice, images } = value;
+  const { pid, attributes, price, compareAtPrice, cost, images } = value;
 
   try {
-    const productExists = await Product.exists({ _id: pid });
+    const exist = await Product.exists({ _id: pid });
 
-    if (!productExists) {
+    if (!exist) {
       const error = customError(404, "Product not found");
       logger.error(`Product with id ${pid} not found: `, error);
       return next(error);
@@ -32,6 +32,7 @@ export const createVariant = async (req, res, next) => {
       attributes,
       price,
       compareAtPrice,
+      cost,
       images,
     });
 
@@ -62,6 +63,7 @@ export const updateVariant = async (req, res, next) => {
     toRemove,
     price,
     compareAtPrice,
+    cost,
     isDefault,
   } = value;
 
@@ -78,6 +80,7 @@ export const updateVariant = async (req, res, next) => {
           price,
           compareAtPrice,
           isDefault,
+          cost,
         },
       },
     },
