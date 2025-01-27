@@ -87,24 +87,48 @@ export const updateVariant = async (req, res, next) => {
   });
 
   if (toAdd) {
-    bulkOperations.push({
-      updateOne: {
-        filter: {
-          _id: vid,
-          product: pid,
-        },
-        update: {
-          $addToSet: {
-            attributes: {
-              $each: toAdd.attributes,
-            },
-            images: {
-              $each: toAdd.images,
-            },
+    const addToBulk = (filter, value) => {
+      bulkOperations.push({
+        updateOne: {
+          filter: {
+            _id: vid,
+            product: pid,
+            ...filter,
+          },
+          update: {
+            $addToSet: { ...value },
           },
         },
-      },
-    });
+      });
+    };
+
+    if (toAdd.attributes)
+      addToBulk(
+        {
+          "attributes.name": {
+            $nin: toAdd.attributes.map((attribute) => attribute.name),
+          },
+        },
+        {
+          attributes: {
+            $each: toAdd.attributes,
+          },
+        }
+      );
+
+    if (toAdd.images)
+      addToBulk(
+        {
+          "images.url": {
+            $nin: toAdd.images.map((image) => image.url),
+          },
+        },
+        {
+          images: {
+            $each: toAdd.images,
+          },
+        }
+      );
   }
 
   if (toRemove) {
@@ -203,7 +227,10 @@ export const updateVariant = async (req, res, next) => {
     const { matchedCount } = await Variant.bulkWrite(bulkOperations);
 
     if (!matchedCount) {
-      const error = customError(404, "Variant not found");
+      const error = customError(
+        404,
+        "Variant with provided specifications not found"
+      );
       logger.error(`Variant with id ${vid} not found: `, error);
       return next(error);
     }

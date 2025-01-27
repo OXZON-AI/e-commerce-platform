@@ -1,5 +1,21 @@
 import Joi from "joi";
 
+const validAttribtues = [
+  "color",
+  "size",
+  "storage",
+  "ram",
+  "processor",
+  "display",
+  "battery",
+  "operating system",
+  "camera",
+  "connectivity",
+  "gpu",
+  "ports",
+  "weight",
+];
+
 export const createProductSchema = Joi.object({
   name: Joi.string().trim().required(),
   description: Joi.object({
@@ -19,11 +35,27 @@ export const createProductSchema = Joi.object({
         attributes: Joi.array()
           .items(
             Joi.object({
-              name: Joi.string().trim().lowercase().required(),
+              name: Joi.string()
+                .trim()
+                .lowercase()
+                .valid(...validAttribtues)
+                .required(),
               value: Joi.string().trim().lowercase().required(),
             })
           )
           .min(1)
+          .custom((attributes, helpers) => {
+            const names = attributes.map((attribute) => attribute.name);
+            const duplicates = names.filter(
+              (name, i) => names.indexOf(name) !== i
+            );
+
+            if (duplicates.length > 0) {
+              return helpers.message(`Duplicate attributes ${duplicates}`);
+            }
+
+            return attributes;
+          })
           .required(),
         price: Joi.number().min(1).less(Joi.ref("compareAtPrice")).required(),
         compareAtPrice: Joi.number().min(1).required(),
@@ -40,6 +72,16 @@ export const createProductSchema = Joi.object({
             })
           )
           .min(1)
+          .custom((images, helpers) => {
+            const urls = images.map((image) => image.url);
+            const duplicates = urls.filter((url, i) => urls.indexOf(url) !== i);
+
+            if (duplicates.length > 0) {
+              return helpers.message(`Duplicate urls ${duplicates}`);
+            }
+
+            return images;
+          })
           .required(),
         isDefault: Joi.boolean(),
       })
@@ -112,7 +154,11 @@ export const createVariantSchema = Joi.object({
   attributes: Joi.array()
     .items(
       Joi.object({
-        name: Joi.string().trim().lowercase().required(),
+        name: Joi.string()
+          .trim()
+          .lowercase()
+          .valid(...validAttribtues)
+          .required(),
         value: Joi.string().trim().lowercase().required(),
       })
     )
@@ -154,10 +200,24 @@ export const updateVariantSchema = Joi.object({
     attributes: Joi.array()
       .items(
         Joi.object({
-          name: Joi.string().trim().lowercase().required(),
+          name: Joi.string()
+            .trim()
+            .lowercase()
+            .valid(...validAttribtues)
+            .required(),
           value: Joi.string().trim().lowercase().required(),
         })
       )
+      .custom((attributes, helpers) => {
+        const names = attributes.map((attribute) => attribute.name);
+        const duplicates = names.filter((name, i) => names.indexOf(name) !== i);
+
+        if (duplicates.length > 0) {
+          return helpers.message(`Duplicate attributes ${duplicates}`);
+        }
+
+        return attributes;
+      })
       .default([]),
     images: Joi.array()
       .items(
@@ -170,12 +230,26 @@ export const updateVariantSchema = Joi.object({
           isDefault: Joi.boolean(),
         })
       )
+      .custom((images, helpers) => {
+        const urls = images.map((image) => image.url);
+        const duplicates = urls.filter((url, i) => urls.indexOf(url) !== i);
+
+        if (duplicates.length > 0) {
+          return helpers.message(`Duplicate urls ${duplicates}`);
+        }
+
+        return images;
+      })
       .default([]),
   }),
   toChange: Joi.object({
     attributes: Joi.array().items(
       Joi.object({
-        name: Joi.string().trim().lowercase().required(),
+        name: Joi.string()
+          .trim()
+          .lowercase()
+          .valid(...validAttribtues)
+          .required(),
         value: Joi.string().trim().lowercase().required(),
         id: Joi.string()
           .regex(/^[0-9a-fA-F]{24}$/)
