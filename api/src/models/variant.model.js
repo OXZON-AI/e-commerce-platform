@@ -23,6 +23,10 @@ const variantSchema = new mongoose.Schema(
       type: Number,
       min: 1,
     },
+    cost: {
+      type: Number,
+      min: 1,
+    },
     stock: {
       type: Number,
       min: 0,
