@@ -3,6 +3,7 @@ import ScrollToTop from "./helpers/scroll-top";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/router-protector/ProtectedRoute";
 import AdminRouteProtector from "./components/router-protector/AdminRouteProtector";
+import SampleProductCatalogue from "./pages/other/SampleProductCatalogue";
 
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
 const ForgotPassword = lazy(() => import("./pages/other/ForgotPassword"));
@@ -47,6 +48,14 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <MyAccount />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={"/"}
+              element={
+                <ProtectedRoute>
+                  <SampleProductCatalogue />
                 </ProtectedRoute>
               }
             />
