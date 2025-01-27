@@ -1,3 +1,4 @@
+import { salesSummarySchema } from "./validationSchemas/analytics.schema.js";
 import {
   deleteUserSchema,
   getUsersSchema,
@@ -67,3 +68,4 @@ export const validateUpdateStatus = validate(updateStatusSchema);
 export const validateCancelOrder = validate(cancelOrderSchema);
 export const validateRecommendations = validate(recommendationsSchema);
 export const validateRelatedProducts = validate(relatedProductsSchema);
+export const validateSalesSummary = validate(salesSummarySchema);
