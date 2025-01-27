@@ -6,9 +6,10 @@ export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
   async (filters = {}, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/v1/products", {
+      const response = await axiosInstance.get("/v1/products/", {
         params: filters,
       });
+      console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(
