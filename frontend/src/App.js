@@ -52,7 +52,7 @@ const App = () => {
               }
             />
             <Route
-              path={"/"}
+              path={process.env.PUBLIC_URL + "/"}
               element={
                 <ProtectedRoute>
                   <SampleProductCatalogue />

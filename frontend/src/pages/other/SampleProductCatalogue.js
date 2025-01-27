@@ -3,31 +3,33 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearProducts, fetchProducts } from "../../store/slices/product-slice";
 
 const SampleProductCatalogue = () => {
-  const dispatch = useDispatch();
-  const { items = [], loading, error } = useSelector((state) => state.product);
+  const dispatch = useDispatch(); // Dispatch function to interact with Redux store
+  const { items = [], loading, error } = useSelector((state) => state.product); // Selecting the product state from the Redux store
 
+  // Local state to manage the filters
   const [filters, setFilters] = useState({
     search: "",
     category: "",
     brand: "",
-    sortBy: "",
-    sortOrder: "",
-    priceRange: [0, 1000],
-    page: 1,
-    limit: 10,
+    sortBy: "", // Field to sort by (ratings or price)
+    sortOrder: "", // Sort order (ascending or descending)
+    priceRange: [0, 1000], // Price range filter (min, max)
+    page: 1, // Current page for pagination
+    limit: 10, // Number of products per page
   });
 
+  // Function to build query params based on the selected filters
   const buildFilters = (filters) => {
     const query = {};
-    if (filters.search) query.search = filters.search.trim();
-    if (filters.category) query.category = filters.category.trim();
-    if (filters.brand) query.brand = filters.brand.trim();
+    if (filters.search) query.search = filters.search.trim(); // If a search term exists, add it to the query
+    if (filters.category) query.category = filters.category.trim(); // If a category is selected, add it to the query
+    if (filters.brand) query.brand = filters.brand.trim(); // If a brand is selected, add it to the query
     if (filters.sortBy) {
       query.sortBy = filters.sortBy.trim();
       query.sortOrder = filters.sortOrder
         ? filters.sortOrder.trim()
         : undefined;
-    }
+    } // If sorting is enabled, add sort options to the query
     if (
       filters.priceRange[0] &&
       (!filters.priceRange[1] || filters.priceRange[0] < filters.priceRange[1])
@@ -36,20 +38,25 @@ const SampleProductCatalogue = () => {
     }
     if (filters.priceRange[1]) {
       query.maxPrice = filters.priceRange[1];
-    }
+    } // If a price range is defined, add the min and max prices to the query
+
+    // Add pagination info to the query
     query.page = filters.page || 1;
     query.limit = filters.limit || 10;
+
     return query;
   };
 
+  // Effect hook to fetch products when filters change or component mounts
   useEffect(() => {
-    const query = buildFilters(filters);
-    dispatch(fetchProducts(query));
+    const query = buildFilters(filters); // Generate the query based on the current filters
+    dispatch(fetchProducts(query)); // Dispatch the fetchProducts action with the generated query
 
+    // Cleanup function to clear products when component unmounts or filters change
     return () => {
-      dispatch(clearProducts());
+      dispatch(clearProducts()); // This is called whenever the component is about to unmount or when the filters object changes. This is useful for clearing any previous product data before new products are fetched based on updated filters.
     };
-  }, [dispatch, filters]);
+  }, [dispatch, filters]); // Dependencies: dispatch and filters, so it triggers when either changes
 
   return (
     <div className="product-catalogue max-w-6xl mx-auto p-6">
