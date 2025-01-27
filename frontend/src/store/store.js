@@ -54,15 +54,3 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
-
-
-// import { configureStore, combineReducers } from '@reduxjs/toolkit';
-// import userReducer from './slices/user-slice';
-
-// const store = configureStore({
-//     reducer: {
-//         user: userReducer,
-//     },
-// })
-
-// export default store;
