@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/router-protector/ProtectedRoute";
 import AdminRouteProtector from "./components/router-protector/AdminRouteProtector";
 import SampleProductCatalogue from "./pages/other/SampleProductCatalogue";
+import SampleProductDetail from "./pages/other/SampleProductDetail";
 
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
 const ForgotPassword = lazy(() => import("./pages/other/ForgotPassword"));
@@ -41,6 +42,14 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/reset-password"}
               element={<ResetPassword />}
             />
+            <Route
+              path={process.env.PUBLIC_URL + "/"}
+              element={<SampleProductCatalogue />}
+            />
+            <Route
+              path={process.env.PUBLIC_URL + "/product/:slug"}
+              element={<SampleProductDetail />}
+            />
 
             {/* Protected routes for not logged in user */}
             <Route
@@ -48,14 +57,6 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <MyAccount />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path={process.env.PUBLIC_URL + "/"}
-              element={
-                <ProtectedRoute>
-                  <SampleProductCatalogue />
                 </ProtectedRoute>
               }
             />
