@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearProducts, fetchProducts } from "../../store/slices/product-slice";
+import { Link } from "react-router-dom";
+import placeholderImage from "../../assets/images/placeholder_image.png";
 
 const SampleProductCatalogue = () => {
   const dispatch = useDispatch(); // Dispatch function to interact with Redux store
@@ -157,21 +159,31 @@ const SampleProductCatalogue = () => {
           </p>
         )}
         {items?.map((product) => (
-          <div
-            key={product._id}
-            className="product-item p-4 border rounded-lg shadow-sm hover:shadow-lg transition-shadow"
-          >
-            <h2 className="text-xl font-semibold">{product.name}</h2>
-            <p className="inline-block bg-blue-100 border-2 border-blue-500 text-blue-500 rounded px-1 py-1 text-sm font-bold text-blue-600 mt-2">
-              {product.brand}
-            </p>
-            <p className="text-gray-600 mt-2">
-              {product.description?.short || "No description available"}
-            </p>
-            <p className="text-lg font-bold mt-2">
-              Price: ${product.defaultVariant?.price || "N/A"}
-            </p>
-          </div>
+          <Link to={`/product/${product.slug}`} key={product._id}>
+            <div
+              key={product._id}
+              className="product-item p-4 border rounded-lg shadow-sm hover:shadow-lg transition-shadow"
+            >
+              <img
+                className="w-full h-48 object-cover rounded-lg mb-4"
+                src={product.defaultVariant?.images?.[0]?.url || placeholderImage}
+                alt={product.defaultVariant?.images?.[0]?.alt || "Product Image"}
+                onError={(e) => {
+                  e.target.src = placeholderImage;
+                }}
+              />
+              <h2 className="text-xl font-semibold">{product.name}</h2>
+              <p className="inline-block bg-blue-100 border-2 border-blue-500 text-blue-500 rounded px-1 py-1 text-sm font-bold text-blue-600 mt-2">
+                {product.brand}
+              </p>
+              <p className="text-gray-600 mt-2">
+                {product.description?.short || "No description available"}
+              </p>
+              <p className="text-lg font-bold mt-2">
+                Price: ${product.defaultVariant?.price || "N/A"}
+              </p>
+            </div>
+          </Link>
         ))}
       </div>
     </div>
