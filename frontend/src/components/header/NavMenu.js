@@ -127,7 +127,7 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
             </ul>
           </li>
           <li>
-            <Link to={process.env.PUBLIC_URL + "/shop-grid-standard"}>
+            <Link to={process.env.PUBLIC_URL + "/product-list"}>
               {t("collection")}
             </Link>
           </li>

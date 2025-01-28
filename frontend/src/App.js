@@ -9,6 +9,9 @@ const ForgotPassword = lazy(() => import("./pages/other/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/other/ResetPassword"));
 const MyAccount = lazy(() => import("./pages/other/MyAccount"));
 
+// product pages
+const ProductListPage = lazy(() => import("./pages/products/ProductListPage"));
+
 //Admin User Management Page
 const RegisteredUsers = lazy(() => import("./pages/admin/RegisteredUsers"));
 
@@ -39,6 +42,11 @@ const App = () => {
             <Route
               path={process.env.PUBLIC_URL + "/reset-password"}
               element={<ResetPassword />}
+            />
+
+            <Route
+              path={process.env.PUBLIC_URL + "/product-list"}
+              element={<ProductListPage />}
             />
 
             {/* Protected routes for not logged in user */}
