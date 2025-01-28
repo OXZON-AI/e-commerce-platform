@@ -21,10 +21,28 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch a product details
+export const fetchProductDetails = createAsyncThunk(
+  "product/fetchProductDetails",
+  async (slug, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/v1/products/${slug}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      );
+    }
+  }
+);
+
 const productSlice = createSlice({
   name: "product",
   initialState: {
     items: [],
+    productDetail: null,
     loading: false,
     error: null,
   },
@@ -32,6 +50,9 @@ const productSlice = createSlice({
     clearProducts: (state) => {
       state.items = [];
     },
+    clearProductDetail: (state) => {
+      state.productDetail = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -46,9 +67,21 @@ const productSlice = createSlice({
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchProductDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchProductDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.productDetail = action.payload;
+      })
+      .addCase(fetchProductDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { clearProducts } = productSlice.actions;
+export const { clearProducts, clearProductDetail } = productSlice.actions;
 export default productSlice.reducer;
