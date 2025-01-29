@@ -26,6 +26,7 @@ const variantSchema = new mongoose.Schema(
     cost: {
       type: Number,
       min: 1,
+      required: true,
     },
     stock: {
       type: Number,
@@ -35,8 +36,8 @@ const variantSchema = new mongoose.Schema(
     images: [
       {
         url: { type: String, required: true },
-        alt: { type: String },
-        isDefault: { type: Boolean, default: false },
+        alt: { type: String, default: "" },
+        isDefault: { type: Boolean, default: true },
       },
     ],
     isDefault: {

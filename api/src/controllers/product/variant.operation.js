@@ -16,12 +16,12 @@ export const createVariant = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { pid, attributes, price, compareAtPrice, images } = value;
+  const { pid, attributes, price, compareAtPrice, cost, images } = value;
 
   try {
-    const productExists = await Product.exists({ _id: pid });
+    const exist = await Product.exists({ _id: pid });
 
-    if (!productExists) {
+    if (!exist) {
       const error = customError(404, "Product not found");
       logger.error(`Product with id ${pid} not found: `, error);
       return next(error);
@@ -32,6 +32,7 @@ export const createVariant = async (req, res, next) => {
       attributes,
       price,
       compareAtPrice,
+      cost,
       images,
     });
 
@@ -62,6 +63,7 @@ export const updateVariant = async (req, res, next) => {
     toRemove,
     price,
     compareAtPrice,
+    cost,
     isDefault,
   } = value;
 
@@ -78,30 +80,55 @@ export const updateVariant = async (req, res, next) => {
           price,
           compareAtPrice,
           isDefault,
+          cost,
         },
       },
     },
   });
 
   if (toAdd) {
-    bulkOperations.push({
-      updateOne: {
-        filter: {
-          _id: vid,
-          product: pid,
-        },
-        update: {
-          $addToSet: {
-            attributes: {
-              $each: toAdd.attributes,
-            },
-            images: {
-              $each: toAdd.images,
-            },
+    const addToBulk = (filter, value) => {
+      bulkOperations.push({
+        updateOne: {
+          filter: {
+            _id: vid,
+            product: pid,
+            ...filter,
+          },
+          update: {
+            $addToSet: { ...value },
           },
         },
-      },
-    });
+      });
+    };
+
+    if (toAdd.attributes)
+      addToBulk(
+        {
+          "attributes.name": {
+            $nin: toAdd.attributes.map((attribute) => attribute.name),
+          },
+        },
+        {
+          attributes: {
+            $each: toAdd.attributes,
+          },
+        }
+      );
+
+    if (toAdd.images)
+      addToBulk(
+        {
+          "images.url": {
+            $nin: toAdd.images.map((image) => image.url),
+          },
+        },
+        {
+          images: {
+            $each: toAdd.images,
+          },
+        }
+      );
   }
 
   if (toRemove) {
@@ -200,7 +227,10 @@ export const updateVariant = async (req, res, next) => {
     const { matchedCount } = await Variant.bulkWrite(bulkOperations);
 
     if (!matchedCount) {
-      const error = customError(404, "Variant not found");
+      const error = customError(
+        404,
+        "Variant with provided specifications not found"
+      );
       logger.error(`Variant with id ${vid} not found: `, error);
       return next(error);
     }

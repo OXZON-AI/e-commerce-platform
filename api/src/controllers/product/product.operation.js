@@ -57,6 +57,7 @@ export const createProduct = async (req, res, next) => {
 };
 
 export const getProduct = async (req, res, next) => {
+  const { role } = req.user;
   const { error, value } = validateGetProduct(req.params);
 
   if (error) return next(error);
@@ -117,6 +118,7 @@ export const getProduct = async (req, res, next) => {
           images: 1,
           isDefault: 1,
           sku: 1,
+          ...(role === "admin" && { cost: 1 }),
         },
       },
     },
@@ -156,8 +158,6 @@ export const getProducts = async (req, res, next) => {
     limit,
   } = value;
   const skip = (page - 1) * limit;
-  const sortByField =
-    sortBy === "ratings" ? "ratings.average" : "defaultVariant.price";
 
   const pipeline = [];
 
@@ -298,11 +298,15 @@ export const getProducts = async (req, res, next) => {
     });
   }
 
-  pipeline.push({
-    $sort: {
-      [sortByField]: sortOrder === "asc" ? 1 : -1,
-    },
-  });
+  if (sortBy) {
+    const sortByField =
+      sortBy === "ratings" ? "ratings.average" : "defaultVariant.price";
+    pipeline.push({
+      $sort: {
+        [sortByField]: sortOrder === "asc" ? 1 : -1,
+      },
+    });
+  }
 
   pipeline.push({
     $skip: skip,

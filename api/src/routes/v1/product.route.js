@@ -14,6 +14,7 @@ import {
   relatedProducts,
 } from "../../controllers/product/index.js";
 import { filterGuest } from "../../middleware/filterGuest.middleware.js";
+import { optionalAuth } from "../../middleware/optionalAuth.middleware.js";
 
 const route = express.Router();
 
@@ -22,7 +23,7 @@ route.post("/:pid/variants", verifyToken, verifyAdmin, createVariant);
 route.get("/", getProducts);
 route.get("/recommendations", verifyToken, filterGuest, productRecommendations);
 route.get("/related", relatedProducts);
-route.get("/:slug", getProduct);
+route.get("/:slug", optionalAuth, getProduct);
 route.put("/:pid", verifyToken, verifyAdmin, updateProduct);
 route.put("/:pid/variants/:vid", verifyToken, verifyAdmin, updateVariant);
 route.delete("/:pid", verifyToken, verifyAdmin, deleteProduct);
