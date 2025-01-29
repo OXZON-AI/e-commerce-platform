@@ -1,13 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "../../axiosConfig";
+import axiosInstance from "../../axiosConfig";
 
 // Async thunk to update user details
 export const updateUser = createAsyncThunk(
   "user/updateUser",
   async ({ userId, userData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        `http://localhost:3000/v1/users/${userId}`, // Add user ID dynamically
+      const response = await axiosInstance.put(
+        `/v1/users/${userId}`, // Add user ID dynamically
         userData // Send user data in the request body
       );
 
@@ -65,5 +65,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, clearUser, clearSuccess, clearError } = userSlice.actions;
+export const { setUser, clearUser, clearSuccess, clearError } =
+  userSlice.actions;
 export default userSlice.reducer;
