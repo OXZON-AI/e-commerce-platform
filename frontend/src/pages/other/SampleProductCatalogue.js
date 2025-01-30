@@ -166,8 +166,8 @@ const SampleProductCatalogue = () => {
             >
               <img
                 className="w-full h-48 object-cover rounded-lg mb-4"
-                src={product.defaultVariant?.images?.[0]?.url || placeholderImage}
-                alt={product.defaultVariant?.images?.[0]?.alt || "Product Image"}
+                src={product.defaultVariant?.image?.url || placeholderImage}
+                alt={product.defaultVariant?.image?.alt || "Product Image"}
                 onError={(e) => {
                   e.target.src = placeholderImage;
                 }}
