@@ -34,46 +34,61 @@ export const summaryPipeline = [
           },
         },
         {
-          $project: {
-            totalCost: {
-              $sum: {
-                $map: {
-                  input: "$items",
-                  as: "item",
-                  in: {
-                    $arrayElemAt: [
+          $addFields: {
+            items: {
+              $map: {
+                input: "$items",
+                as: "item",
+                in: {
+                  variant: "$$item.variant",
+                  quantity: "$$item.quantity",
+                  subTotal: "$$item.subTotal",
+                  cost: {
+                    $multiply: [
+                      "$$item.quantity",
                       {
-                        $map: {
-                          input: {
-                            $filter: {
-                              input: "$variants",
-                              as: "variant",
-                              cond: {
-                                if: {
-                                  $eq: ["$$variant._id", "$$item.variant"],
+                        $arrayElemAt: [
+                          {
+                            $let: {
+                              vars: {
+                                matchingVariant: {
+                                  $filter: {
+                                    input: "$variants",
+                                    as: "variant",
+                                    cond: {
+                                      $eq: ["$$variant._id", "$$item.variant"],
+                                    },
+                                  },
                                 },
                               },
+                              in: "$$matchingVariant.cost",
                             },
                           },
-                          as: "variant",
-                          in: {
-                            $cond: {
-                              if: {
-                                $ne: ["$status", "cancelled"],
-                              },
-                              then: {
-                                $multiply: [
-                                  "$$variant.cost",
-                                  "$$item.quantity",
-                                ],
-                              },
-                              else: 0,
-                            },
-                          },
-                        },
+                          0,
+                        ],
                       },
-                      0,
                     ],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            cost: {
+              $reduce: {
+                input: "$items",
+                initialValue: 0,
+                in: {
+                  $cond: {
+                    if: {
+                      $eq: ["$status", "cancelled"],
+                    },
+                    then: "$$value",
+                    else: {
+                      $add: ["$$value", "$$this.cost"],
+                    },
                   },
                 },
               },
@@ -82,6 +97,19 @@ export const summaryPipeline = [
         },
       ],
       averageOrderValue: [
+        {
+          $addFields: {
+            "payment.amount": {
+              $cond: {
+                if: {
+                  $eq: ["$status", "cancelled"],
+                },
+                then: 0,
+                else: "$payment.amount",
+              },
+            },
+          },
+        },
         {
           $group: {
             _id: null,
@@ -102,7 +130,7 @@ export const summaryPipeline = [
         $arrayElemAt: ["$revenue.sum", 0],
       },
       cost: {
-        $sum: "$costs.totalCost",
+        $sum: "$costs.cost",
       },
       averageOrderValue: {
         $arrayElemAt: ["$averageOrderValue.amount", 0],
@@ -118,7 +146,7 @@ export const summaryPipeline = [
   },
   {
     $project: {
-      count: { $ifNull: ["$count", 0] },
+      orderCount: { $ifNull: ["$count", 0] },
       revenue: { $ifNull: ["$revenue", 0] },
       cost: { $ifNull: ["$cost", 0] },
       profit: { $ifNull: ["$profit", 0] },
