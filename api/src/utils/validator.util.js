@@ -16,7 +16,10 @@ import {
   removeFromCartSchema,
   updateCartSchema,
 } from "./validationSchemas/cart.schema.js";
-import { createCategorySchema } from "./validationSchemas/category.schema.js";
+import {
+  createCategorySchema,
+  updateCategorySchema,
+} from "./validationSchemas/category.schema.js";
 import { completeCheckoutSchema } from "./validationSchemas/checkout.schema.js";
 import {
   cancelOrderSchema,
@@ -60,6 +63,7 @@ export const validateCreateVariant = validate(createVariantSchema);
 export const validateUpdateVariant = validate(updateVariantSchema);
 export const validateDeleteVariant = validate(deleteVariantSchema);
 export const validateCreateCategory = validate(createCategorySchema);
+export const validateUpdateCategory = validate(updateCategorySchema);
 export const validateAddToCart = validate(addToCartSchema);
 export const validateRemoveFromCart = validate(removeFromCartSchema);
 export const validateUpdateCart = validate(updateCartSchema);
