@@ -1,6 +1,7 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearProducts, fetchProducts } from "../../store/slices/product-slice";
+import { fetchCategories } from "../../store/slices/category-slice";
 import { Link } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
 import placeholderImage from "../../assets/images/placeholder_image.png";
@@ -9,6 +10,11 @@ import LayoutOne from "../../layouts/LayoutOne";
 const ProductListPage = () => {
   const dispatch = useDispatch(); // Dispatch function to interact with Redux store
   const { items = [], loading, error } = useSelector((state) => state.product); // Selecting the product state from the Redux store
+  const {
+    categories = [],
+    loadingCategories,
+    errorCategory,
+  } = useSelector((state) => state.categories); // selecting the category state from Redux store
   const [viewLayout, setViewLayout] = useState("grid"); // New state for view layout
 
   // Local state to manage the filters
@@ -68,7 +74,6 @@ const ProductListPage = () => {
 
   // Effect hook to fetch products when filters change or component mounts
   useEffect(() => {
-    console.log("Fetching products with filters:", filters);
     const query = buildFilters(filters); // Generate the query based on the current filters
     dispatch(fetchProducts(query)); // Dispatch the fetchProducts action with the generated query
 
@@ -78,14 +83,19 @@ const ProductListPage = () => {
     };
   }, [filters, dispatch]); // Dependencies: dispatch and filters, so it triggers when either changes
 
-  const categories = [
-    "All Categories",
-    "Consoles",
-    "laptops",
-    "Charger",
-    "Books",
-    "Cosmetics",
-  ];
+  // Effect hook to fetch categories when component mounts
+  useEffect(() => {
+    dispatch(fetchCategories()); // Dispatch the fetchCategories action
+  }, [dispatch]);
+
+  // const categoriesArray = [
+  //   "All Categories",
+  //   "Consoles",
+  //   "laptops",
+  //   "Charger",
+  //   "Books",
+  //   "Cosmetics",
+  // ];
 
   const brands = [
     "All Brands",
@@ -157,17 +167,32 @@ const ProductListPage = () => {
 
             {/* Category List */}
             <ul className="space-y-3">
-              {categories.map((category) => (
+              {loadingCategories && (
+                <p className="col-span-4 text-center text-gray-500">
+                  Loading categories...
+                </p>
+              )}
+              {errorCategory && (
+                <p className="col-span-4 text-center text-red-500">
+                  Error: {errorCategory}
+                </p>
+              )}
+              {categories?.length === 0 && !loadingCategories && (
+                <p className="col-span-4 text-center text-gray-500">
+                  No Categories to show!
+                </p>
+              )}
+              {categories && [{ _id: "all", name: "All Categories" }, ...categories]?.map((category) => ( // Add 'All Categories' name to all categories name. so I can show it on categories list.
                 <li
-                  key={category}
+                  key={category._id}
                   className={`text-center cursor-pointer px-4 py-2 rounded-lg text-sm ${
-                    filters.category === category
+                    filters.category === category.name
                       ? "bg-purple-600 text-white font-semibold"
                       : "hover:bg-gray-200"
                   }`}
-                  onClick={() => handleCategoryChange(category)}
+                  onClick={() => handleCategoryChange(category.name)}
                 >
-                  {category}
+                  {category.name}
                 </li>
               ))}
             </ul>
