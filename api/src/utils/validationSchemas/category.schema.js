@@ -49,3 +49,12 @@ export const updateCategorySchema = Joi.object({
   }),
   level: Joi.number().valid(0, 1, 2),
 });
+
+export const deleteCategorySchema = Joi.object({
+  cid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Category id must be a valid ObjectId",
+    }),
+});

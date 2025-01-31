@@ -1,9 +1,13 @@
 import { Category } from "../models/category.model.js";
-import { buildCategoryTree } from "../services/category.service.js";
+import {
+  buildCategoryTree,
+  getIdsForDelete,
+} from "../services/category.service.js";
 import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
 import {
   validateCreateCategory,
+  validateDeleteCategory,
   validateUpdateCategory,
 } from "../utils/validator.util.js";
 
@@ -97,6 +101,34 @@ export const updateCategory = async (req, res, next) => {
       .json({ message: "Category updated successfully", category });
   } catch (error) {
     logger.error(`Error updating category with id ${cid}: `, error);
+    return next(error);
+  }
+};
+
+export const deleteCategory = async (req, res, next) => {
+  const { error, value } = validateDeleteCategory(req.params);
+
+  if (error) return next(error);
+
+  const { cid } = value;
+
+  try {
+    const ids = await getIdsForDelete(cid);
+
+    const { deletedCount } = await Category.deleteMany({
+      _id: { $in: ids },
+    });
+
+    if (!deletedCount) {
+      const error = customError(404, "Category not found");
+      logger.error(`Category with id ${cid} not found: `, error);
+      return next(error);
+    }
+
+    logger.info(`Category with id ${cid} deleted successfully`);
+    return res.status(200).json({ message: "Category deleted successfully" });
+  } catch (error) {
+    logger.error(`Error deleting category with id ${cid}: `, error);
     return next(error);
   }
 };
