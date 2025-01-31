@@ -42,6 +42,7 @@ const productSlice = createSlice({
   name: "product",
   initialState: {
     items: [],
+    brands: [],
     productDetail: null,
     loading: false,
     error: null,
@@ -52,7 +53,10 @@ const productSlice = createSlice({
     },
     clearProductDetail: (state) => {
       state.productDetail = null;
-    }
+    },
+    setBrands: (state, action) => {
+      state.brands = ["All Brands", ...action.payload]; // Store brands once
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -63,6 +67,17 @@ const productSlice = createSlice({
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
+
+        //Exact unique brands only when products are fetched for the first time
+        if (state.brands.length === 0) {
+          const brandsSet = new Set(); // Set ensures each brand appears only once, removing duplicates.
+          action.payload.forEach((product) => {
+            if (product.brand) {
+              brandsSet.add(product.brand.trim());
+            }
+          });
+          state.brands = ["All Brands", ...Array.from(brandsSet)]; // Ensure "All Brands" is included
+        }
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
