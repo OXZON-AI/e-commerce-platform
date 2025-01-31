@@ -7,12 +7,6 @@ export const createReviewSchema = Joi.object({
     .messages({
       "string.pattern.base": "Variant id must be a valid ObjectId",
     }),
-  user: Joi.string()
-    .regex(/^[0-9a-fA-F]{24}$/)
-    .required()
-    .messages({
-      "string.pattern.base": "User id must be a valid ObjectId",
-    }),
   order: Joi.string()
     .regex(/^[0-9a-fA-F]{24}$/)
     .required()
@@ -36,7 +30,7 @@ export const createReviewSchema = Joi.object({
 export const getReviewsSchema = Joi.object({
   slug: Joi.string().trim().required(),
   rating: Joi.number().min(1).max(5),
-  sort: Joi.string().trim().valid("asc", "desc"),
+  sortOrder: Joi.string().trim().valid("asc", "desc"),
   page: Joi.number().min(1).default(1),
   limit: Joi.number().min(1).default(10),
 });

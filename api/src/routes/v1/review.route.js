@@ -4,10 +4,11 @@ import {
   createReview,
   getReviews,
 } from "../../controllers/review.controller.js";
+import { filterGuest } from "../../middleware/filterGuest.middleware.js";
 
 const route = express.Router();
 
-route.post("/", verifyToken, createReview);
+route.post("/", verifyToken, filterGuest, createReview);
 route.get("/:slug", getReviews);
 
 export default route;

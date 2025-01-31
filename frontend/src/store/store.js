@@ -15,6 +15,8 @@ import currencyReducer from "./slices/currency-slice";
 import cartReducer from "./slices/cart-slice";
 import compareReducer from "./slices/compare-slice";
 import wishlistReducer from "./slices/wishlist-slice";
+import userReducer from './slices/user-slice';
+import adminUserReducer from './slices/admin-user-slice';
 
 const persistConfig = {
     key: "frontend",
@@ -27,7 +29,9 @@ export const rootReducer = combineReducers({
     currency: currencyReducer,
     cart: cartReducer,
     compare: compareReducer,
-    wishlist: wishlistReducer
+    wishlist: wishlistReducer,
+    user: userReducer,
+    users: adminUserReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -1,5 +1,21 @@
 import Joi from "joi";
 
+const validAttribtues = [
+  "color",
+  "size",
+  "storage",
+  "ram",
+  "processor",
+  "display",
+  "battery",
+  "operating system",
+  "camera",
+  "connectivity",
+  "gpu",
+  "ports",
+  "weight",
+];
+
 export const createProductSchema = Joi.object({
   name: Joi.string().trim().required(),
   description: Joi.object({
@@ -19,14 +35,31 @@ export const createProductSchema = Joi.object({
         attributes: Joi.array()
           .items(
             Joi.object({
-              name: Joi.string().trim().lowercase().required(),
+              name: Joi.string()
+                .trim()
+                .lowercase()
+                .valid(...validAttribtues)
+                .required(),
               value: Joi.string().trim().lowercase().required(),
             })
           )
           .min(1)
+          .custom((attributes, helpers) => {
+            const names = attributes.map((attribute) => attribute.name);
+            const duplicates = names.filter(
+              (name, i) => names.indexOf(name) !== i
+            );
+
+            if (duplicates.length > 0) {
+              return helpers.message(`Duplicate attributes ${duplicates}`);
+            }
+
+            return attributes;
+          })
           .required(),
         price: Joi.number().min(1).less(Joi.ref("compareAtPrice")).required(),
-        compareAtPrice: Joi.number().required(),
+        compareAtPrice: Joi.number().min(1).required(),
+        cost: Joi.number().min(1).required(),
         images: Joi.array()
           .items(
             Joi.object({
@@ -39,6 +72,16 @@ export const createProductSchema = Joi.object({
             })
           )
           .min(1)
+          .custom((images, helpers) => {
+            const urls = images.map((image) => image.url);
+            const duplicates = urls.filter((url, i) => urls.indexOf(url) !== i);
+
+            if (duplicates.length > 0) {
+              return helpers.message(`Duplicate urls ${duplicates}`);
+            }
+
+            return images;
+          })
           .required(),
         isDefault: Joi.boolean(),
       })
@@ -56,7 +99,11 @@ export const getProductsSchema = Joi.object({
   category: Joi.string().trim(),
   brand: Joi.string().trim(),
   sortBy: Joi.string().trim().valid("ratings", "price"),
-  sortOrder: Joi.string().trim().valid("asc", "desc"),
+  sortOrder: Joi.when("sortBy", {
+    is: Joi.exist(),
+    then: Joi.string().trim().valid("asc", "desc"),
+    otherwise: Joi.forbidden(),
+  }),
   minPrice: Joi.when("maxPrice", {
     is: Joi.exist(),
     then: Joi.number().less(Joi.ref("maxPrice")),
@@ -107,7 +154,11 @@ export const createVariantSchema = Joi.object({
   attributes: Joi.array()
     .items(
       Joi.object({
-        name: Joi.string().trim().lowercase().required(),
+        name: Joi.string()
+          .trim()
+          .lowercase()
+          .valid(...validAttribtues)
+          .required(),
         value: Joi.string().trim().lowercase().required(),
       })
     )
@@ -115,6 +166,7 @@ export const createVariantSchema = Joi.object({
     .required(),
   price: Joi.number().min(1).less(Joi.ref("compareAtPrice")).required(),
   compareAtPrice: Joi.number().required(),
+  cost: Joi.number().min(1).required(),
   images: Joi.array()
     .items(
       Joi.object({
@@ -148,10 +200,24 @@ export const updateVariantSchema = Joi.object({
     attributes: Joi.array()
       .items(
         Joi.object({
-          name: Joi.string().trim().lowercase().required(),
+          name: Joi.string()
+            .trim()
+            .lowercase()
+            .valid(...validAttribtues)
+            .required(),
           value: Joi.string().trim().lowercase().required(),
         })
       )
+      .custom((attributes, helpers) => {
+        const names = attributes.map((attribute) => attribute.name);
+        const duplicates = names.filter((name, i) => names.indexOf(name) !== i);
+
+        if (duplicates.length > 0) {
+          return helpers.message(`Duplicate attributes ${duplicates}`);
+        }
+
+        return attributes;
+      })
       .default([]),
     images: Joi.array()
       .items(
@@ -164,12 +230,26 @@ export const updateVariantSchema = Joi.object({
           isDefault: Joi.boolean(),
         })
       )
+      .custom((images, helpers) => {
+        const urls = images.map((image) => image.url);
+        const duplicates = urls.filter((url, i) => urls.indexOf(url) !== i);
+
+        if (duplicates.length > 0) {
+          return helpers.message(`Duplicate urls ${duplicates}`);
+        }
+
+        return images;
+      })
       .default([]),
   }),
   toChange: Joi.object({
     attributes: Joi.array().items(
       Joi.object({
-        name: Joi.string().trim().lowercase().required(),
+        name: Joi.string()
+          .trim()
+          .lowercase()
+          .valid(...validAttribtues)
+          .required(),
         value: Joi.string().trim().lowercase().required(),
         id: Joi.string()
           .regex(/^[0-9a-fA-F]{24}$/)
@@ -224,6 +304,7 @@ export const updateVariantSchema = Joi.object({
     otherwise: Joi.number().min(1),
   }),
   compareAtPrice: Joi.number().min(1),
+  cost: Joi.number().min(1),
   isDefault: Joi.boolean(),
 });
 
@@ -240,4 +321,18 @@ export const deleteVariantSchema = Joi.object({
     .messages({
       "string.pattern.base": "Variant id must be a valid ObjectId",
     }),
+});
+
+export const recommendationsSchema = Joi.object({
+  limit: Joi.number().min(1).default(10),
+});
+
+export const relatedProductsSchema = Joi.object({
+  cid: Joi.string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      "string.pattern.base": "Category id must be a valid ObjectId",
+    }),
+  limit: Joi.number().min(1).default(10),
 });

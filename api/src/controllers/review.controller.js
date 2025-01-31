@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Order } from "../models/order.model.js";
 import { Review } from "../models/review.model.js";
 import { customError } from "../utils/error.util.js";
@@ -6,35 +7,64 @@ import {
   validateCreateReview,
   validateGetReviews,
 } from "../utils/validator.util.js";
+import { Product } from "../models/product.model.js";
+import { Variant } from "../models/variant.model.js";
 
 export const createReview = async (req, res, next) => {
+  const { id } = req.user;
   const { error, value } = validateCreateReview(req.body);
 
   if (error) return next(error);
 
-  const { variant, user, order } = value;
+  const { variant: vid, order } = value;
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     const exist = await Order.exists({
       _id: order,
-      "items.variant": variant,
-      user,
-    });
+      "items.variant": vid,
+      user: id,
+    }).session(session);
 
     if (!exist) {
       const error = customError(404, "Order not found");
-
       logger.error("Error: ", error);
       return next(error);
     }
 
-    const review = Review(value);
+    const variant = await Variant.findById(vid)
+      .select("product")
+      .populate({ path: "product" })
+      .session(session);
 
-    await review.save();
+    if (!variant) {
+      const error = customError(404, "Product not found");
+      logger.error("Error: ", error);
+      return next(error);
+    }
+
+    const newCount = variant.product.ratings.count + 1;
+    const newAverage =
+      (variant.product.ratings.average * variant.product.ratings.count +
+        value.rating) /
+      newCount;
+
+    const review = Review({ user: id, ...value });
+
+    await review.save({ session });
+
+    await Product.findByIdAndUpdate(variant.product._id, {
+      $set: { "ratings.count": newCount, "ratings.average": newAverage },
+    }).session(session);
+
+    await session.commitTransaction();
 
     logger.info(`Created review  order ${order}`);
     return res.status(201).json({ message: "Review posted successfully" });
   } catch (error) {
+    await session.abortTransaction();
+
     if (error.code === 11000) {
       const err = customError(400, "You have already reviewed this product.");
       logger.error(`Duplicate review attempt for order ${order}: `, err);
@@ -43,6 +73,8 @@ export const createReview = async (req, res, next) => {
 
     logger.error(`Error creating the review for order ${order}: `, error);
     return next(error);
+  } finally {
+    await session.endSession();
   }
 };
 
@@ -54,7 +86,7 @@ export const getReviews = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { slug, page, limit, rating, sort } = value;
+  const { slug, page, limit, rating, sortOrder } = value;
   const skip = (page - 1) * limit;
 
   const countsPipeline = [
@@ -127,7 +159,7 @@ export const getReviews = async (req, res, next) => {
   reviewsPipeline.push(
     {
       $sort: {
-        rating: sort === "asc" ? 1 : -1,
+        rating: sortOrder === "asc" ? 1 : -1,
       },
     },
     {

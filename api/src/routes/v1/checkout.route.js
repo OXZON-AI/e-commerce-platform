@@ -5,9 +5,9 @@ import {
   processCheckout,
 } from "../../controllers/checkout.controller.js";
 
-const router = express.Router();
+const route = express.Router();
 
-router.post("/process", verifyToken, processCheckout);
-router.post("/complete", verifyToken, completeCheckout);
+route.post("/process", verifyToken, processCheckout);
+route.post("/complete", verifyToken, completeCheckout);
 
-export default router;
+export default route;

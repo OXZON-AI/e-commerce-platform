@@ -1,4 +1,10 @@
 import {
+  salesPerformanceSchema,
+  salesSummarySchema,
+} from "./validationSchemas/analytics.schema.js";
+import {
+  deleteUserSchema,
+  getUsersSchema,
   requestResetSchema,
   resetPasswordSchema,
   signinSchema,
@@ -13,12 +19,19 @@ import {
 import { createCategorySchema } from "./validationSchemas/category.schema.js";
 import { completeCheckoutSchema } from "./validationSchemas/checkout.schema.js";
 import {
+  cancelOrderSchema,
+  getOrdersSchema,
+  updateStatusSchema,
+} from "./validationSchemas/order.schema.js";
+import {
   createProductSchema,
   createVariantSchema,
   deleteProductSchema,
   deleteVariantSchema,
   getProductSchema,
   getProductsSchema,
+  recommendationsSchema,
+  relatedProductsSchema,
   updateProductSchema,
   updateVariantSchema,
 } from "./validationSchemas/product.schema.js";
@@ -36,6 +49,8 @@ export const validateSignin = validate(signinSchema);
 export const validateRequestReset = validate(requestResetSchema);
 export const validatePasswordReset = validate(resetPasswordSchema);
 export const validateUpdateUser = validate(updateUserSchema);
+export const validateGetUsers = validate(getUsersSchema);
+export const validateDeleteUser = validate(deleteUserSchema);
 export const validateCreateProduct = validate(createProductSchema);
 export const validateGetProduct = validate(getProductSchema);
 export const validateGetProducts = validate(getProductsSchema);
@@ -51,3 +66,10 @@ export const validateUpdateCart = validate(updateCartSchema);
 export const validateCompleteCheckout = validate(completeCheckoutSchema);
 export const validateCreateReview = validate(createReviewSchema);
 export const validateGetReviews = validate(getReviewsSchema);
+export const validateGetOrders = validate(getOrdersSchema);
+export const validateUpdateStatus = validate(updateStatusSchema);
+export const validateCancelOrder = validate(cancelOrderSchema);
+export const validateRecommendations = validate(recommendationsSchema);
+export const validateRelatedProducts = validate(relatedProductsSchema);
+export const validateSalesSummary = validate(salesSummarySchema);
+export const validateSalesPerformance = validate(salesPerformanceSchema);
