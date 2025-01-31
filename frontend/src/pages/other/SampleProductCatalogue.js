@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { clearProducts, fetchProducts } from "../../store/slices/product-slice";
 import { Link } from "react-router-dom";
 import placeholderImage from "../../assets/images/placeholder_image.png";
+import LayoutOne from "../../layouts/LayoutOne";
 
 const SampleProductCatalogue = () => {
   const dispatch = useDispatch(); // Dispatch function to interact with Redux store
@@ -51,6 +52,7 @@ const SampleProductCatalogue = () => {
 
   // Effect hook to fetch products when filters change or component mounts
   useEffect(() => {
+    console.log("Fetching products with filters:", filters);
     const query = buildFilters(filters); // Generate the query based on the current filters
     dispatch(fetchProducts(query)); // Dispatch the fetchProducts action with the generated query
 
@@ -61,6 +63,10 @@ const SampleProductCatalogue = () => {
   }, [dispatch, filters]); // Dependencies: dispatch and filters, so it triggers when either changes
 
   return (
+    <Fragment>
+      <LayoutOne>
+
+      
     <div className="product-catalogue max-w-6xl mx-auto p-6">
       <h1 className="text-3xl font-semibold text-center mb-6">
         Product Catalogue
@@ -148,7 +154,7 @@ const SampleProductCatalogue = () => {
       {/* Product List */}
       <div className="product-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {loading && (
-          <p className="col-span-4 text-center text-gray-500">Loading...</p>
+          <p className="col-span-4 text-center text-gray-500">Loading products...</p>
         )}
         {error && (
           <p className="col-span-4 text-center text-red-500">Error: {error}</p>
@@ -176,6 +182,9 @@ const SampleProductCatalogue = () => {
               <p className="inline-block bg-blue-100 border-2 border-blue-500 text-blue-500 rounded px-1 py-1 text-sm font-bold text-blue-600 mt-2">
                 {product.brand}
               </p>
+              <p className="inline-block bg-blue-100 border-2 border-blue-500 text-blue-500 rounded px-1 py-1 text-sm font-bold text-blue-600 mt-2">
+                {product.category.name}
+              </p>
               <p className="text-gray-600 mt-2">
                 {product.description?.short || "No description available"}
               </p>
@@ -187,6 +196,9 @@ const SampleProductCatalogue = () => {
         ))}
       </div>
     </div>
+
+    </LayoutOne>
+    </Fragment>
   );
 };
 
