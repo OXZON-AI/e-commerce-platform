@@ -105,23 +105,6 @@ const ProductListPage = () => {
     };
   }, [dispatch]);
 
-  // const categoriesArray = [
-  //   "All Categories",
-  //   "Consoles",
-  //   "laptops",
-  //   "Charger",
-  //   "Books",
-  //   "Cosmetics",
-  // ];
-
-  // const brands = [
-  //   "All Brands",
-  //   "XYZ Electronics",
-  //   "samsung",
-  //   "Brand C",
-  //   "Brand D",
-  // ];
-
   const handleCategoryChange = (category) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
@@ -165,14 +148,6 @@ const ProductListPage = () => {
   };
 
   const totalPages = Math.ceil(items.length / filters.limit);
-
-  // if (loading) {
-  //   return <div className="text-center text-lg mt-8">Loading products...</div>;
-  // }
-
-  // if (error) {
-  //   return <div className="text-center text-red-500 mt-8">{error}</div>;
-  // }
 
   return (
     <Fragment>
@@ -254,19 +229,6 @@ const ProductListPage = () => {
             <div className="mt-6">
               <h4 className="text-lg font-medium mb-3">Filter by Brand</h4>
               <ul className="space-y-2">
-                {/* {items?.map((item) => (
-                  <li
-                    key={item.brand}
-                    className={`cursor-pointer px-4 py-2 rounded-lg text-sm ${
-                      filters.brand === item.brand
-                        ? "bg-purple-600 text-white font-semibold"
-                        : "hover:bg-gray-200"
-                    }`}
-                    onClick={() => handleBrandChange(items.brand)}
-                  >
-                    {item.brand}
-                  </li>
-                ))} */}
                 {brands.map((brand) => (
                   <li
                     key={brand}
