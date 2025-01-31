@@ -1,6 +1,11 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { clearProducts, fetchProducts } from "../../store/slices/product-slice";
+import {
+  clearProducts,
+  fetchProducts,
+  clearBrands,
+} from "../../store/slices/product-slice";
+import { fetchCategories } from "../../store/slices/category-slice";
 import { Link } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
 import placeholderImage from "../../assets/images/placeholder_image.png";
@@ -8,14 +13,24 @@ import LayoutOne from "../../layouts/LayoutOne";
 
 const ProductListPage = () => {
   const dispatch = useDispatch(); // Dispatch function to interact with Redux store
-  const { items = [], loading, error } = useSelector((state) => state.product); // Selecting the product state from the Redux store
+  const {
+    items = [],
+    brands = [],
+    loading,
+    error,
+  } = useSelector((state) => state.product); // Selecting the product state from the Redux store
+  const {
+    categories = [],
+    loadingCategories,
+    errorCategory,
+  } = useSelector((state) => state.categories); // selecting the category state from Redux store
   const [viewLayout, setViewLayout] = useState("grid"); // New state for view layout
 
   // Local state to manage the filters
   const [filters, setFilters] = useState({
     search: "",
-    category: "",
-    brand: "",
+    category: "All Categories",
+    brand: "All Brands",
     sortBy: "", // Field to sort by (ratings or price)
     sortOrder: "", // Sort order (ascending or descending)
     priceRange: [0, 1000], // Price range filter (min, max)
@@ -26,15 +41,29 @@ const ProductListPage = () => {
   // Function to build query params based on the selected filters
   const buildFilters = (filters) => {
     const query = {};
+
+    // Search term
     if (filters.search) query.search = filters.search.trim(); // If a search term exists, add it to the query
-    if (filters.category) query.category = filters.category.trim(); // If a category is selected, add it to the query
-    if (filters.brand) query.brand = filters.brand.trim(); // If a brand is selected, add it to the query
+
+    // Category filter (omit if "All Categories" is selected)
+    if (filters.category && filters.category !== "All Categories") {
+      query.category = filters.category.trim(); // If a category is selected, add it to the query
+    }
+
+    // Brand filter (omit if "All Brands" is selected)
+    if (filters.brand && filters.brand !== "All Brands") {
+      query.brand = filters.brand.trim(); // If a brand is selected, add it to the query
+    }
+
+    // Sorting Options
     if (filters.sortBy) {
       query.sortBy = filters.sortBy.trim();
       query.sortOrder = filters.sortOrder
         ? filters.sortOrder.trim()
         : undefined;
     } // If sorting is enabled, add sort options to the query
+
+    // Price range filter
     if (
       filters.priceRange[0] &&
       (!filters.priceRange[1] || filters.priceRange[0] < filters.priceRange[1])
@@ -54,7 +83,6 @@ const ProductListPage = () => {
 
   // Effect hook to fetch products when filters change or component mounts
   useEffect(() => {
-    console.log("Fetching products with filters:", filters);
     const query = buildFilters(filters); // Generate the query based on the current filters
     dispatch(fetchProducts(query)); // Dispatch the fetchProducts action with the generated query
 
@@ -64,22 +92,18 @@ const ProductListPage = () => {
     };
   }, [filters, dispatch]); // Dependencies: dispatch and filters, so it triggers when either changes
 
-  const categories = [
-    "All Categories",
-    "Consoles",
-    "laptops",
-    "Charger",
-    "Books",
-    "Cosmetics",
-  ];
+  // Effect hook to fetch categories when component mounts
+  useEffect(() => {
+    dispatch(fetchCategories()); // Dispatch the fetchCategories action
+  }, [dispatch]);
 
-  const brands = [
-    "All Brands",
-    "XYZ Electronics",
-    "samsung",
-    "Brand C",
-    "Brand D",
-  ];
+  // Clear brands when the component unmounts
+  useEffect(() => {
+    return () => {
+      console.log("Component unmounted");  // Log when unmounted
+      dispatch(clearBrands());
+    };
+  }, [dispatch]);
 
   const handleCategoryChange = (category) => {
     setFilters((prevFilters) => ({
@@ -125,14 +149,6 @@ const ProductListPage = () => {
 
   const totalPages = Math.ceil(items.length / filters.limit);
 
-  // if (loading) {
-  //   return <div className="text-center text-lg mt-8">Loading products...</div>;
-  // }
-
-  // if (error) {
-  //   return <div className="text-center text-red-500 mt-8">{error}</div>;
-  // }
-
   return (
     <Fragment>
       <LayoutOne>
@@ -143,19 +159,39 @@ const ProductListPage = () => {
 
             {/* Category List */}
             <ul className="space-y-3">
-              {categories.map((category) => (
-                <li
-                  key={category}
-                  className={`text-center cursor-pointer px-4 py-2 rounded-lg text-sm ${
-                    filters.category === category
-                      ? "bg-purple-600 text-white font-semibold"
-                      : "hover:bg-gray-200"
-                  }`}
-                  onClick={() => handleCategoryChange(category)}
-                >
-                  {category}
-                </li>
-              ))}
+              {loadingCategories && (
+                <p className="col-span-4 text-center text-gray-500">
+                  Loading categories...
+                </p>
+              )}
+              {errorCategory && (
+                <p className="col-span-4 text-center text-red-500">
+                  Error: {errorCategory}
+                </p>
+              )}
+              {categories?.length === 0 && !loadingCategories && (
+                <p className="col-span-4 text-center text-gray-500">
+                  No Categories to show!
+                </p>
+              )}
+              {categories &&
+                [{ _id: "all", name: "All Categories" }, ...categories]?.map(
+                  (
+                    category // Add 'All Categories' name to all categories name. so I can show it on categories list.
+                  ) => (
+                    <li
+                      key={category._id}
+                      className={`text-center cursor-pointer px-4 py-2 rounded-lg text-sm ${
+                        filters.category === category.name
+                          ? "bg-purple-600 text-white font-semibold"
+                          : "hover:bg-gray-200"
+                      }`}
+                      onClick={() => handleCategoryChange(category.name)}
+                    >
+                      {category.name}
+                    </li>
+                  )
+                )}
             </ul>
 
             {/* Price Range Filter */}
@@ -163,8 +199,8 @@ const ProductListPage = () => {
               <h4 className="text-lg font-medium mb-3">Filter by Price</h4>
               <div className="flex flex-col">
                 <div className="flex justify-between text-sm">
-                  <span>${filters.priceRange[0]}</span>
-                  <span>${filters.priceRange[1]}</span>
+                  <span>{filters.priceRange[0]} MVR</span>
+                  <span>{filters.priceRange[1]} MVR</span>
                 </div>
                 <input
                   type="range"
@@ -210,7 +246,7 @@ const ProductListPage = () => {
             </div>
 
             {/* Filter Tags */}
-            {/* <div className="mt-6">
+            <div className="mt-6">
               <h4 className="text-lg font-medium mb-3">Filter by Tags</h4>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -250,7 +286,7 @@ const ProductListPage = () => {
                   Cosmetics
                 </button>
               </div>
-            </div> */}
+            </div>
           </div>
 
           {/* Main Content */}
@@ -417,10 +453,10 @@ const ProductListPage = () => {
                         {/* Pricing Section */}
                         <div className="text-lg mb-2">
                           <span className="text-green-600 font-bold">
-                            ${product.defaultVariant?.price || "N/A"}
+                            {product.defaultVariant?.price || "N/A"} MVR
                           </span>
                           {/* <span className="line-through text-gray-500 ml-2">
-                            ${product.price.toFixed(2)}
+                            {product.price.toFixed(2)} MVR
                           </span> */}
                           {/* <span className="ml-2 text-green-600">
                             ({product.discount}% OFF)
@@ -484,10 +520,10 @@ const ProductListPage = () => {
                       {/* Pricing Section */}
                       <div className="text-lg mb-2">
                         <span className="text-green-600 font-bold">
-                          ${product.defaultVariant?.price || "N/A"}
+                          {product.defaultVariant?.price || "N/A"} MVR
                         </span>
                         {/* <span className="line-through text-gray-500 ml-2">
-                          ${product.price.toFixed(2)}
+                          {product.price.toFixed(2)} MVR
                         </span>
                         <span className="ml-2 text-green-600">
                           ({product.discount}% OFF)
