@@ -19,7 +19,7 @@ const paymentSchema = new mongoose.Schema({
     type: String,
   },
   last4: {
-    type: String,
+    type: Number,
   },
   brand: {
     type: String,

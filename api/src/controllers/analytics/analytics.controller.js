@@ -1,4 +1,9 @@
 import { Order } from "../../models/order.model.js";
+import { Variant } from "../../models/variant.model.js";
+import {
+  generateOrdersExcel,
+  generateProductsExcel,
+} from "../../services/analytics.service.js";
 import { logger } from "../../utils/logger.util.js";
 import {
   validateSalesPerformance,
@@ -99,6 +104,72 @@ export const salesPerformance = async (req, res, next) => {
     return res.status(200).json(performance);
   } catch (error) {
     logger.error("Failed to fetch sales performance analytics: ", error);
+    return next(error);
+  }
+};
+
+export const salesExport = async (req, res, next) => {
+  try {
+    const orders = await Order.find().lean();
+
+    const workbook = generateOrdersExcel(orders);
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader("Content-Disposition", "attachment; filename=orders.xlsx");
+
+    await workbook.xlsx.write(res);
+
+    logger.info("Sales excel exported successfully.");
+    res.status(200).end();
+  } catch (error) {
+    logger.error("Failed to export sales excel: ", error);
+    return next(error);
+  }
+};
+
+export const productsExport = async (req, res, next) => {
+  try {
+    const data = await Variant.aggregate([
+      {
+        $group: {
+          _id: "$product",
+          variants: {
+            $push: "$$ROOT",
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "_id",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      {
+        $unwind: {
+          path: "$product",
+        },
+      },
+    ]);
+
+    const workbook = generateProductsExcel(data);
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader("Content-Disposition", "attachment; filename=products.xlsx");
+
+    await workbook.xlsx.write(res);
+
+    logger.info("Products excel exported successfully.");
+    res.status(200).end();
+  } catch (error) {
+    logger.error("Failed to export products excel: ", error);
     return next(error);
   }
 };
