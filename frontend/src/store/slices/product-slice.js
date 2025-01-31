@@ -54,9 +54,9 @@ const productSlice = createSlice({
     clearProductDetail: (state) => {
       state.productDetail = null;
     },
-    setBrands: (state, action) => {
-      state.brands = ["All Brands", ...action.payload]; // Store brands once
-    },
+    clearBrands: (state) => {
+      state.brands = [];
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -77,6 +77,8 @@ const productSlice = createSlice({
             }
           });
           state.brands = ["All Brands", ...Array.from(brandsSet)]; // Ensure "All Brands" is included
+          console.log("brands: ", state.brands);
+          
         }
       })
       .addCase(fetchProducts.rejected, (state, action) => {
@@ -98,5 +100,5 @@ const productSlice = createSlice({
   },
 });
 
-export const { clearProducts, clearProductDetail } = productSlice.actions;
+export const { clearProducts, clearProductDetail, clearBrands } = productSlice.actions;
 export default productSlice.reducer;

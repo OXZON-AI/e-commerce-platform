@@ -1,6 +1,10 @@
 import React, { Fragment, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { clearProducts, fetchProducts } from "../../store/slices/product-slice";
+import {
+  clearProducts,
+  fetchProducts,
+  clearBrands,
+} from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
 import { Link } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
@@ -9,7 +13,12 @@ import LayoutOne from "../../layouts/LayoutOne";
 
 const ProductListPage = () => {
   const dispatch = useDispatch(); // Dispatch function to interact with Redux store
-  const { items = [], loading, error } = useSelector((state) => state.product); // Selecting the product state from the Redux store
+  const {
+    items = [],
+    brands = [],
+    loading,
+    error,
+  } = useSelector((state) => state.product); // Selecting the product state from the Redux store
   const {
     categories = [],
     loadingCategories,
@@ -88,6 +97,14 @@ const ProductListPage = () => {
     dispatch(fetchCategories()); // Dispatch the fetchCategories action
   }, [dispatch]);
 
+  // Clear brands when the component unmounts
+  useEffect(() => {
+    return () => {
+      console.log("Component unmounted");  // Log when unmounted
+      dispatch(clearBrands());
+    };
+  }, [dispatch]);
+
   // const categoriesArray = [
   //   "All Categories",
   //   "Consoles",
@@ -97,13 +114,13 @@ const ProductListPage = () => {
   //   "Cosmetics",
   // ];
 
-  const brands = [
-    "All Brands",
-    "XYZ Electronics",
-    "samsung",
-    "Brand C",
-    "Brand D",
-  ];
+  // const brands = [
+  //   "All Brands",
+  //   "XYZ Electronics",
+  //   "samsung",
+  //   "Brand C",
+  //   "Brand D",
+  // ];
 
   const handleCategoryChange = (category) => {
     setFilters((prevFilters) => ({
@@ -182,19 +199,24 @@ const ProductListPage = () => {
                   No Categories to show!
                 </p>
               )}
-              {categories && [{ _id: "all", name: "All Categories" }, ...categories]?.map((category) => ( // Add 'All Categories' name to all categories name. so I can show it on categories list.
-                <li
-                  key={category._id}
-                  className={`text-center cursor-pointer px-4 py-2 rounded-lg text-sm ${
-                    filters.category === category.name
-                      ? "bg-purple-600 text-white font-semibold"
-                      : "hover:bg-gray-200"
-                  }`}
-                  onClick={() => handleCategoryChange(category.name)}
-                >
-                  {category.name}
-                </li>
-              ))}
+              {categories &&
+                [{ _id: "all", name: "All Categories" }, ...categories]?.map(
+                  (
+                    category // Add 'All Categories' name to all categories name. so I can show it on categories list.
+                  ) => (
+                    <li
+                      key={category._id}
+                      className={`text-center cursor-pointer px-4 py-2 rounded-lg text-sm ${
+                        filters.category === category.name
+                          ? "bg-purple-600 text-white font-semibold"
+                          : "hover:bg-gray-200"
+                      }`}
+                      onClick={() => handleCategoryChange(category.name)}
+                    >
+                      {category.name}
+                    </li>
+                  )
+                )}
             </ul>
 
             {/* Price Range Filter */}
@@ -232,6 +254,19 @@ const ProductListPage = () => {
             <div className="mt-6">
               <h4 className="text-lg font-medium mb-3">Filter by Brand</h4>
               <ul className="space-y-2">
+                {/* {items?.map((item) => (
+                  <li
+                    key={item.brand}
+                    className={`cursor-pointer px-4 py-2 rounded-lg text-sm ${
+                      filters.brand === item.brand
+                        ? "bg-purple-600 text-white font-semibold"
+                        : "hover:bg-gray-200"
+                    }`}
+                    onClick={() => handleBrandChange(items.brand)}
+                  >
+                    {item.brand}
+                  </li>
+                ))} */}
                 {brands.map((brand) => (
                   <li
                     key={brand}
