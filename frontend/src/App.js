@@ -13,6 +13,7 @@ const MyAccount = lazy(() => import("./pages/other/MyAccount"));
 
 // product pages
 const ProductListPage = lazy(() => import("./pages/products/ProductListPage"));
+const ProductDetailPage = lazy(() => import("./pages/products/ProductDetailPage"));
 
 //Admin User Management Page
 const RegisteredUsers = lazy(() => import("./pages/admin/RegisteredUsers"));
@@ -57,6 +58,12 @@ const App = () => {
             <Route
               path={process.env.PUBLIC_URL + "/product-list"}
               element={<ProductListPage />}
+            />
+
+            {/* Route for individual product detail page with dynamic product ID */}
+            <Route
+              path={process.env.PUBLIC_URL + "/product/:productId"}
+              element={<ProductDetailPage />}
             />
 
             {/* Protected routes for not logged in user */}
