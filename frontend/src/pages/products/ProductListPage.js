@@ -14,8 +14,8 @@ const ProductListPage = () => {
   // Local state to manage the filters
   const [filters, setFilters] = useState({
     search: "",
-    category: "",
-    brand: "",
+    category: "All Categories",
+    brand: "All Brands",
     sortBy: "", // Field to sort by (ratings or price)
     sortOrder: "", // Sort order (ascending or descending)
     priceRange: [0, 1000], // Price range filter (min, max)
@@ -26,15 +26,29 @@ const ProductListPage = () => {
   // Function to build query params based on the selected filters
   const buildFilters = (filters) => {
     const query = {};
+
+    // Search term
     if (filters.search) query.search = filters.search.trim(); // If a search term exists, add it to the query
-    if (filters.category) query.category = filters.category.trim(); // If a category is selected, add it to the query
-    if (filters.brand) query.brand = filters.brand.trim(); // If a brand is selected, add it to the query
+
+    // Category filter (omit if "All Categories" is selected)
+    if (filters.category && filters.category !== "All Categories") {
+      query.category = filters.category.trim(); // If a category is selected, add it to the query
+    }
+
+    // Brand filter (omit if "All Brands" is selected)
+    if (filters.brand && filters.brand !== "All Brands") {
+      query.brand = filters.brand.trim(); // If a brand is selected, add it to the query
+    }
+
+    // Sorting Options
     if (filters.sortBy) {
       query.sortBy = filters.sortBy.trim();
       query.sortOrder = filters.sortOrder
         ? filters.sortOrder.trim()
         : undefined;
     } // If sorting is enabled, add sort options to the query
+
+    // Price range filter
     if (
       filters.priceRange[0] &&
       (!filters.priceRange[1] || filters.priceRange[0] < filters.priceRange[1])
@@ -163,8 +177,8 @@ const ProductListPage = () => {
               <h4 className="text-lg font-medium mb-3">Filter by Price</h4>
               <div className="flex flex-col">
                 <div className="flex justify-between text-sm">
-                  <span>${filters.priceRange[0]}</span>
-                  <span>${filters.priceRange[1]}</span>
+                  <span>{filters.priceRange[0]} MVR</span>
+                  <span>{filters.priceRange[1]} MVR</span>
                 </div>
                 <input
                   type="range"
@@ -210,7 +224,7 @@ const ProductListPage = () => {
             </div>
 
             {/* Filter Tags */}
-            {/* <div className="mt-6">
+            <div className="mt-6">
               <h4 className="text-lg font-medium mb-3">Filter by Tags</h4>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -250,7 +264,7 @@ const ProductListPage = () => {
                   Cosmetics
                 </button>
               </div>
-            </div> */}
+            </div>
           </div>
 
           {/* Main Content */}
@@ -417,10 +431,10 @@ const ProductListPage = () => {
                         {/* Pricing Section */}
                         <div className="text-lg mb-2">
                           <span className="text-green-600 font-bold">
-                            ${product.defaultVariant?.price || "N/A"}
+                            {product.defaultVariant?.price || "N/A"} MVR
                           </span>
                           {/* <span className="line-through text-gray-500 ml-2">
-                            ${product.price.toFixed(2)}
+                            {product.price.toFixed(2)} MVR
                           </span> */}
                           {/* <span className="ml-2 text-green-600">
                             ({product.discount}% OFF)
@@ -484,10 +498,10 @@ const ProductListPage = () => {
                       {/* Pricing Section */}
                       <div className="text-lg mb-2">
                         <span className="text-green-600 font-bold">
-                          ${product.defaultVariant?.price || "N/A"}
+                          {product.defaultVariant?.price || "N/A"} MVR
                         </span>
                         {/* <span className="line-through text-gray-500 ml-2">
-                          ${product.price.toFixed(2)}
+                          {product.price.toFixed(2)} MVR
                         </span>
                         <span className="ml-2 text-green-600">
                           ({product.discount}% OFF)
