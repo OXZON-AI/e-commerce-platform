@@ -6,13 +6,14 @@ import {
   clearBrands,
 } from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import LayoutOne from "../../layouts/LayoutOne";
 
 const ProductListPage = () => {
   const dispatch = useDispatch(); // Dispatch function to interact with Redux store
+  const navigate = useNavigate();
   const {
     items = [],
     brands = [],
@@ -100,15 +101,14 @@ const ProductListPage = () => {
   // Clear brands when the component unmounts
   useEffect(() => {
     return () => {
-      console.log("Component unmounted");  // Log when unmounted
       dispatch(clearBrands());
     };
   }, [dispatch]);
 
-  const handleCategoryChange = (category) => {
+  const handleCategoryChange = (slug) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
-      category: category,
+      category: slug,
       page: 1, // Reset page
     }));
   };
@@ -175,18 +175,18 @@ const ProductListPage = () => {
                 </p>
               )}
               {categories &&
-                [{ _id: "all", name: "All Categories" }, ...categories]?.map(
+                [{ _id: "all", name: "All Categories", slug: "All Categories" }, ...categories]?.map(
                   (
                     category // Add 'All Categories' name to all categories name. so I can show it on categories list.
                   ) => (
                     <li
                       key={category._id}
                       className={`text-center cursor-pointer px-4 py-2 rounded-lg text-sm ${
-                        filters.category === category.name
+                        filters.category === category.slug
                           ? "bg-purple-600 text-white font-semibold"
                           : "hover:bg-gray-200"
                       }`}
-                      onClick={() => handleCategoryChange(category.name)}
+                      onClick={() => handleCategoryChange(category.slug)} // Backend requireing category slug instead of name to filter.
                     >
                       {category.name}
                     </li>
@@ -477,11 +477,7 @@ const ProductListPage = () => {
                       <div className="flex justify-end mt-4 md:mt-0 md:ml-4 w-full">
                         <button
                           className="py-2 px-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center space-x-2"
-                          onClick={() =>
-                            alert(
-                              `Go to product detail page for ${product.name}`
-                            )
-                          }
+                          onClick={() => navigate(`/product/${product.slug}`)}
                         >
                           <FaEye className="text-white" />{" "}
                           {/* FontAwesome Eye Icon */}
@@ -534,11 +530,7 @@ const ProductListPage = () => {
                       <div className="flex justify-end mt-4">
                         <button
                           className="py-2 px-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center space-x-2"
-                          onClick={() =>
-                            alert(
-                              `Go to product detail page for ${product.name}`
-                            )
-                          }
+                          onClick={() => navigate(`/product/${product.slug}`)}
                         >
                           <FaEye className="text-white" />{" "}
                           {/* FontAwesome Eye Icon */}

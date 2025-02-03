@@ -47,22 +47,22 @@ const App = () => {
               element={<ResetPassword />}
             />
             <Route
-              path={process.env.PUBLIC_URL + "/"}
+              path={process.env.PUBLIC_URL + "/product-list"}
               element={<SampleProductCatalogue />}
             />
-            <Route
-              path={process.env.PUBLIC_URL + "/product/:slug"}
+            {/* <Route
+              path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
               element={<SampleProductDetail />}
-            />
+            /> */}
 
             <Route
-              path={process.env.PUBLIC_URL + "/product-list"}
+              path={process.env.PUBLIC_URL + "/"}
               element={<ProductListPage />}
             />
 
             {/* Route for individual product detail page with dynamic product ID */}
             <Route
-              path={process.env.PUBLIC_URL + "/product/:productId"}
+              path={process.env.PUBLIC_URL + "/product/:slug"}
               element={<ProductDetailPage />}
             />
 

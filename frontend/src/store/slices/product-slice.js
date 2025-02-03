@@ -9,7 +9,6 @@ export const fetchProducts = createAsyncThunk(
       const response = await axiosInstance.get("/v1/products/", {
         params: filters,
       });
-      console.log(response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -27,6 +26,7 @@ export const fetchProductDetails = createAsyncThunk(
   async (slug, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/v1/products/${slug}`);
+
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -56,7 +56,7 @@ const productSlice = createSlice({
     },
     clearBrands: (state) => {
       state.brands = [];
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -77,8 +77,6 @@ const productSlice = createSlice({
             }
           });
           state.brands = ["All Brands", ...Array.from(brandsSet)]; // Ensure "All Brands" is included
-          console.log("brands: ", state.brands);
-          
         }
       })
       .addCase(fetchProducts.rejected, (state, action) => {
@@ -100,5 +98,6 @@ const productSlice = createSlice({
   },
 });
 
-export const { clearProducts, clearProductDetail, clearBrands } = productSlice.actions;
+export const { clearProducts, clearProductDetail, clearBrands } =
+  productSlice.actions;
 export default productSlice.reducer;
