@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const ProductDetailSubComponent = ({ prodDetails }) => {
   const [activeTab, setActiveTab] = useState("specs");
@@ -31,10 +31,6 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     { id: 4, name: "4K Smart TV 55-inch", newTag: true, rating: 4 },
   ];
 
-  useEffect(() => {
-    console.log("prod details: ", prodDetails);
-  });
-
   return (
     <div className="container mx-auto p-6">
       {/* Tabs Section */}
@@ -65,9 +61,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
           </div>
         )}
         {activeTab === "description" && (
-          <p>
-            {prodDetails.description.detailed}
-          </p>
+          <p>{prodDetails.description.detailed}</p>
         )}
         {activeTab === "reviews" && (
           <div className="flex flex-wrap justify-between">

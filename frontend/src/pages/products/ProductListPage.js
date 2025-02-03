@@ -20,7 +20,6 @@ const ProductListPage = () => {
     loading,
     error,
   } = useSelector((state) => state.product); // Selecting the product state from the Redux store
-  console.log("Products in Redux Store:", items); // Debugging log
   const {
     categories = [],
     loadingCategories,
@@ -88,8 +87,6 @@ const ProductListPage = () => {
     const query = buildFilters(filters); // Generate the query based on the current filters
     dispatch(fetchProducts(query)); // Dispatch the fetchProducts action with the generated query
 
-    console.log("filterbuilder : ", query);
-
     // Cleanup function to clear products when component unmounts or filters change
     return () => {
       dispatch(clearProducts()); // This is called whenever the component is about to unmount or when the filters object changes. This is useful for clearing any previous product data before new products are fetched based on updated filters.
@@ -104,7 +101,6 @@ const ProductListPage = () => {
   // Clear brands when the component unmounts
   useEffect(() => {
     return () => {
-      console.log("Component unmounted"); // Log when unmounted
       dispatch(clearBrands());
     };
   }, [dispatch]);

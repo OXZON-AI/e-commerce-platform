@@ -23,7 +23,6 @@ const ProductDetailPage = () => {
 
   useEffect(() => {
     dispatch(fetchProductDetails(slug));
-    console.log("productDetail : ", productDetail);
 
     return () => {
       dispatch(clearProductDetail());
