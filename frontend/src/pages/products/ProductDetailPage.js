@@ -186,7 +186,7 @@ const ProductDetailPage = () => {
               </div>
             </div>
             <div className="mt-8">
-              <ProductDetailSubComponent />
+              <ProductDetailSubComponent prodDetails={productDetail}/>
             </div>
             {notification && (
               <div

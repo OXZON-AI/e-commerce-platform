@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const ProductDetailSubComponent = () => {
+const ProductDetailSubComponent = ({ prodDetails }) => {
   const [activeTab, setActiveTab] = useState("specs");
 
   const [submitted, setSubmitted] = useState(false);
@@ -31,6 +31,10 @@ const ProductDetailSubComponent = () => {
     { id: 4, name: "4K Smart TV 55-inch", newTag: true, rating: 4 },
   ];
 
+  useEffect(() => {
+    console.log("prod details: ", prodDetails);
+  });
+
   return (
     <div className="container mx-auto p-6">
       {/* Tabs Section */}
@@ -53,34 +57,16 @@ const ProductDetailSubComponent = () => {
         {activeTab === "specs" && (
           <div>
             <p>
-              <strong>Brand:</strong> TechMaster
+              <strong>Brand:</strong> {prodDetails.name}
             </p>
             <p>
-              <strong>Processor:</strong> Intel Core i9 13th Gen
-            </p>
-            <p>
-              <strong>RAM:</strong> 16GB DDR5
-            </p>
-            <p>
-              <strong>Storage:</strong> 1TB NVMe SSD
-            </p>
-            <p>
-              <strong>Display:</strong> 15.6-inch 4K OLED
-            </p>
-            <p>
-              <strong>Battery:</strong> 6000mAh, 100W Fast Charging
-            </p>
-            <p>
-              <strong>OS:</strong> Windows 11 Pro
+              <strong>Category:</strong> {prodDetails.category?.name}
             </p>
           </div>
         )}
         {activeTab === "description" && (
           <p>
-            This high-performance gaming laptop is built for speed and power.
-            With an Intel Core i9 processor, stunning 4K OLED display, and
-            advanced cooling technology, it delivers an unmatched gaming and
-            productivity experience.
+            {prodDetails.description.detailed}
           </p>
         )}
         {activeTab === "reviews" && (
