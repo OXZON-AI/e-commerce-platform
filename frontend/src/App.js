@@ -47,7 +47,7 @@ const App = () => {
               element={<ResetPassword />}
             />
             <Route
-              path={process.env.PUBLIC_URL + "/"}
+              path={process.env.PUBLIC_URL + "/product-list"}
               element={<SampleProductCatalogue />}
             />
             {/* <Route
@@ -56,7 +56,7 @@ const App = () => {
             /> */}
 
             <Route
-              path={process.env.PUBLIC_URL + "/product-list"}
+              path={process.env.PUBLIC_URL + "/"}
               element={<ProductListPage />}
             />
 
