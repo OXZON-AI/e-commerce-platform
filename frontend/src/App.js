@@ -50,10 +50,10 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/"}
               element={<SampleProductCatalogue />}
             />
-            <Route
-              path={process.env.PUBLIC_URL + "/product/:slug"}
+            {/* <Route
+              path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
               element={<SampleProductDetail />}
-            />
+            /> */}
 
             <Route
               path={process.env.PUBLIC_URL + "/product-list"}
@@ -62,7 +62,7 @@ const App = () => {
 
             {/* Route for individual product detail page with dynamic product ID */}
             <Route
-              path={process.env.PUBLIC_URL + "/product/:productId"}
+              path={process.env.PUBLIC_URL + "/product/:slug"}
               element={<ProductDetailPage />}
             />
 

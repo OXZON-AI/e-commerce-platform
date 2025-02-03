@@ -6,13 +6,14 @@ import {
   clearBrands,
 } from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import LayoutOne from "../../layouts/LayoutOne";
 
 const ProductListPage = () => {
   const dispatch = useDispatch(); // Dispatch function to interact with Redux store
+  const navigate = useNavigate();
   const {
     items = [],
     brands = [],
@@ -86,6 +87,8 @@ const ProductListPage = () => {
     const query = buildFilters(filters); // Generate the query based on the current filters
     dispatch(fetchProducts(query)); // Dispatch the fetchProducts action with the generated query
 
+    console.log("filterbuilder : ", query);
+
     // Cleanup function to clear products when component unmounts or filters change
     return () => {
       dispatch(clearProducts()); // This is called whenever the component is about to unmount or when the filters object changes. This is useful for clearing any previous product data before new products are fetched based on updated filters.
@@ -100,7 +103,7 @@ const ProductListPage = () => {
   // Clear brands when the component unmounts
   useEffect(() => {
     return () => {
-      console.log("Component unmounted");  // Log when unmounted
+      console.log("Component unmounted"); // Log when unmounted
       dispatch(clearBrands());
     };
   }, [dispatch]);
@@ -477,11 +480,7 @@ const ProductListPage = () => {
                       <div className="flex justify-end mt-4 md:mt-0 md:ml-4 w-full">
                         <button
                           className="py-2 px-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center space-x-2"
-                          onClick={() =>
-                            alert(
-                              `Go to product detail page for ${product.name}`
-                            )
-                          }
+                          onClick={() => navigate(`/product/${product.slug}`)}
                         >
                           <FaEye className="text-white" />{" "}
                           {/* FontAwesome Eye Icon */}
@@ -534,11 +533,7 @@ const ProductListPage = () => {
                       <div className="flex justify-end mt-4">
                         <button
                           className="py-2 px-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center space-x-2"
-                          onClick={() =>
-                            alert(
-                              `Go to product detail page for ${product.name}`
-                            )
-                          }
+                          onClick={() => navigate(`/product/${product.slug}`)}
                         >
                           <FaEye className="text-white" />{" "}
                           {/* FontAwesome Eye Icon */}

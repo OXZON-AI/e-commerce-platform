@@ -16,6 +16,7 @@ const SampleProductDetail = () => {
 
   useEffect(() => {
     dispatch(fetchProductDetails(slug));
+    console.log('product details : ', productDetail);
 
     return () => {
       // cleanup if needed

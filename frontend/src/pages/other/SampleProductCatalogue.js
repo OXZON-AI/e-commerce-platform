@@ -165,7 +165,7 @@ const SampleProductCatalogue = () => {
           </p>
         )}
         {items?.map((product) => (
-          <Link to={`/product/${product.slug}`} key={product._id}>
+          <Link to={`/sampleproduct/${product.slug}`} key={product._id}>
             <div
               key={product._id}
               className="product-item p-4 border rounded-lg shadow-sm hover:shadow-lg transition-shadow"
