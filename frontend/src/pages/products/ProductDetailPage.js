@@ -145,9 +145,9 @@ const ProductDetailPage = () => {
                 {"☆".repeat(5 - Math.round(overallRating))} ({overallRating})
               </p> */}
                 <hr className="my-6 h-0.5 border-t-0 bg-indigo-950" />
-                {productDetail.varients?.[0]?.stock > 0 ? (
+                {productDetail.variants?.[0]?.stock > 0 ? (
                   <p className="text-green-500 font-medium mb-4">
-                    In Stock ({productDetail.varients?.[0]?.stock} left)
+                    In Stock ({productDetail.variants?.[0]?.stock} left)
                   </p>
                 ) : (
                   <p className="text-red-500 font-medium mb-4">Out of Stock</p>
