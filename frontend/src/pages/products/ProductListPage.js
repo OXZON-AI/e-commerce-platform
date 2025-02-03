@@ -20,6 +20,7 @@ const ProductListPage = () => {
     loading,
     error,
   } = useSelector((state) => state.product); // Selecting the product state from the Redux store
+  console.log("Products in Redux Store:", items); // Debugging log
   const {
     categories = [],
     loadingCategories,
@@ -108,10 +109,10 @@ const ProductListPage = () => {
     };
   }, [dispatch]);
 
-  const handleCategoryChange = (category) => {
+  const handleCategoryChange = (slug) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
-      category: category,
+      category: slug,
       page: 1, // Reset page
     }));
   };
@@ -178,18 +179,18 @@ const ProductListPage = () => {
                 </p>
               )}
               {categories &&
-                [{ _id: "all", name: "All Categories" }, ...categories]?.map(
+                [{ _id: "all", name: "All Categories", slug: "All Categories" }, ...categories]?.map(
                   (
                     category // Add 'All Categories' name to all categories name. so I can show it on categories list.
                   ) => (
                     <li
                       key={category._id}
                       className={`text-center cursor-pointer px-4 py-2 rounded-lg text-sm ${
-                        filters.category === category.name
+                        filters.category === category.slug
                           ? "bg-purple-600 text-white font-semibold"
                           : "hover:bg-gray-200"
                       }`}
-                      onClick={() => handleCategoryChange(category.name)}
+                      onClick={() => handleCategoryChange(category.slug)} // Backend requireing category slug instead of name to filter.
                     >
                       {category.name}
                     </li>
