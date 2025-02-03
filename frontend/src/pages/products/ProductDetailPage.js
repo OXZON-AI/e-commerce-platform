@@ -155,21 +155,21 @@ const ProductDetailPage = () => {
                   <button
                     className="px-3 py-1 border rounded-md"
                     onClick={increaseQuantity}
-                    disabled={quantity >= productDetail.varients?.[0]?.stock}
+                    disabled={quantity >= productDetail.variants?.[0]?.stock}
                   >
                     +
                   </button>
 
                   <button
                     className={`px-4 py-2 rounded-none text-white font-medium ${
-                      productDetail.varients?.[0]?.stock > 0
+                      productDetail.variants?.[0]?.stock > 0
                         ? "bg-purple-600 hover:bg-purple-700"
                         : "bg-gray-400 cursor-not-allowed"
                     }`}
-                    disabled={productDetail.varients?.[0]?.stock === 0}
+                    disabled={productDetail.variants?.[0]?.stock === 0}
                     onClick={addToCart}
                   >
-                    {productDetail.varients?.[0]?.stock > 0
+                    {productDetail.variants?.[0]?.stock > 0
                       ? `Add ${quantity} to Cart`
                       : "Unavailable"}
                   </button>
