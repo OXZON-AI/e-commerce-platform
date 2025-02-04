@@ -13,10 +13,19 @@ const MyAccount = lazy(() => import("./pages/other/MyAccount"));
 
 // product pages
 const ProductListPage = lazy(() => import("./pages/products/ProductListPage"));
-const ProductDetailPage = lazy(() => import("./pages/products/ProductDetailPage"));
+const ProductDetailPage = lazy(() =>
+  import("./pages/products/ProductDetailPage")
+);
 
-//Admin User Management Page
+//Admin Management Page
 const RegisteredUsers = lazy(() => import("./pages/admin/RegisteredUsers"));
+const AdminProductManagement = lazy(() =>
+  import("./pages/admin/AdminProductManagement")
+);
+
+const AdminCategoryManagement = lazy(() =>
+  import("./pages/admin/AdminCategoryManagement")
+);
 
 const App = () => {
   return (
@@ -54,6 +63,17 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
               element={<SampleProductDetail />}
             /> */}
+
+            {/* Admin Product & Category Management */}
+            <Route
+              path={process.env.PUBLIC_URL + "/admin-product"}
+              element={<AdminProductManagement />}
+            />
+
+            <Route
+              path="/manage-categories"
+              element={<AdminCategoryManagement />}
+            />
 
             <Route
               path={process.env.PUBLIC_URL + "/"}
