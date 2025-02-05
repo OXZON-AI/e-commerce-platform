@@ -6,7 +6,7 @@ import {
   clearBrands,
 } from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import LayoutOne from "../../layouts/LayoutOne";
@@ -175,7 +175,14 @@ const ProductListPage = () => {
                 </p>
               )}
               {categories &&
-                [{ _id: "all", name: "All Categories", slug: "All Categories" }, ...categories]?.map(
+                [
+                  {
+                    _id: "all",
+                    name: "All Categories",
+                    slug: "All Categories",
+                  },
+                  ...categories,
+                ]?.map(
                   (
                     category // Add 'All Categories' name to all categories name. so I can show it on categories list.
                   ) => (
