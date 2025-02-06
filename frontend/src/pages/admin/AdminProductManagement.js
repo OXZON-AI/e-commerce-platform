@@ -1,105 +1,85 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
-
 import { motion } from "framer-motion";
 import { FiUpload } from "react-icons/fi";
-
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import placeholderImage from "../../assets/images/placeholder_image.png";
+import { fetchCategories } from "../../store/slices/category-slice";
+import {
+  createProduct,
+  deleteProduct,
+  fetchProducts,
+  updateProduct,
+} from "../../store/slices/product-slice";
 import AdminCategoryManagement from "./AdminCategoryManagement";
+import ProductModal from "./Modals/ProductModal";
+import DeleteModal from "./Modals/DeleteModal";
 
 const AdminProductManagement = () => {
-  const [imagePreview, setImagePreview] = useState(null);
+  const dispatch = useDispatch();
+  const { items = [], loading, error } = useSelector((state) => state.product);
+  const { categories = [] } = useSelector((state) => state.categories);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorValidation, setErrorValidation] = useState("");
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); // Initialize the navigate hook
-
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-      handleChange(event);
-    }
-  };
-
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Laptop",
-      description: "Powerful laptop",
-      price: 1200,
-      stock: 10,
-      category: "Electronics",
-      vendor: "Tech Corp",
-      image: "https://dummyimage.com/600x800/808080/fff.png",
-    },
-    {
-      id: 2,
-      name: "Smartphone",
-      description: "Latest model with a great camera",
-      price: 800,
-      stock: 20,
-      category: "Electronics",
-      vendor: "Gadget World",
-      image: "https://dummyimage.com/600x800/cccccc/000.png",
-    },
-    {
-      id: 3,
-      name: "Headphones",
-      description: "Noise-canceling over-ear headphones",
-      price: 200,
-      stock: 50,
-      category: "Accessories",
-      vendor: "Audio Tech",
-      image: "https://dummyimage.com/600x800/ffffff/000.png",
-    },
-    {
-      id: 4,
-      name: "Smartwatch",
-      description: "Stylish smartwatch with fitness tracking",
-      price: 250,
-      stock: 15,
-      category: "Wearables",
-      vendor: "WearTech",
-      image: "https://dummyimage.com/600x800/333333/fff.png",
-    },
-  ]);
-
-  const [categories, setCategories] = useState([
-    "Laptops",
-    "Smartphones",
-    "Headphones",
-    "Smartwatches",
-    "Accessories",
-  ]);
+  useEffect(() => {
+    dispatch(fetchProducts());
+    dispatch(fetchCategories());
+  }, [dispatch]);
 
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
+    slug: "",
+    shortDescription: "",
+    detailedDescription: "",
     price: "",
-    stock: "",
+    compareAtPrice: "",
+    cost: "",
     category: "",
-    vendor: "",
+    brand: "",
     image: "",
+    attributes: [{ name: "color", value: "" }],
+    isDefault: true,
   });
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-  //const [newCategory, setNewCategory] = useState("");
-
-  const [successMessage, setSuccessMessage] = useState("");
 
   const openModal = (product = null) => {
     setSelectedProduct(product);
     setFormData(
-      product || {
-        name: "",
-        description: "",
-        price: "",
-        stock: "",
-        category: "",
-        vendor: "",
-        image: "",
-      }
+      product
+        ? {
+            name: product.name || "",
+            slug: product.slug || "",
+            shortDescription: product.description?.short || "",
+            detailedDescription: product.description?.detailed || "",
+            price: product.defaultVariant?.price || "",
+            compareAtPrice: product.defaultVariant?.compareAtPrice || "",
+            cost: product.defaultVariant?.cost || "",
+            category: product.category?._id || "",
+            brand: product.brand || "",
+            image: product.defaultVariant?.image?.url || "",
+            attributes: product.defaultVariant?.attributes || [],
+            isDefault: product.defaultVariant?.isDefault,
+          }
+        : {
+            name: "",
+            slug: "",
+            shortDescription: "",
+            detailedDescription: "",
+            price: "",
+            compareAtPrice: "",
+            cost: "",
+            category: "",
+            brand: "",
+            image: "",
+            attributes: [{ name: "color", value: "" }],
+            isDefault: true,
+          }
     );
     setModalOpen(true);
   };
@@ -113,27 +93,86 @@ const AdminProductManagement = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    if (!formData.name || !formData.price || !formData.stock) return;
+  const handleAttributeChange = (index, e) => {
+    const newAttributes = [...formData.attributes];
+    newAttributes[index][e.target.name] = e.target.value;
+    setFormData({ ...formData, attributes: newAttributes });
+  };
 
-    if (selectedProduct) {
-      // Edit existing product
-      setProducts(
-        products.map((p) =>
-          p.id === selectedProduct.id ? { ...formData, id: p.id } : p
-        )
-      );
-      setSuccessMessage("Product updated successfully!"); // Show edit message
-    } else {
-      // Add new product
-      setProducts([...products, { ...formData, id: products.length + 1 }]);
-      setSuccessMessage("Product added successfully!"); // Show add message
+  const handleSave = async () => {
+    console.log("handleSave called");
+    console.log("Form Data:", formData);
+
+    // Check if we are updating or creating a product
+    const isUpdating = !!selectedProduct;
+
+    // Separate validation logic for Create & Update
+    if (!formData.name || !formData.shortDescription || !formData.category) {
+      setErrorValidation("Missing required fields");
+      return;
     }
 
-    closeModal(); // Close the modal
+    if (!isUpdating && (!formData.price || !formData.image)) {
+      setErrorValidation("For new products, price and image are required");
+      return;
+    }
 
-    // Automatically hide success message after 3 seconds
-    setTimeout(() => setSuccessMessage(""), 3000);
+    if (!isUpdating && !formData.detailedDescription?.trim()) {
+      setErrorValidation("Detailed description is required for new products");
+      return;
+    }
+
+    const formattedProduct = {
+      name: formData.name,
+      description: {
+        short: formData.shortDescription,
+        ...(formData.detailedDescription?.trim() && {
+          detailed: formData.detailedDescription,
+        }), // Only include if detailedDescription not empty
+      },
+      category: formData.category,
+      brand: formData.brand,
+    };
+
+    // Only send variants if creating a new product
+    if (!isUpdating) {
+      formattedProduct.variants = [
+        {
+          price: parseFloat(formData.price),
+          compareAtPrice: formData.compareAtPrice
+            ? parseFloat(formData.compareAtPrice)
+            : undefined,
+          cost: formData.cost ? parseFloat(formData.cost) : undefined,
+          images: formData.image
+            ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
+            : [],
+          attributes: formData.attributes.filter(
+            (attr) => attr.name && attr.value
+          ),
+          isDefault: formData.isDefault,
+        },
+      ];
+    }
+
+    try {
+      if (isUpdating) {
+        console.log("Updating product");
+        await dispatch(
+          updateProduct({ productId: selectedProduct._id, ...formattedProduct })
+        ).unwrap();
+        setSuccessMessage("Product updated successfully!");
+      } else {
+        console.log("Creating new product");
+        await dispatch(createProduct(formattedProduct)).unwrap();
+        setSuccessMessage("Product added successfully!");
+      }
+
+      dispatch(fetchProducts());
+      closeModal();
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setErrorValidation("Error saving product : ", error);
+    }
   };
 
   const openDeleteModal = (product) => {
@@ -141,12 +180,11 @@ const AdminProductManagement = () => {
     setDeleteModalOpen(true);
   };
 
-  const handleDelete = () => {
-    setProducts(products.filter((p) => p.id !== selectedProduct.id));
+  const handleDelete = async () => {
+    await dispatch(deleteProduct(selectedProduct._id)).unwrap();
     setDeleteModalOpen(false);
-    setSuccessMessage("Product deleted successfully!"); // Show success message
-
-    // Automatically hide success message after 3 seconds
+    setSuccessMessage("Product deleted successfully!");
+    dispatch(fetchProducts());
     setTimeout(() => setSuccessMessage(""), 3000);
   };
 
@@ -177,6 +215,13 @@ const AdminProductManagement = () => {
               <Plus className="w-5 h-5 mr-2" /> Add Product
             </button>
           </div>
+
+          {/* <button
+            onClick={() => openModal()}
+            className="flex items-center justify-center bg-teal-500 text-white px-6 py-3 rounded-lg shadow hover:bg-teal-600 focus:ring-4 focus:ring-teal-300"
+          >
+            <Plus className="w-5 h-5 mr-2" /> Add Product
+          </button> */}
         </div>
         <table className="min-w-full table-auto border-collapse">
           <thead>
@@ -200,7 +245,7 @@ const AdminProductManagement = () => {
                 Category
               </th>
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                Vendor
+                Brand
               </th>
               <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
                 Actions
@@ -208,12 +253,15 @@ const AdminProductManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
-              <tr key={product.id} className="border-t">
+            {items.map((product) => (
+              <tr key={product._id} className="border-t">
                 <td className="px-6 py-4 text-sm text-gray-700">
                   <img
-                    src={product.image}
-                    alt={product.name}
+                    src={product.defaultVariant?.image?.url || placeholderImage}
+                    alt={product.defaultVariant?.image?.alt || "Product Image"}
+                    onError={(e) => {
+                      e.target.src = placeholderImage;
+                    }}
                     className="w-12 h-12 object-cover rounded-lg shadow-md"
                   />
                 </td>
@@ -221,19 +269,19 @@ const AdminProductManagement = () => {
                   {product.name}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.description}
+                  {product.description?.short || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  ${product.price}
+                  {product.defaultVariant?.price || "N/A"} MVR
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.stock}
+                  {product.defaultVariant?.stock || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.category}
+                  {product.category?.name || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.vendor}
+                  {product.brand || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-sm text-right space-x-2">
                   <button
@@ -256,192 +304,28 @@ const AdminProductManagement = () => {
       </div>
 
       {modalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-slate-300 rounded-lg p-6 sm:p-8 md:p-10 max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl w-full mx-auto">
-            <h3 className="text-xl font-semibold mb-4">
-              {selectedProduct ? "Edit Product" : "Add Product"}
-            </h3>
-
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-lg w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto max-h-[90vh] sm:max-h-[95vh] lg:max-h-screen overflow-auto"
-            >
-              {/* <h2 className="text-2xl md:text-3xl font-semibold text-center text-gray-800 mb-6">
-                Add New Product
-              </h2> */}
-
-              <form className="space-y-4">
-                {/* Name Field */}
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700">
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                  />
-                </div>
-
-                {/* Image Upload */}
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    Image
-                  </label>
-                  <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-lg flex items-center gap-2">
-                      <FiUpload /> Upload Image
-                      <input
-                        type="file"
-                        name="image"
-                        onChange={handleImageChange}
-                        className="hidden"
-                      />
-                    </label>
-                    {imagePreview && (
-                      <img
-                        src={imagePreview}
-                        alt="Preview"
-                        className="w-16 h-16 rounded-lg object-cover"
-                      />
-                    )}
-                  </div>
-                </div>
-
-                {/* Description Field */}
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700">
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                  />
-                </div>
-
-                {/* Price & Stock Fields */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-700">
-                      Price
-                    </label>
-                    <input
-                      type="number"
-                      name="price"
-                      value={formData.price}
-                      onChange={handleChange}
-                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium text-gray-700">
-                      Stock
-                    </label>
-                    <input
-                      type="number"
-                      name="stock"
-                      value={formData.stock}
-                      onChange={handleChange}
-                      className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                    />
-                  </div>
-                </div>
-
-                {/* Category Dropdown */}
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700">
-                    Category
-                  </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                  >
-                    {categories.map((category, index) => (
-                      <option key={index} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Vendor Field */}
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium text-gray-700">
-                    Vendor
-                  </label>
-                  <input
-                    type="text"
-                    name="vendor"
-                    value={formData.vendor}
-                    onChange={handleChange}
-                    className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                  />
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row justify-between mt-6 gap-4">
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    className="w-full sm:w-auto bg-gray-500 text-white px-5 py-3 rounded-lg hover:bg-gray-400 transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSave}
-                    className="w-full sm:w-auto bg-purple-500 text-white px-5 py-3 rounded-lg hover:bg-purple-600 transition"
-                  >
-                    Save
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        </div>
+        <ProductModal
+          isOpen={openModal}
+          onClose={closeModal}
+          selectedProduct={selectedProduct}
+          formData={formData}
+          handleChange={handleChange}
+          handleAttributeChange={handleAttributeChange}
+          handleSave={handleSave}
+          errorValidation={errorValidation}
+          categories={categories}
+          setFormData={setFormData}
+        />
       )}
 
       {deleteModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-lg w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto max-h-[90vh] sm:max-h-[95vh] lg:max-h-screen overflow-auto"
-          >
-            <h3 className="text-xl font-semibold mb-4">Delete Product</h3>
-            <p className="mb-4">
-              Are you sure you want to delete this product?
-            </p>
-            <div className="flex justify-between">
-              <button
-                type="button"
-                onClick={() => setDeleteModalOpen(false)}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-400"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500"
-              >
-                Delete
-              </button>
-            </div>
-          </motion.div>
-        </div>
+        <DeleteModal
+          deleteModalOpen={deleteModalOpen}
+          setDeleteModalOpen={setDeleteModalOpen}
+          handleDelete={handleDelete}
+        />
       )}
 
-      {/* Success Message Popup */}
       {successMessage && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}

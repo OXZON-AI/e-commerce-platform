@@ -9,6 +9,8 @@ export const fetchProducts = createAsyncThunk(
       const response = await axiosInstance.get("/v1/products/", {
         params: filters,
       });
+      console.log("product-slice : ", response.data);
+      
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -26,6 +28,7 @@ export const fetchProductDetails = createAsyncThunk(
   async (slug, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/v1/products/${slug}`);
+      console.log("product-details-slice : ", response.data);
 
       return response.data;
     } catch (error) {
@@ -34,6 +37,48 @@ export const fetchProductDetails = createAsyncThunk(
           ? error.response.data.message
           : error.message
       );
+    }
+  }
+);
+
+// Async thunk to create Product
+export const createProduct = createAsyncThunk(
+  "product/createProduct",
+  async (productData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/v1/products/", productData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+// Async thunk to update a product
+export const updateProduct = createAsyncThunk(
+  "product/updateProduct",
+  async ({ productId, ...updateData }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.put(
+        `/v1/products/${productId}`,
+        updateData
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+// Async thunk to delete a product
+export const deleteProduct = createAsyncThunk(
+  "product/deleteProduct",
+  async (productId, { rejectWithValue }) => {
+    try {
+      await axiosInstance.delete(`/v1/products/${productId}`);
+      return productId;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   }
 );
@@ -67,7 +112,8 @@ const productSlice = createSlice({
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
-
+        console.log("brand-action-load: ", action.payload);
+        
         //Exact unique brands only when products are fetched for the first time
         if (state.brands.length === 0) {
           const brandsSet = new Set(); // Set ensures each brand appears only once, removing duplicates.
@@ -92,6 +138,44 @@ const productSlice = createSlice({
         state.productDetail = action.payload;
       })
       .addCase(fetchProductDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(createProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items.push(action.payload);
+      })
+      .addCase(createProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = state.items.map((item) =>
+          item._id === action.payload._id ? action.payload : item
+        );
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = state.items.filter((item) => item._id !== action.payload);
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

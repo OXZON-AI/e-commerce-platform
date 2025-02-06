@@ -125,7 +125,7 @@ const ProductDetailPage = () => {
                   {productDetail.name}
                 </h1>
                 <p className="text-gray-700 mb-2">
-                  {productDetail.description.detailed}
+                  {productDetail.description.short}
                   {productDetail.variants?.[0]?.price}
                 </p>
                 <p className="text-2xl font-semibold mb-2">

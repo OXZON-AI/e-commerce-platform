@@ -20,6 +20,8 @@ const ProductListPage = () => {
     loading,
     error,
   } = useSelector((state) => state.product); // Selecting the product state from the Redux store
+  console.log("products : ", items);
+  
   const {
     categories = [],
     loadingCategories,
@@ -34,7 +36,7 @@ const ProductListPage = () => {
     brand: "All Brands",
     sortBy: "", // Field to sort by (ratings or price)
     sortOrder: "", // Sort order (ascending or descending)
-    priceRange: [0, 1000], // Price range filter (min, max)
+    priceRange: [0, 1000000], // Price range filter (min, max)
     page: 1, // Current page for pagination
     limit: 10, // Number of products per page
   });
@@ -515,10 +517,10 @@ const ProductListPage = () => {
                       <h4 className="text-lg font-bold text-gray-800 mb-2 truncate">
                         {product.name}
                       </h4>
-                      <p className="text-sm text-gray-600 mb-4">
+                      {/* <p className="text-sm text-gray-600 mb-4">
                         {product.category.name.charAt(0).toUpperCase() +
-                          product.category.name.slice(1)}
-                      </p>
+                          product.category.name.slice(1) || "N/A"}
+                      </p> */}
 
                       {/* Pricing Section */}
                       <div className="text-lg mb-2">
