@@ -152,6 +152,8 @@ const LoginRegister = () => {
 
       if (userData.role === "admin"){
         navigate("/admin-product")
+      } else {
+        navigate("/");
       }
 
       setServerSuccess("User signed in as " + response.data.user.name);
