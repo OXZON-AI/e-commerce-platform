@@ -174,9 +174,6 @@ export const getProducts = async (req, res, next) => {
             maxExpansions: 50,
           },
         },
-        count: {
-          type: "total",
-        },
       },
     });
   } else {
@@ -316,11 +313,54 @@ export const getProducts = async (req, res, next) => {
     $limit: limit,
   });
 
+  pipeline.push({
+    $facet: {
+      products: [],
+      count: [{ $count: "totalCount" }],
+    },
+  });
+
+  pipeline.push({
+    $project: {
+      products: 1,
+      paginationInfo: {
+        totalCount: {
+          $ifNull: [
+            {
+              $arrayElemAt: ["$count.totalCount", 0],
+            },
+            0,
+          ],
+        },
+        totalPages: {
+          $ceil: {
+            $divide: [
+              {
+                $ifNull: [
+                  {
+                    $arrayElemAt: ["$count.totalCount", 0],
+                  },
+                  0,
+                ],
+              },
+              limit,
+            ],
+          },
+        },
+      },
+    },
+  });
+
   try {
-    const products = await Product.aggregate(pipeline);
+    const result = await Product.aggregate(pipeline);
+
+    const { products, paginationInfo } = result[0];
 
     logger.info("Products fetched successfully.");
-    return res.status(200).json(products);
+    return res.status(200).json({
+      products,
+      paginationInfo,
+    });
   } catch (error) {
     logger.error("Error fetching products: ", error);
     return next(error);
