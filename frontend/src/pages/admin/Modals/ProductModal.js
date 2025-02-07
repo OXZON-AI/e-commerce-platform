@@ -11,6 +11,7 @@ const ProductModal = ({
   handleAttributeChange,
   handleSave,
   errorValidation,
+  error,
   categories,
   setFormData,
 }) => {
@@ -29,12 +30,18 @@ const ProductModal = ({
           className="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-lg w-full max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto max-h-[90vh] sm:max-h-[95vh] lg:max-h-screen overflow-auto"
         >
           <form className="space-y-4">
-            {errorValidation && (
+            {error ? (
               <div className="w-full bg-red-100 border border-red-500 text-red-700 p-4 rounded-md mb-4">
-                <p className="text-sm font-medium text-red-700">
-                  {errorValidation}
-                </p>
+                <p className="text-sm font-medium text-red-700">{error}</p>
               </div>
+            ) : (
+              errorValidation && (
+                <div className="w-full bg-red-100 border border-red-500 text-red-700 p-4 rounded-md mb-4">
+                  <p className="text-sm font-medium text-red-700">
+                    {errorValidation}
+                  </p>
+                </div>
+              )
             )}
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-700">Name</label>

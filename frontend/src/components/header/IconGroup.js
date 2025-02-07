@@ -5,6 +5,7 @@ import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
 import axios from "axios";
 import { clearUser } from "../../store/slices/user-slice";
+import Cookie from 'js-cookie';
 
 const IconGroup = ({ iconWhiteClass }) => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const IconGroup = ({ iconWhiteClass }) => {
       );
       dispatch(clearUser()); // Clear the Redux user state
       localStorage.removeItem('persist:frontend'); // Remove persisted Redux state
+      Cookie.remove("token");
       console.log(response.data.message);
       alert('Signed out successfully!');
 

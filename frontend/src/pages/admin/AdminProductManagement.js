@@ -5,6 +5,11 @@ import { FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import placeholderImage from "../../assets/images/placeholder_image.png";
+import {
+  clearBrands,
+  clearProductError,
+  clearProducts,
+} from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
 import {
   createProduct,
@@ -18,7 +23,13 @@ import DeleteModal from "./Modals/DeleteModal";
 
 const AdminProductManagement = () => {
   const dispatch = useDispatch();
-  const { items = [], loading, error } = useSelector((state) => state.product);
+  const navigate = useNavigate();
+  const {
+    items = [],
+    brands = [],
+    loading,
+    error,
+  } = useSelector((state) => state.product);
   const { categories = [] } = useSelector((state) => state.categories);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
@@ -26,12 +37,72 @@ const AdminProductManagement = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
-  const navigate = useNavigate();
+  const [totalPages, setTotalPages] = useState(0);
+  const [filters, setFilters] = useState({
+    search: "",
+    category: "All Categories",
+    brand: "All Brands",
+    sortBy: "", // Field to sort by (ratings or price)
+    sortOrder: "", // Sort order (ascending or descending)
+    priceRange: [0, 1000000], // Price range filter (min, max)
+    page: 1, // Current page for pagination
+    limit: 10, // Number of products per page
+  });
+
+  const buildFilters = (filters) => {
+    const query = {};
+
+    if (filters.search) query.search = filters.search.trim();
+    if (filters.category && filters.category !== "All Categories")
+      query.category = filters.category.trim();
+    if (filters.brand && filters.brand !== "All Brands")
+      query.brand = filters.brand.trim();
+    if (filters.sortBy) {
+      query.sortBy = filters.sortBy.trim();
+      query.sortOrder = filters.sortOrder
+        ? filters.sortOrder.trim()
+        : undefined;
+    }
+    if (filters.priceRange[0] < filters.priceRange[1])
+      query.minPrice = filters.priceRange[0];
+    if (filters.priceRange[1]) query.maxPrice = filters.priceRange[1];
+
+    query.page = filters.page;
+    query.limit = filters.limit;
+
+    return query;
+  };
 
   useEffect(() => {
-    dispatch(fetchProducts());
-    dispatch(fetchCategories());
+    const filterQuery = buildFilters(filters);
+    dispatch(fetchProducts(filterQuery));
+
+    // Cleanup function to clear products when component unmounts or filters change
+    return () => {
+      dispatch(clearProducts()); // This is called whenever the component is about to unmount or when the filters object changes. This is useful for clearing any previous product data before new products are fetched based on updated filters.
+      clearProductError();
+    };
+  }, [dispatch, filters]);
+
+  // Effect hook to fetch categories when component mounts
+  useEffect(() => {
+    dispatch(fetchCategories()); // Dispatch the fetchCategories action
   }, [dispatch]);
+
+  // Clear brands when the component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearBrands());
+    };
+  }, [dispatch]);
+
+  // Handle pagination
+  const handlePageChange = (newPage) => {
+    if (newPage < 1) return; // Prevent going below page 1
+    setFilters((prev) => ({ ...prev, page: newPage }));
+  };
+
+  const isNextPageDisabled = items.length < 10; // If the length of the current items is less than 10, disable next
 
   const [formData, setFormData] = useState({
     name: "",
@@ -87,6 +158,8 @@ const AdminProductManagement = () => {
   const closeModal = () => {
     setModalOpen(false);
     setSelectedProduct(null);
+    setErrorValidation("");
+    clearProductError();
   };
 
   const handleChange = (e) => {
@@ -170,8 +243,8 @@ const AdminProductManagement = () => {
       dispatch(fetchProducts());
       closeModal();
       setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (error) {
-      setErrorValidation("Error saving product : ", error);
+    } catch (err) {
+      console.error("Error saving product : ", err);
     }
   };
 
@@ -215,17 +288,172 @@ const AdminProductManagement = () => {
               <Plus className="w-5 h-5 mr-2" /> Add Product
             </button>
           </div>
-
-          {/* <button
-            onClick={() => openModal()}
-            className="flex items-center justify-center bg-teal-500 text-white px-6 py-3 rounded-lg shadow hover:bg-teal-600 focus:ring-4 focus:ring-teal-300"
-          >
-            <Plus className="w-5 h-5 mr-2" /> Add Product
-          </button> */}
         </div>
+
+        {/* Filters -----------------------------------------------------------------*/}
+        <div className="p-4 bg-gray-100 rounded-lg">
+          {/* Top Row: Search, Price Range, Reset */}
+          <div className="flex flex-wrap items-center gap-4 mb-4">
+            {/* Search Input */}
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={filters.search}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  search: e.target.value,
+                  page: 1,
+                }))
+              }
+              className="px-3 py-2 border rounded-md w-60"
+            />
+
+            {/* Price Range */}
+            <div className="flex items-center space-x-2">
+              <input
+                type="number"
+                value={filters.priceRange[0]}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    priceRange: [Number(e.target.value), prev.priceRange[1]],
+                    page: 1,
+                  }))
+                }
+                className="px-3 py-2 border rounded-md w-24"
+                placeholder="Min Price"
+              />
+              <span>-</span>
+              <input
+                type="number"
+                value={filters.priceRange[1]}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    priceRange: [prev.priceRange[0], Number(e.target.value)],
+                    page: 1,
+                  }))
+                }
+                className="px-3 py-2 border rounded-md w-24"
+                placeholder="Max Price"
+              />
+            </div>
+
+            {/* Reset Button */}
+            <button
+              onClick={() =>
+                setFilters({
+                  search: "",
+                  category: "All Categories",
+                  brand: "All Brands",
+                  sortBy: "",
+                  sortOrder: "",
+                  priceRange: [0, 1000000],
+                  page: 1,
+                  limit: 10,
+                })
+              }
+              className="px-4 py-2 bg-purple-500 text-white rounded-md"
+            >
+              Reset All Filters
+            </button>
+          </div>
+
+          {/* Bottom Row: Category, Brand, Sorting, Order */}
+          <div className="flex justify-between items-center gap-4 mb-4">
+            {/* Category Dropdown */}
+            <div className="flex-1">
+              <select
+                value={filters.category}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    category: e.target.value,
+                    page: 1,
+                  }))
+                }
+                className="px-3 py-2 border rounded-md w-full"
+              >
+                <option>All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Brand Dropdown */}
+            <div className="flex-1">
+              <select
+                value={filters.brand}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    brand: e.target.value,
+                    page: 1,
+                  }))
+                }
+                className="px-3 py-2 border rounded-md w-full"
+              >
+                <option>All Brands</option>
+                {brands.map((brand) => (
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sort By Dropdown */}
+            <div className="flex-1">
+              <select
+                value={filters.sortBy}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    sortBy: e.target.value,
+                    page: 1,
+                  }))
+                }
+                className="px-3 py-2 border rounded-md w-full"
+              >
+                <option value="">Sort By</option>
+                <option value="ratings">Ratings</option>
+                <option value="price">Price</option>
+              </select>
+            </div>
+
+            {/* Sort Order Dropdown */}
+            <div className="flex-1">
+              <select
+                value={filters.sortOrder}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    sortOrder: e.target.value,
+                    page: 1,
+                  }))
+                }
+                className="px-3 py-2 border rounded-md w-full"
+                disabled={!filters.sortBy}
+              >
+                <option value="">Order</option>
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Table -----------------------------------------------------------------*/}
         <table className="min-w-full table-auto border-collapse">
           <thead>
             <tr>
+              <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                No.
+              </th>
               <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
                 Image
               </th>
@@ -253,8 +481,9 @@ const AdminProductManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {items.map((product) => (
+            {items.map((product, index) => (
               <tr key={product._id} className="border-t">
+                <td className="px-6 py-4 text-sm text-gray-700">{index + 1}</td>
                 <td className="px-6 py-4 text-sm text-gray-700">
                   <img
                     src={product.defaultVariant?.image?.url || placeholderImage}
@@ -269,7 +498,11 @@ const AdminProductManagement = () => {
                   {product.name}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.description?.short || "N/A"}
+                  {product.description?.short ? (
+                    <span className="text-gray-700">Description Provided</span>
+                  ) : (
+                    <span className="text-yellow-500">N/A</span>
+                  )}
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-700">
                   {product.defaultVariant?.price || "N/A"} MVR
@@ -301,6 +534,23 @@ const AdminProductManagement = () => {
             ))}
           </tbody>
         </table>
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={() => handlePageChange(filters.page - 1)}
+            disabled={filters.page === 1}
+            className="px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="px-4 py-2">Page {filters.page}</span>
+          <button
+            onClick={() => handlePageChange(filters.page + 1)}
+            disabled={isNextPageDisabled}
+            className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
 
       {modalOpen && (
@@ -313,6 +563,7 @@ const AdminProductManagement = () => {
           handleAttributeChange={handleAttributeChange}
           handleSave={handleSave}
           errorValidation={errorValidation}
+          error={error}
           categories={categories}
           setFormData={setFormData}
         />

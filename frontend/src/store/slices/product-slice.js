@@ -102,6 +102,9 @@ const productSlice = createSlice({
     clearBrands: (state) => {
       state.brands = [];
     },
+    clearProductError: (state) => {
+      state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -182,6 +185,6 @@ const productSlice = createSlice({
   },
 });
 
-export const { clearProducts, clearProductDetail, clearBrands } =
+export const { clearProducts, clearProductDetail, clearBrands, clearProductError } =
   productSlice.actions;
 export default productSlice.reducer;
