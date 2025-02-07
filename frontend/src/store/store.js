@@ -18,6 +18,7 @@ import wishlistReducer from "./slices/wishlist-slice";
 import userReducer from './slices/user-slice';
 import adminUserReducer from './slices/admin-user-slice';
 import categoryReducer from './slices/category-slice';
+import variantReducer from './slices/variant-slice';
 
 const persistConfig = {
     key: "frontend",
@@ -34,6 +35,7 @@ export const rootReducer = combineReducers({
     user: userReducer,
     users: adminUserReducer,
     categories: categoryReducer,
+    variant: variantReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

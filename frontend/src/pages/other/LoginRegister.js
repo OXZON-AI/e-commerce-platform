@@ -1,5 +1,5 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { Fragment, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
 import axiosInstance from "../../axiosConfig";
@@ -20,6 +20,7 @@ const LoginRegister = () => {
   const loginCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is login form ReCaptcha element
   const registerCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is register form ReCaptcha element
   const dispatch = useDispatch(); // Get the dispatch function
+  const navigate = useNavigate();
 
   // Helper function to validate email
   const validateEmail = (email) => {
@@ -100,6 +101,10 @@ const LoginRegister = () => {
 
       // ReCaptcha Token
       const token = await loginCaptchaRef.current.executeAsync();
+      if (!token) {
+        setServerError("ReCAPTCHA verification failed. Please try again.");
+        return;
+      }
       loginCaptchaRef.current.reset(); // allow to re-excute the reCapture check
 
       const response = await axiosInstance.post("/v1/auth/signup", {
@@ -131,6 +136,10 @@ const LoginRegister = () => {
     try {
       // ReCaptcha Token
       const token = await registerCaptchaRef.current.executeAsync();
+      if (!token) {
+        setServerError("ReCAPTCHA verification failed. Please try again.");
+        return;
+      }
       registerCaptchaRef.current.reset(); // allow to re-excute the reCapture check
 
       const response = await axiosInstance.post("/v1/auth/signin", {
@@ -140,6 +149,12 @@ const LoginRegister = () => {
 
       const userData = response.data.user; // catching user data from response
       dispatch(setUser(userData)); // save user data to redux
+
+      if (userData.role === "admin"){
+        navigate("/admin-product")
+      } else {
+        navigate("/");
+      }
 
       setServerSuccess("User signed in as " + response.data.user.name);
     } catch (err) {

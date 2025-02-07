@@ -6,7 +6,7 @@ import {
   clearBrands,
 } from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import LayoutOne from "../../layouts/LayoutOne";
@@ -20,6 +20,8 @@ const ProductListPage = () => {
     loading,
     error,
   } = useSelector((state) => state.product); // Selecting the product state from the Redux store
+  console.log("products : ", items);
+  
   const {
     categories = [],
     loadingCategories,
@@ -34,7 +36,7 @@ const ProductListPage = () => {
     brand: "All Brands",
     sortBy: "", // Field to sort by (ratings or price)
     sortOrder: "", // Sort order (ascending or descending)
-    priceRange: [0, 1000], // Price range filter (min, max)
+    priceRange: [0, 1000000], // Price range filter (min, max)
     page: 1, // Current page for pagination
     limit: 10, // Number of products per page
   });
@@ -175,7 +177,14 @@ const ProductListPage = () => {
                 </p>
               )}
               {categories &&
-                [{ _id: "all", name: "All Categories", slug: "All Categories" }, ...categories]?.map(
+                [
+                  {
+                    _id: "all",
+                    name: "All Categories",
+                    slug: "All Categories",
+                  },
+                  ...categories,
+                ]?.map(
                   (
                     category // Add 'All Categories' name to all categories name. so I can show it on categories list.
                   ) => (
@@ -508,10 +517,10 @@ const ProductListPage = () => {
                       <h4 className="text-lg font-bold text-gray-800 mb-2 truncate">
                         {product.name}
                       </h4>
-                      <p className="text-sm text-gray-600 mb-4">
+                      {/* <p className="text-sm text-gray-600 mb-4">
                         {product.category.name.charAt(0).toUpperCase() +
-                          product.category.name.slice(1)}
-                      </p>
+                          product.category.name.slice(1) || "N/A"}
+                      </p> */}
 
                       {/* Pricing Section */}
                       <div className="text-lg mb-2">
