@@ -8,6 +8,7 @@ export const createCategorySchema = Joi.object({
     then: Joi.forbidden(),
     otherwise: Joi.string()
       .regex(/^[0-9a-fA-F]{24}$/)
+      .required()
       .messages({
         "string.pattern.base": "Parent category must be a valid ObjectId",
       }),

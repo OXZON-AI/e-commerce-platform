@@ -16,7 +16,7 @@ export const createCategory = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { parent } = value;
+  const { parent, ...rest } = value;
 
   try {
     if (parent) {
@@ -30,7 +30,7 @@ export const createCategory = async (req, res, next) => {
       }
     }
 
-    const category = new Category(value);
+    const category = new Category({ parent: parent ? parent : null, ...rest });
     const { _id } = await category.save();
 
     logger.info(`Category with id ${_id} created successfully.`);
