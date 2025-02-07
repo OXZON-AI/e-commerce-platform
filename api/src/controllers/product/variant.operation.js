@@ -65,6 +65,7 @@ export const updateVariant = async (req, res, next) => {
     compareAtPrice,
     cost,
     isDefault,
+    stock,
   } = value;
 
   const bulkOperations = [];
@@ -188,9 +189,9 @@ export const updateVariant = async (req, res, next) => {
   }
 
   try {
-    if ((price && !compareAtPrice) || (!price && compareAtPrice)) {
+    if ((price && !compareAtPrice) || (!price && compareAtPrice) || stock) {
       const variant = await Variant.findOne({ _id: vid, product: pid })
-        .select("price compareAtPrice")
+        .select("price compareAtPrice stock")
         .lean();
 
       if (!variant) {
@@ -221,6 +222,24 @@ export const updateVariant = async (req, res, next) => {
           logger.error("CompareAtPrice error: ", error);
           return next(error);
         }
+      }
+
+      if (stock) {
+        const newStock = variant.stock + stock;
+
+        bulkOperations.push({
+          updateOne: {
+            filter: {
+              _id: vid,
+              product: pid,
+            },
+            update: {
+              $set: {
+                stock: newStock >= 0 ? newStock : 0,
+              },
+            },
+          },
+        });
       }
     }
 
