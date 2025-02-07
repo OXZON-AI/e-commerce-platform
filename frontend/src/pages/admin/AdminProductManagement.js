@@ -18,7 +18,7 @@ import {
   updateProduct,
 } from "../../store/slices/product-slice";
 import AdminCategoryManagement from "./AdminCategoryManagement";
-import ProductModal from "./Modals/ProductCreateModal";
+import ProductModal from "./Modals/ProductModal";
 import DeleteModal from "./Modals/DeleteModal";
 import { updateVariant } from "../../store/slices/variant-slice";
 import HashLoader from "react-spinners/HashLoader";
@@ -384,7 +384,7 @@ const AdminProductManagement = () => {
                     page: 1,
                   }))
                 }
-                className="px-3 py-2 border rounded-md w-24"
+                className="px-3 py-2 border rounded-md w-30"
                 placeholder="Min Price"
               />
               <span>-</span>
@@ -398,7 +398,7 @@ const AdminProductManagement = () => {
                     page: 1,
                   }))
                 }
-                className="px-3 py-2 border rounded-md w-24"
+                className="px-3 py-2 border rounded-md w-30"
                 placeholder="Max Price"
               />
             </div>
