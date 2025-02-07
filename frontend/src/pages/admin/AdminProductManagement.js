@@ -18,8 +18,9 @@ import {
   updateProduct,
 } from "../../store/slices/product-slice";
 import AdminCategoryManagement from "./AdminCategoryManagement";
-import ProductModal from "./Modals/ProductModal";
+import ProductModal from "./Modals/ProductCreateModal";
 import DeleteModal from "./Modals/DeleteModal";
+import { createVariant, updateVariant } from "../../store/slices/variant-slice";
 
 const AdminProductManagement = () => {
   const dispatch = useDispatch();
@@ -30,14 +31,17 @@ const AdminProductManagement = () => {
     loading,
     error,
   } = useSelector((state) => state.product);
-  const { categories = [] } = useSelector((state) => state.categories);
+  const {
+    categories = [],
+    loadingCategories,
+    errorCategory,
+  } = useSelector((state) => state.categories);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
-  const [totalPages, setTotalPages] = useState(0);
   const [filters, setFilters] = useState({
     search: "",
     category: "All Categories",
@@ -48,6 +52,8 @@ const AdminProductManagement = () => {
     page: 1, // Current page for pagination
     limit: 10, // Number of products per page
   });
+
+  console.log("selected product : ", selectedProduct);
 
   const buildFilters = (filters) => {
     const query = {};
@@ -128,9 +134,10 @@ const AdminProductManagement = () => {
             slug: product.slug || "",
             shortDescription: product.description?.short || "",
             detailedDescription: product.description?.detailed || "",
-            price: product.defaultVariant?.price || "",
-            compareAtPrice: product.defaultVariant?.compareAtPrice || "",
-            cost: product.defaultVariant?.cost || "",
+            price: product.defaultVariant?.price || null,
+            compareAtPrice: product.defaultVariant?.compareAtPrice || null,
+            cost: product.defaultVariant?.cost || null,
+            stock: product.defaultVariant?.stock || null,
             category: product.category?._id || "",
             brand: product.brand || "",
             image: product.defaultVariant?.image?.url || "",
@@ -142,9 +149,10 @@ const AdminProductManagement = () => {
             slug: "",
             shortDescription: "",
             detailedDescription: "",
-            price: "",
-            compareAtPrice: "",
-            cost: "",
+            price: null,
+            compareAtPrice: null,
+            cost: null,
+            stock: null,
             category: "",
             brand: "",
             image: "",
@@ -195,49 +203,103 @@ const AdminProductManagement = () => {
       return;
     }
 
-    const formattedProduct = {
-      name: formData.name,
-      description: {
-        short: formData.shortDescription,
-        ...(formData.detailedDescription?.trim() && {
-          detailed: formData.detailedDescription,
-        }), // Only include if detailedDescription not empty
-      },
-      category: formData.category,
-      brand: formData.brand,
-    };
-
-    // Only send variants if creating a new product
-    if (!isUpdating) {
-      formattedProduct.variants = [
-        {
-          price: parseFloat(formData.price),
-          compareAtPrice: formData.compareAtPrice
-            ? parseFloat(formData.compareAtPrice)
-            : undefined,
-          cost: formData.cost ? parseFloat(formData.cost) : undefined,
-          images: formData.image
-            ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
-            : [],
-          attributes: formData.attributes.filter(
-            (attr) => attr.name && attr.value
-          ),
-          isDefault: formData.isDefault,
-        },
-      ];
-    }
-
     try {
+
+      // if create new product
+      if (!isUpdating) {
+        console.log("Creating new product");
+
+        // format new product for backend
+        const formattedNewProduct = {
+          name: formData.name,
+          description: {
+            short: formData.shortDescription,
+            ...(formData.detailedDescription?.trim() && {
+              detailed: formData.detailedDescription,
+            }), // Only include if detailedDescription not empty
+          },
+          category: formData.category,
+          brand: formData.brand,
+          variants: [
+            {
+              price: parseFloat(formData.price),
+              compareAtPrice: formData.compareAtPrice
+                ? parseFloat(formData.compareAtPrice)
+                : undefined,
+              cost: formData.cost ? parseFloat(formData.cost) : undefined,
+              images: formData.image
+                ? [
+                    {
+                      url: formData.image,
+                      alt: "Product Image",
+                      isDefault: true,
+                    },
+                  ]
+                : [],
+              attributes: formData.attributes.filter(
+                (attr) => attr.name && attr.value
+              ),
+              isDefault: formData.isDefault,
+              ...(isUpdating && { stock: parseInt(formData.stock) || 0 }), // Only add stock when updating
+            },
+          ],
+        };
+
+        await dispatch(createProduct(formattedNewProduct)).unwrap();
+
+        setSuccessMessage("Product and variant added successfully!");
+      }
+
+      // If update product
       if (isUpdating) {
         console.log("Updating product");
+
+        // format selected product for backend
+        const formattedUpdateProduct = {
+          name: formData.name,
+          description: {
+            short: formData.shortDescription,
+            ...(formData.detailedDescription?.trim() && {
+              detailed: formData.detailedDescription,
+            }), // Only include if detailedDescription not empty
+          },
+          category: formData.category,
+          brand: formData.brand,
+        };
+
+        // update product
         await dispatch(
-          updateProduct({ productId: selectedProduct._id, ...formattedProduct })
+          updateProduct({
+            productId: selectedProduct._id,
+            ...formattedUpdateProduct,
+          })
         ).unwrap();
+
+        // Update variant separately if needed
+        if (selectedProduct.defaultVariant._id) {
+          // format selected product variant for backend
+          const updatedVariant = {
+            productId: selectedProduct._id,
+            variantId: selectedProduct.defaultVariant._id,
+            price: parseFloat(formData.price),
+            compareAtPrice: formData.compareAtPrice
+              ? parseFloat(formData.compareAtPrice)
+              : undefined,
+            cost: formData.cost ? parseFloat(formData.cost) : undefined,
+            // stock: parseInt(formData.stock) || 0,
+            // image: formData.image
+            //   ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
+            //   : [],
+            // attributes: formData.attributes.filter(
+            //   (attr) => attr.name && attr.value
+            // ),
+            isDefault: formData.isDefault,
+          };
+
+          await dispatch(updateVariant(updatedVariant)).unwrap();
+        }
+
         setSuccessMessage("Product updated successfully!");
-      } else {
-        console.log("Creating new product");
-        await dispatch(createProduct(formattedProduct)).unwrap();
-        setSuccessMessage("Product added successfully!");
       }
 
       dispatch(fetchProducts());
@@ -377,7 +439,7 @@ const AdminProductManagement = () => {
               >
                 <option>All Categories</option>
                 {categories.map((cat) => (
-                  <option key={cat._id} value={cat.name}>
+                  <option key={cat._id} value={cat.slug}>
                     {cat.name}
                   </option>
                 ))}

@@ -121,6 +121,18 @@ const ProductModal = ({
             </div>
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-700">
+                Stock
+              </label>
+              <input
+                type="number"
+                name="stock"
+                value={formData.stock}
+                onChange={handleChange}
+                className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700">
                 Category
               </label>
               <select
