@@ -305,6 +305,7 @@ export const updateVariantSchema = Joi.object({
   }),
   compareAtPrice: Joi.number().min(1),
   cost: Joi.number().min(1),
+  stock: Joi.number().integer(),
   isDefault: Joi.boolean(),
 });
 
