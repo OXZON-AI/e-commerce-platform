@@ -18,9 +18,10 @@ import {
   updateProduct,
 } from "../../store/slices/product-slice";
 import AdminCategoryManagement from "./AdminCategoryManagement";
-import ProductModal from "./Modals/ProductCreateModal";
+import ProductModal from "./Modals/ProductModal";
 import DeleteModal from "./Modals/DeleteModal";
-import { createVariant, updateVariant } from "../../store/slices/variant-slice";
+import { updateVariant } from "../../store/slices/variant-slice";
+import HashLoader from "react-spinners/HashLoader";
 
 const AdminProductManagement = () => {
   const dispatch = useDispatch();
@@ -204,7 +205,6 @@ const AdminProductManagement = () => {
     }
 
     try {
-
       // if create new product
       if (!isUpdating) {
         console.log("Creating new product");
@@ -335,6 +335,7 @@ const AdminProductManagement = () => {
           <h2 className="text-3xl font-semibold text-gray-800">
             Product Management
           </h2>
+
           <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
             <button
               onClick={openCategoryModal}
@@ -383,7 +384,7 @@ const AdminProductManagement = () => {
                     page: 1,
                   }))
                 }
-                className="px-3 py-2 border rounded-md w-24"
+                className="px-3 py-2 border rounded-md w-30"
                 placeholder="Min Price"
               />
               <span>-</span>
@@ -397,7 +398,7 @@ const AdminProductManagement = () => {
                     page: 1,
                   }))
                 }
-                className="px-3 py-2 border rounded-md w-24"
+                className="px-3 py-2 border rounded-md w-30"
                 placeholder="Max Price"
               />
             </div>
@@ -509,93 +510,114 @@ const AdminProductManagement = () => {
           </div>
         </div>
 
-        {/* Table -----------------------------------------------------------------*/}
-        <table className="min-w-full table-auto border-collapse">
-          <thead>
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                No.
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                Image
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                Name
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                Description
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                Price
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                Stock
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                Category
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                Brand
-              </th>
-              <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((product, index) => (
-              <tr key={product._id} className="border-t">
-                <td className="px-6 py-4 text-sm text-gray-700">{index + 1}</td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  <img
-                    src={product.defaultVariant?.image?.url || placeholderImage}
-                    alt={product.defaultVariant?.image?.alt || "Product Image"}
-                    onError={(e) => {
-                      e.target.src = placeholderImage;
-                    }}
-                    className="w-12 h-12 object-cover rounded-lg shadow-md"
-                  />
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.name}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.description?.short ? (
-                    <span className="text-gray-700">Description Provided</span>
-                  ) : (
-                    <span className="text-yellow-500">N/A</span>
-                  )}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.defaultVariant?.price || "N/A"} MVR
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.defaultVariant?.stock || "N/A"}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.category?.name || "N/A"}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-700">
-                  {product.brand || "N/A"}
-                </td>
-                <td className="px-6 py-4 text-sm text-right space-x-2">
-                  <button
-                    onClick={() => openModal(product)}
-                    className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-400 transition-all duration-200"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => openDeleteModal(product)}
-                    className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-500 transition-all duration-200"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </td>
+        {loading ? (
+          // Show Loading State with Centered HashLoader
+          <div className="flex flex-col justify-center items-center py-[50px] mx-auto text-gray-700 font-semibold">
+            <HashLoader color="#a855f7" size={50} />
+            <span className="mt-3">Loading products...</span>
+          </div>
+        ) : error ? (
+          // Show Error Message Instead of Table
+          <div className="text-center my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
+            <span className="mt-3">Error: {error}</span>
+          </div>
+        ) : (
+          // Show Table Only If There’s No Loading/Error -----------------------------------------------------------------
+          <table className="min-w-full table-auto border-collapse">
+            <thead>
+              <tr>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                  No.
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                  Image
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                  Name
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                  Description
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                  Price
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                  Stock
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                  Category
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                  Brand
+                </th>
+                <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {items.map((product, index) => (
+                <tr key={product._id} className="border-t">
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {index + 1}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    <img
+                      src={
+                        product.defaultVariant?.image?.url || placeholderImage
+                      }
+                      alt={
+                        product.defaultVariant?.image?.alt || "Product Image"
+                      }
+                      onError={(e) => {
+                        e.target.src = placeholderImage;
+                      }}
+                      className="w-12 h-12 object-cover rounded-lg shadow-md"
+                    />
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {product.name}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {product.description?.short ? (
+                      <span className="text-gray-700">
+                        Description Provided
+                      </span>
+                    ) : (
+                      <span className="text-yellow-500">N/A</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {product.defaultVariant?.price || "N/A"} MVR
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {product.defaultVariant?.stock || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {product.category?.name || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {product.brand || "N/A"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-right space-x-2">
+                    <button
+                      onClick={() => openModal(product)}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-400 transition-all duration-200"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => openDeleteModal(product)}
+                      className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-500 transition-all duration-200"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         <div className="flex justify-end mt-4">
           <button
             onClick={() => handlePageChange(filters.page - 1)}
