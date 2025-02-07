@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../../axiosConfig";
+import { useDispatch } from "react-redux";
 
 // Async Thunk for fetching all categories
 export const fetchCategories = createAsyncThunk(
@@ -28,6 +29,7 @@ export const createCategory = createAsyncThunk(
         "/v1/categories/",
         categoryData
       );
+
       console.log("created category : ", response.data);
       return response.data;
     } catch (error) {
