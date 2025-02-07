@@ -286,7 +286,7 @@ const AdminProductManagement = () => {
               ? parseFloat(formData.compareAtPrice)
               : undefined,
             cost: formData.cost ? parseFloat(formData.cost) : undefined,
-            // stock: parseInt(formData.stock) || 0,
+            stock: parseInt(formData.stock) || 0,
             // image: formData.image
             //   ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
             //   : [],

@@ -114,13 +114,13 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
-        console.log("brand-action-load: ", action.payload);
+        state.items = action.payload.products;
+        console.log("brand-action-load: ", action.payload.products);
         
         //Exact unique brands only when products are fetched for the first time
         if (state.brands.length === 0) {
           const brandsSet = new Set(); // Set ensures each brand appears only once, removing duplicates.
-          action.payload.forEach((product) => {
+          action.payload.products.forEach((product) => {
             if (product.brand) {
               brandsSet.add(product.brand.trim());
             }
