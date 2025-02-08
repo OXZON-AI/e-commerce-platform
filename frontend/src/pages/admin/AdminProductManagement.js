@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
+
+
+import Sidebar from "./components/Sidebar";
+import AdminNavbar from "./components/AdminNavbar";
+
+
 import { FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -329,8 +335,19 @@ const AdminProductManagement = () => {
   };
 
   return (
-    <div className="p-6 sm:p-8 md:p-10 lg:p-12 max-w-full sm:max-w-md md:max-w-lg lg:max-w-6xl mx-auto">
-      <div className="bg-white shadow-xl rounded-lg p-6">
+    <div className="flex flex-col h-screen">
+    {/* Admin Navbar placed on top */}
+    <AdminNavbar />
+    
+    <div className="flex flex-1">
+      {/* Sidebar on the left */}
+      <Sidebar />
+      
+      {/* Main content area */}
+      <div className="flex-1 p-0 overflow-y-auto">
+      <div className="p-0 sm:p-8 md:p-10 lg:p-12 w-full mx-auto">
+
+      <div className="bg-white shadow-xl rounded-none p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-semibold text-gray-800">
             Product Management
@@ -684,6 +701,9 @@ const AdminProductManagement = () => {
           </motion.div>
         </div>
       )}
+    </div>
+    </div>
+    </div>
     </div>
   );
 };
