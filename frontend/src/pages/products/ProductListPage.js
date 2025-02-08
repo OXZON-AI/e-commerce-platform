@@ -157,6 +157,25 @@ const ProductListPage = () => {
         <div className="flex flex-col lg:flex-row p-6 gap-6 bg-gray-50 min-h-screen">
           {/* Sidebar */}
           <div className="lg:w-1/6 w-full md:w-1/3 sm:w-1/2 border rounded-lg shadow-md p-4 bg-white">
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Search
+              </h3>
+              <input
+                type="text"
+                name="search"
+                placeholder="Search products..."
+                value={filters.search || ""}
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
+                className="w-full p-4 pl-5 pr-12 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 ease-in-out"
+                style={{
+                  boxSizing: "border-box",
+                }}
+              />
+            </div>
+
             <h3 className="text-xl font-semibold mb-4">Categories</h3>
 
             {/* Category List */}
@@ -190,7 +209,7 @@ const ProductListPage = () => {
                   ) => (
                     <li
                       key={category._id}
-                      className={`text-center cursor-pointer px-4 py-2 rounded-lg text-sm ${
+                      className={`text-center cursor-pointer px-4 py-2 rounded-sm text-sm ${
                         filters.category === category.slug
                           ? "bg-purple-600 text-white font-semibold"
                           : "hover:bg-gray-200"
@@ -253,76 +272,16 @@ const ProductListPage = () => {
                 ))}
               </ul>
             </div>
-
-            {/* Filter Tags */}
-            <div className="mt-6">
-              <h4 className="text-lg font-medium mb-3">Filter by Tags</h4>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-sm font-medium transition-all duration-300"
-                  onClick={() => handleCategoryChange("All Categories")}
-                >
-                  All
-                </button>
-                <button
-                  className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-sm font-medium transition-all duration-300"
-                  onClick={() => handleCategoryChange("Electronics")}
-                >
-                  Electronics
-                </button>
-                <button
-                  className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-sm font-medium transition-all duration-300"
-                  onClick={() => handleCategoryChange("Fashion")}
-                >
-                  Fashion
-                </button>
-                <button
-                  className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-sm font-medium transition-all duration-300"
-                  onClick={() => handleCategoryChange("Furniture")}
-                >
-                  Furniture
-                </button>
-                <button
-                  className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-sm font-medium transition-all duration-300"
-                  onClick={() => handleCategoryChange("Books")}
-                >
-                  Books
-                </button>
-                <button
-                  className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 text-sm font-medium transition-all duration-300"
-                  onClick={() => handleCategoryChange("Cosmetics")}
-                >
-                  Cosmetics
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Main Content */}
           <div className="flex-1">
-            {/* Search, Sorting, and View Layout Options */}
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
-              {/* Search Bar */}
-              <div className="relative w-full md:w-1/3">
-                <input
-                  type="text"
-                  name="search"
-                  placeholder="Search products..."
-                  value={filters.search || ""}
-                  onChange={(e) =>
-                    setFilters({ ...filters, search: e.target.value })
-                  }
-                  className="w-full p-3 pl-4 pr-12 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
-                  style={{
-                    boxSizing: "border-box",
-                  }}
-                />
-              </div>
-
+            {/* Sorting, and View Layout Options */}
+            <div className="flex flex-col md:flex-row justify-center items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
               {/* Sort By Dropdown */}
               <select
                 name="sortBy"
-                className="w-full sm:w-1/3 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm"
+                className="w-full sm:w-60 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm"
                 value={filters.sortBy || ""}
                 onChange={(e) =>
                   setFilters({ ...filters, sortBy: e.target.value })
@@ -339,7 +298,7 @@ const ProductListPage = () => {
               {/* Sort Order Dropdown */}
               <select
                 name="sortOrder"
-                className="w-full sm:w-1/3 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm"
+                className="w-full sm:w-60 p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-ms"
                 value={filters.sortOrder || ""}
                 onChange={(e) =>
                   setFilters({ ...filters, sortOrder: e.target.value })
@@ -355,10 +314,10 @@ const ProductListPage = () => {
               </select>
 
               {/* View Layout Options */}
-              <div className="flex space-x-4 mt-4 md:mt-0 justify-center md:justify-start">
+              <div className="flex space-x-4 mt-4 md:mt-0 justify-end w-full">
                 <button
                   onClick={() => handleLayoutChange("grid")}
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg ${
+                  className={`w-10 h-10 flex items-center justify-center rounded-md ${
                     viewLayout === "grid"
                       ? "bg-purple-600 text-white"
                       : "bg-gray-200 hover:bg-gray-300"
@@ -368,7 +327,7 @@ const ProductListPage = () => {
                 </button>
                 <button
                   onClick={() => handleLayoutChange("compact-grid")}
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg ${
+                  className={`w-10 h-10 flex items-center justify-center rounded-md ${
                     viewLayout === "compact-grid"
                       ? "bg-purple-600 text-white"
                       : "bg-gray-200 hover:bg-gray-300"
@@ -378,7 +337,7 @@ const ProductListPage = () => {
                 </button>
                 <button
                   onClick={() => handleLayoutChange("list")}
-                  className={`w-12 h-12 flex items-center justify-center rounded-lg ${
+                  className={`w-10 h-10 flex items-center justify-center rounded-md ${
                     viewLayout === "list"
                       ? "bg-purple-600 text-white"
                       : "bg-gray-200 hover:bg-gray-300"
