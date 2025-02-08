@@ -10,6 +10,11 @@ import {
 } from "../../store/slices/category-slice";
 import placeholderImage from "../../assets/images/placeholder_image.png";
 
+
+import Sidebar from "./components/Sidebar";
+import AdminNavbar from "./components/AdminNavbar";
+
+
 export default function AdminCategoryManagement() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -109,8 +114,20 @@ export default function AdminCategoryManagement() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-4xl bg-white shadow-lg rounded-xl p-8">
+    <div className="flex flex-col h-screen">
+    {/* Admin Navbar placed on top */}
+    <AdminNavbar />
+    
+    <div className="flex flex-1">
+      {/* Sidebar on the left */}
+      <Sidebar />
+      {/* Main content area */}
+      <div className="flex-1 p-0 overflow-y-auto">
+      <div className="p-0 sm:p-8 md:p-10 lg:p-12 w-full mx-auto">
+
+      
+    
+      <div className="w-full max-w-full bg-white shadow-md rounded-none p-8">
         <button
           onClick={() => navigate("/admin-product")}
           className="flex items-center mb-6 text-purple-500 hover:text-purple-600 transition text-base font-semibold"
@@ -263,5 +280,9 @@ export default function AdminCategoryManagement() {
         </table>
       </div>
     </div>
+    </div>
+    </div>
+    </div>
+    
   );
 }
