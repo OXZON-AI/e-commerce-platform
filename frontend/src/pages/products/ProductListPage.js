@@ -21,7 +21,7 @@ const ProductListPage = () => {
     error,
   } = useSelector((state) => state.product); // Selecting the product state from the Redux store
   console.log("products : ", items);
-  
+
   const {
     categories = [],
     loadingCategories,
@@ -301,7 +301,8 @@ const ProductListPage = () => {
           {/* Main Content */}
           <div className="flex-1">
             {/* Search, Sorting, and View Layout Options */}
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
+              {/* Search Bar */}
               <div className="relative w-full md:w-1/3">
                 <input
                   type="text"
@@ -311,16 +312,17 @@ const ProductListPage = () => {
                   onChange={(e) =>
                     setFilters({ ...filters, search: e.target.value })
                   }
-                  className="w-full p-3 pl-4 pr-12 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 mb-4 md:mb-0"
+                  className="w-full p-3 pl-4 pr-12 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
                   style={{
                     boxSizing: "border-box",
                   }}
                 />
               </div>
 
+              {/* Sort By Dropdown */}
               <select
                 name="sortBy"
-                className="w-full sm:w-1/3 p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm"
+                className="w-full sm:w-1/3 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm"
                 value={filters.sortBy || ""}
                 onChange={(e) =>
                   setFilters({ ...filters, sortBy: e.target.value })
@@ -333,9 +335,11 @@ const ProductListPage = () => {
                 <option value="ratings">Ratings</option>
                 <option value="price">Price</option>
               </select>
+
+              {/* Sort Order Dropdown */}
               <select
                 name="sortOrder"
-                className="w-full sm:w-1/3 p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm"
+                className="w-full sm:w-1/3 p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm"
                 value={filters.sortOrder || ""}
                 onChange={(e) =>
                   setFilters({ ...filters, sortOrder: e.target.value })
@@ -351,10 +355,10 @@ const ProductListPage = () => {
               </select>
 
               {/* View Layout Options */}
-              <div className="flex space-x-4 mt-4 md:mt-0">
+              <div className="flex space-x-4 mt-4 md:mt-0 justify-center md:justify-start">
                 <button
                   onClick={() => handleLayoutChange("grid")}
-                  className={`p-2 ${
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg ${
                     viewLayout === "grid"
                       ? "bg-purple-600 text-white"
                       : "bg-gray-200 hover:bg-gray-300"
@@ -364,7 +368,7 @@ const ProductListPage = () => {
                 </button>
                 <button
                   onClick={() => handleLayoutChange("compact-grid")}
-                  className={`p-2 ${
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg ${
                     viewLayout === "compact-grid"
                       ? "bg-purple-600 text-white"
                       : "bg-gray-200 hover:bg-gray-300"
@@ -374,7 +378,7 @@ const ProductListPage = () => {
                 </button>
                 <button
                   onClick={() => handleLayoutChange("list")}
-                  className={`p-2 ${
+                  className={`w-12 h-12 flex items-center justify-center rounded-lg ${
                     viewLayout === "list"
                       ? "bg-purple-600 text-white"
                       : "bg-gray-200 hover:bg-gray-300"
