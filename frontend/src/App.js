@@ -29,7 +29,12 @@ const AdminCategoryManagement = lazy(() =>
 
 const App = () => {
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true, // Keep the previous flag!
+        v7_relativeSplatPath: true, // Add the new flag
+      }}
+    >
       <ScrollToTop>
         <Suspense
           fallback={
