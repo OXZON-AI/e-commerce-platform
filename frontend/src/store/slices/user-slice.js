@@ -34,16 +34,16 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      state.userInfo = action.payload; // Set user info on login
+      state.userInfo = action.payload; // Set user info ex: on login
     },
     clearUser(state) {
       state.userInfo = null; // Clear user data
     },
     clearSuccess(state) {
-      state.success = false; // Clear success state after update
+      state.success = false; // Clear success state ex: after update
     },
     clearError: (state) => {
-      state.error = null; // Clear error state after update
+      state.error = null; // Clear error state ex: after update
     },
   },
   extraReducers: (builder) => {
