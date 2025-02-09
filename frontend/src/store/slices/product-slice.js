@@ -25,8 +25,9 @@ export const fetchProducts = createAsyncThunk(
 // Async thunk to fetch a product details
 export const fetchProductDetails = createAsyncThunk(
   "product/fetchProductDetails",
-  async (slug, { rejectWithValue }) => {
+  async (slug, { dispatch, rejectWithValue }) => {
     try {
+      dispatch(clearProductDetail()); // clears previous product details
       const response = await axiosInstance.get(`/v1/products/${slug}`);
       console.log("product-details-slice : ", response.data);
 

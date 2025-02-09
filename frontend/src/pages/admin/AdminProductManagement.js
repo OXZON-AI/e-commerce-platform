@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import {
   clearBrands,
+  clearProductDetail,
   clearProductError,
   clearProducts,
   fetchProductDetails,
@@ -39,6 +40,7 @@ const AdminProductManagement = () => {
     loadingCategories,
     errorCategory,
   } = useSelector((state) => state.categories);
+  // const selectedProductDetails = useSelector((state) => state.product.productDetail);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -105,6 +107,43 @@ const AdminProductManagement = () => {
     };
   }, [dispatch, filters]);
 
+  // Effect hook to fetch selected product details and set form data if update. if create formdata empty
+  useEffect(() => {
+    if (productDetail) {
+      setFormData({
+        name: productDetail?.name || "",
+        slug: productDetail?.slug || "",
+        shortDescription: productDetail?.description?.short || "",
+        detailedDescription: productDetail?.description?.detailed || "",
+        price: productDetail?.variants[0]?.price || null,
+        compareAtPrice: productDetail?.variants[0]?.compareAtPrice || null,
+        cost: productDetail?.variants[0]?.cost || null,
+        stock: productDetail?.variants[0]?.stock || null,
+        category: productDetail?.category?._id || "",
+        brand: productDetail?.brand || "",
+        image: productDetail?.variants[0]?.images[0]?.url || "",
+        attributes: productDetail?.variants[0]?.attributes || [],
+        isDefault: productDetail?.variants[0]?.isDefault,
+      });
+    } else {
+      setFormData({
+        name: "",
+        slug: "",
+        shortDescription: "",
+        detailedDescription: "",
+        price: null,
+        compareAtPrice: null,
+        cost: null,
+        stock: null,
+        category: "",
+        brand: "",
+        image: "",
+        attributes: [{ name: "color", value: "" }],
+        isDefault: true,
+      });
+    }
+  }, [productDetail]);
+
   // Effect hook to fetch categories when component mounts
   useEffect(() => {
     dispatch(fetchCategories()); // Dispatch the fetchCategories action
@@ -125,74 +164,26 @@ const AdminProductManagement = () => {
 
   const isNextPageDisabled = items.length < 10; // If the length of the current items is less than 10, disable next
 
-  const selectedProductDetails = (product_slug) => {
-    dispatch(fetchProductDetails(product_slug)); // this will make 'productDetail' state in slice
-  };
-
-  const openModal = (product = null) => {
-    setSelectedProduct(product);
+  const openModal = (productSlug = null) => {
+    dispatch(clearProductDetail()); // Always clear previous data first
 
     // get selected product details fom product details endpoint for update form input details only
-    if (product) {
-      selectedProductDetails(product.slug);
+    if (productSlug) {
+      dispatch(fetchProductDetails(productSlug)); // // If editing a product, fetch its details
       console.log("select-prod-detail :::: ", productDetail);
     }
 
-    setFormData(
-      product
-        ? {
-            // name: product.name || "",
-            // slug: product.slug || "",
-            // shortDescription: product.description?.short || "",
-            // detailedDescription: product.description?.detailed || "",
-            // price: product.defaultVariant?.price || null,
-            // compareAtPrice: product.defaultVariant?.compareAtPrice || null,
-            // cost: product.defaultVariant?.cost || null,
-            // stock: product.defaultVariant?.stock || null,
-            // category: product.category?._id || "",
-            // brand: product.brand || "",
-            // image: product.defaultVariant?.image?.url || "",
-            // attributes: product.defaultVariant?.attributes || [],
-            // isDefault: product.defaultVariant?.isDefault,
-
-            name: productDetail?.name || "",
-            slug: productDetail?.slug || "",
-            shortDescription: productDetail?.description?.short || "",
-            detailedDescription: productDetail?.description?.detailed || "",
-            price: productDetail?.variants[0]?.price || null,
-            compareAtPrice: productDetail?.variants[0]?.compareAtPrice || null,
-            cost: productDetail?.variants[0]?.cost || null,
-            stock: productDetail?.variants[0]?.stock || null,
-            category: productDetail?.category?._id || "",
-            brand: productDetail?.brand || "",
-            image: productDetail?.variants[0]?.images[0]?.url || "",
-            attributes: productDetail?.variants[0]?.attributes || [],
-            isDefault: productDetail?.variants[0]?.isDefault,
-          }
-        : {
-            name: "",
-            slug: "",
-            shortDescription: "",
-            detailedDescription: "",
-            price: null,
-            compareAtPrice: null,
-            cost: null,
-            stock: null,
-            category: "",
-            brand: "",
-            image: "",
-            attributes: [{ name: "color", value: "" }],
-            isDefault: true,
-          }
-    );
     setModalOpen(true);
   };
 
   const closeModal = () => {
-    setModalOpen(false);
-    setSelectedProduct(null);
+    if (productDetail) {
+      dispatch(clearProductDetail());
+    }
+
     setErrorValidation("");
-    clearProductError();
+    dispatch(clearProductError());
+    setModalOpen(false);
   };
 
   const handleChange = (e) => {
@@ -201,7 +192,10 @@ const AdminProductManagement = () => {
 
   const handleAttributeChange = (index, e) => {
     const newAttributes = [...formData.attributes];
-    newAttributes[index][e.target.name] = e.target.value;
+    newAttributes[index] = {
+      ...newAttributes[index],
+      [e.target.name]: e.target.value,
+    };
     setFormData({ ...formData, attributes: newAttributes });
   };
 
@@ -209,8 +203,9 @@ const AdminProductManagement = () => {
     console.log("handleSave called");
     console.log("Form Data:", formData);
 
-    // Check if we are updating or creating a product
-    const isUpdating = !!selectedProduct;
+    // update or not
+    const isUpdating = !!productDetail;
+    console.log("isUpdating : ", isUpdating);
 
     // Separate validation logic for Create & Update
     if (!formData.name || !formData.shortDescription || !formData.category) {
@@ -294,17 +289,20 @@ const AdminProductManagement = () => {
         // update product
         await dispatch(
           updateProduct({
-            productId: selectedProduct._id,
+            productId: productDetail._id,
             ...formattedUpdateProduct,
           })
         ).unwrap();
 
+        console.log("product-details: ", productDetail);
+        console.log("product variant: ", !!productDetail.variants[0].sku);
+
         // Update variant separately if needed
-        if (selectedProduct.defaultVariant._id) {
+        if (productDetail.variants?.[0]?.sku) {
           // format selected product variant for backend
           const updatedVariant = {
-            productId: selectedProduct._id,
-            variantId: selectedProduct.defaultVariant._id,
+            productId: productDetail._id,
+            variantId: productDetail.variants[0]._id,
             price: parseFloat(formData.price),
             compareAtPrice: formData.compareAtPrice
               ? parseFloat(formData.compareAtPrice)
@@ -334,13 +332,13 @@ const AdminProductManagement = () => {
     }
   };
 
-  const openDeleteModal = (product) => {
-    setSelectedProduct(product);
+  const openDeleteModal = (productId) => {
+    dispatch(fetchProductDetails(productId)); // change the product in state to want to delete product
     setDeleteModalOpen(true);
   };
 
   const handleDelete = async () => {
-    await dispatch(deleteProduct(selectedProduct._id)).unwrap();
+    await dispatch(deleteProduct(productDetail._id)).unwrap();
     setDeleteModalOpen(false);
     setSuccessMessage("Product deleted successfully!");
     dispatch(fetchProducts());
@@ -625,7 +623,7 @@ const AdminProductManagement = () => {
                   </td>
                   <td className="px-6 py-4 text-sm text-right space-x-2">
                     <button
-                      onClick={() => openModal(product)}
+                      onClick={() => openModal(product.slug)}
                       className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-400 transition-all duration-200"
                     >
                       <Edit className="w-4 h-4" />
@@ -665,7 +663,7 @@ const AdminProductManagement = () => {
         <ProductModal
           isOpen={openModal}
           onClose={closeModal}
-          selectedProduct={selectedProduct}
+          productDetail={productDetail}
           formData={formData}
           handleChange={handleChange}
           handleAttributeChange={handleAttributeChange}
