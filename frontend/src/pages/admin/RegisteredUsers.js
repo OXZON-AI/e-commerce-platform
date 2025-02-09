@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUsers, deleteUser } from "../../store/slices/admin-user-slice";
+import { fetchUsers, deleteUser, clearError } from "../../store/slices/admin-user-slice";
 
 const RegisteredUsers = () => {
   const dispatch = useDispatch();
   const { users, loading, error } = useSelector((state) => state.users);
 
   useEffect(() => {
+    dispatch(clearError());
     dispatch(fetchUsers()); // Fetch all registered users on component mount
   }, [dispatch]);
 

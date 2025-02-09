@@ -9,6 +9,7 @@ import {
   clearBrands,
   clearProductError,
   clearProducts,
+  fetchProductDetails,
 } from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
 import {
@@ -29,6 +30,7 @@ const AdminProductManagement = () => {
   const {
     items = [],
     brands = [],
+    productDetail,
     loading,
     error,
   } = useSelector((state) => state.product);
@@ -43,6 +45,20 @@ const AdminProductManagement = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    slug: "",
+    shortDescription: "",
+    detailedDescription: "",
+    price: "",
+    compareAtPrice: "",
+    cost: "",
+    category: "",
+    brand: "",
+    image: "",
+    attributes: [{ name: "color", value: "" }],
+    isDefault: true,
+  });
   const [filters, setFilters] = useState({
     search: "",
     category: "All Categories",
@@ -53,8 +69,6 @@ const AdminProductManagement = () => {
     page: 1, // Current page for pagination
     limit: 10, // Number of products per page
   });
-
-  console.log("selected product : ", selectedProduct);
 
   const buildFilters = (filters) => {
     const query = {};
@@ -111,39 +125,49 @@ const AdminProductManagement = () => {
 
   const isNextPageDisabled = items.length < 10; // If the length of the current items is less than 10, disable next
 
-  const [formData, setFormData] = useState({
-    name: "",
-    slug: "",
-    shortDescription: "",
-    detailedDescription: "",
-    price: "",
-    compareAtPrice: "",
-    cost: "",
-    category: "",
-    brand: "",
-    image: "",
-    attributes: [{ name: "color", value: "" }],
-    isDefault: true,
-  });
+  const selectedProductDetails = (product_slug) => {
+    dispatch(fetchProductDetails(product_slug)); // this will make 'productDetail' state in slice
+  };
 
   const openModal = (product = null) => {
     setSelectedProduct(product);
+
+    // get selected product details fom product details endpoint for update form input details only
+    if (product) {
+      selectedProductDetails(product.slug);
+      console.log("select-prod-detail :::: ", productDetail);
+    }
+
     setFormData(
       product
         ? {
-            name: product.name || "",
-            slug: product.slug || "",
-            shortDescription: product.description?.short || "",
-            detailedDescription: product.description?.detailed || "",
-            price: product.defaultVariant?.price || null,
-            compareAtPrice: product.defaultVariant?.compareAtPrice || null,
-            cost: product.defaultVariant?.cost || null,
-            stock: product.defaultVariant?.stock || null,
-            category: product.category?._id || "",
-            brand: product.brand || "",
-            image: product.defaultVariant?.image?.url || "",
-            attributes: product.defaultVariant?.attributes || [],
-            isDefault: product.defaultVariant?.isDefault,
+            // name: product.name || "",
+            // slug: product.slug || "",
+            // shortDescription: product.description?.short || "",
+            // detailedDescription: product.description?.detailed || "",
+            // price: product.defaultVariant?.price || null,
+            // compareAtPrice: product.defaultVariant?.compareAtPrice || null,
+            // cost: product.defaultVariant?.cost || null,
+            // stock: product.defaultVariant?.stock || null,
+            // category: product.category?._id || "",
+            // brand: product.brand || "",
+            // image: product.defaultVariant?.image?.url || "",
+            // attributes: product.defaultVariant?.attributes || [],
+            // isDefault: product.defaultVariant?.isDefault,
+
+            name: productDetail?.name || "",
+            slug: productDetail?.slug || "",
+            shortDescription: productDetail?.description?.short || "",
+            detailedDescription: productDetail?.description?.detailed || "",
+            price: productDetail?.variants[0]?.price || null,
+            compareAtPrice: productDetail?.variants[0]?.compareAtPrice || null,
+            cost: productDetail?.variants[0]?.cost || null,
+            stock: productDetail?.variants[0]?.stock || null,
+            category: productDetail?.category?._id || "",
+            brand: productDetail?.brand || "",
+            image: productDetail?.variants[0]?.images[0]?.url || "",
+            attributes: productDetail?.variants[0]?.attributes || [],
+            isDefault: productDetail?.variants[0]?.isDefault,
           }
         : {
             name: "",

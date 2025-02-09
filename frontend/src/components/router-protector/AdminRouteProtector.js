@@ -4,6 +4,8 @@ import { Navigate } from "react-router-dom";
 
 const AdminRouteProtector = ({ children }) => {
   const { userInfo } = useSelector((state) => state.user); // Get user info from Redux state
+  console.log("admin route protector : ", userInfo);
+  
 
   // Redirect to user account if admin is not logged in
   if (userInfo.role !== 'admin') {
