@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import LayoutOne from "../../layouts/LayoutOne";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid"; // Import search icon
 
 const ProductListPage = () => {
   const dispatch = useDispatch(); // Dispatch function to interact with Redux store
@@ -156,27 +157,27 @@ const ProductListPage = () => {
       <LayoutOne>
         <div className="flex flex-col lg:flex-row p-6 gap-6 bg-gray-50 min-h-screen">
           {/* Sidebar */}
-          <div className="lg:w-1/6 w-full md:w-1/3 sm:w-1/2 border rounded-lg shadow-md p-4 bg-white">
+          <div className="lg:w-1/6 w-full md:w-1/3 sm:w-1/2 border rounded-none shadow-sm p-4 bg-white">
             <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-800 mb-4">
-                Search
-              </h3>
-              <input
-                type="text"
-                name="search"
-                placeholder="Search products..."
-                value={filters.search || ""}
-                onChange={(e) =>
-                  setFilters({ ...filters, search: e.target.value })
-                }
-                className="w-full p-4 pl-5 pr-12 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 ease-in-out"
-                style={{
-                  boxSizing: "border-box",
-                }}
-              />
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Search</h3>
+              <div className="relative flex">
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="Search products..."
+                  value={filters.search || ""}
+                  onChange={(e) =>
+                    setFilters({ ...filters, search: e.target.value })
+                  }
+                  className="w-full p-4 pr-14 pl-5 text-gray-900 bg-white border border-gray-300 rounded-none shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-purple-600 transition-all duration-300 ease-in-out"
+                />
+                <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray p-2 rounded-md transition duration-300">
+                  <MagnifyingGlassIcon className="w-6 h-6" />
+                </button>
+              </div>
             </div>
 
-            <h3 className="text-xl font-semibold mb-4">Categories</h3>
+            <h3 className="text-xl font-bold mb-4">Categories</h3>
 
             {/* Category List */}
             <ul className="space-y-3">
@@ -224,7 +225,7 @@ const ProductListPage = () => {
 
             {/* Price Range Filter */}
             <div className="mt-6">
-              <h4 className="text-lg font-medium mb-3">Filter by Price</h4>
+              <h4 className="text-xl font-bold mb-3">Filter by Price</h4>
               <div className="flex flex-col">
                 <div className="flex justify-between text-sm">
                   <span>{filters.priceRange[0]} MVR</span>
@@ -255,7 +256,7 @@ const ProductListPage = () => {
 
             {/* Filter by Brand */}
             <div className="mt-6">
-              <h4 className="text-lg font-medium mb-3">Filter by Brand</h4>
+              <h4 className="text-xl font-bold mb-3">Filter by Brand</h4>
               <ul className="space-y-2">
                 {brands.map((brand) => (
                   <li

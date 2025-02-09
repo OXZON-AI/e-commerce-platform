@@ -19,8 +19,8 @@ const ProductModal = ({
 
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-slate-300 rounded-lg p-6 sm:p-8 md:p-10 max-w-full sm:max-w-3xl w-full mx-auto">
-        <h3 className="text-xl font-semibold mb-4">
+      <div className="bg-slate-300 rounded-md p-10 sm:p-12 md:p-14 lg:p-16 xl:p-20 max-w-full sm:max-w-5xl lg:max-w-7xl w-full mx-auto">
+        <h3 className="text-3xl font-semibold mb-4 text-center">
           {productDetail ? "Edit Product" : "Add Product"}
         </h3>
         <motion.div
