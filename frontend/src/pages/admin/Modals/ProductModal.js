@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const ProductModal = ({
   isOpen,
   onClose,
-  selectedProduct,
+  productDetail,
   formData,
   handleChange,
   handleAttributeChange,
@@ -21,7 +21,7 @@ const ProductModal = ({
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-slate-300 rounded-lg p-6 sm:p-8 md:p-10 max-w-full sm:max-w-3xl w-full mx-auto">
         <h3 className="text-xl font-semibold mb-4">
-          {selectedProduct ? "Edit Product" : "Add Product"}
+          {productDetail ? "Edit Product" : "Add Product"}
         </h3>
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -143,9 +143,9 @@ const ProductModal = ({
                   name="stock"
                   value={formData.stock}
                   onChange={handleChange}
-                  disabled={!selectedProduct} // if create form disable stock
+                  disabled={!productDetail} // if create form disable stock
                   className={`w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 ${
-                    !selectedProduct
+                    !productDetail
                       ? "bg-gray-100 border-gray-100 text-gray-500 cursor-not-allowed"
                       : ""
                   }`}
