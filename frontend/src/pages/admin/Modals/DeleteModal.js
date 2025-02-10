@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const DeleteModal = ({ deleteModalOpen, setDeleteModalOpen, handleDelete }) => {
+const DeleteModal = ({ deleteModalOpen, setDeleteModalOpen, handleDelete, productId }) => {
   if (!deleteModalOpen) return null;
 
   return (
@@ -24,7 +24,7 @@ const DeleteModal = ({ deleteModalOpen, setDeleteModalOpen, handleDelete }) => {
           </button>
           <button
             type="button"
-            onClick={handleDelete}
+            onClick={() => handleDelete(productId)}
             className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500"
           >
             Delete

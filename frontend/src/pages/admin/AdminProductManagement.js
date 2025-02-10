@@ -51,6 +51,7 @@ const AdminProductManagement = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
+  const [deleteProductId, setDeleteProductId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -397,12 +398,13 @@ const AdminProductManagement = () => {
   };
 
   const openDeleteModal = (productId) => {
-    dispatch(fetchProductDetails(productId)); // change the product in state to want to delete product
+    setDeleteProductId(productId);
     setDeleteModalOpen(true);
   };
 
-  const handleDelete = async () => {
-    await dispatch(deleteProduct(productDetail._id)).unwrap();
+  const handleDelete = async (productId) => {
+    await dispatch(deleteProduct(productId)).unwrap();
+    setDeleteProductId(null);
     setDeleteModalOpen(false);
     setSuccessMessage("Product deleted successfully!");
     dispatch(fetchProducts());
@@ -711,7 +713,7 @@ const AdminProductManagement = () => {
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => openDeleteModal(product)}
+                            onClick={() => openDeleteModal(product._id)}
                             className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-500 transition-all duration-200"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -762,6 +764,7 @@ const AdminProductManagement = () => {
                 deleteModalOpen={deleteModalOpen}
                 setDeleteModalOpen={setDeleteModalOpen}
                 handleDelete={handleDelete}
+                productId={deleteProductId}
               />
             )}
 
