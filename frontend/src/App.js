@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/router-protector/ProtectedRoute";
 import AdminRouteProtector from "./components/router-protector/AdminRouteProtector";
 import SampleProductCatalogue from "./pages/other/SampleProductCatalogue";
+import UnauthorizedPage from "./pages/admin/Unauthorized_Page";
 // import SampleProductDetail from "./pages/other/SampleProductDetail";
 
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
@@ -69,17 +70,6 @@ const App = () => {
               element={<SampleProductDetail />}
             /> */}
 
-            {/* Admin Product & Category Management */}
-            <Route
-              path={process.env.PUBLIC_URL + "/admin-product"}
-              element={<AdminProductManagement />}
-            />
-
-            <Route
-              path="/manage-categories"
-              element={<AdminCategoryManagement />}
-            />
-
             <Route
               path={process.env.PUBLIC_URL + "/"}
               element={<ProductListPage />}
@@ -110,6 +100,28 @@ const App = () => {
                 </AdminRouteProtector>
               }
             />
+
+            {/* Admin Product Management */}
+            <Route
+              path={process.env.PUBLIC_URL + "/admin-product"}
+              element={
+                <AdminRouteProtector>
+                  <AdminProductManagement />
+                </AdminRouteProtector>
+              }
+            />
+
+            {/* Admin Category Management */}
+            <Route
+              path="/manage-categories"
+              element={
+                <AdminRouteProtector>
+                  <AdminCategoryManagement />
+                </AdminRouteProtector>
+              }
+            />
+
+            <Route path="/unauthorized-access" element={<UnauthorizedPage />} />
           </Routes>
         </Suspense>
       </ScrollToTop>

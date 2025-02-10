@@ -2,10 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Plus, Edit, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 
-
 import Sidebar from "./components/Sidebar";
 import AdminNavbar from "./components/AdminNavbar";
-
 
 import { FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -187,6 +185,23 @@ const AdminProductManagement = () => {
       dispatch(clearProductDetail());
     }
 
+    // clear the form
+    setFormData({
+      name: "",
+      slug: "",
+      shortDescription: "",
+      detailedDescription: "",
+      price: null,
+      compareAtPrice: null,
+      cost: null,
+      stock: null,
+      category: "",
+      brand: "",
+      image: "",
+      attributes: [{ name: "color", value: "" }],
+      isDefault: true,
+    });
+
     setErrorValidation("");
     dispatch(clearProductError());
     setModalOpen(false);
@@ -205,6 +220,53 @@ const AdminProductManagement = () => {
     setFormData({ ...formData, attributes: newAttributes });
   };
 
+  const validateCreateForm = (formData) => {
+    if (
+      !formData.name ||
+      !formData.shortDescription ||
+      !formData.category ||
+      !formData.brand
+    ) {
+      alert(
+        "All required fields (name, short description, category, brand) must be filled!"
+      );
+      return false;
+    }
+
+    if (!formData.price || !formData.cost || !formData.compareAtPrice) {
+      alert("Each product must have price, compareAtPrice, and cost!");
+      return false;
+    }
+
+    if (parseFloat(formData.price) >= parseFloat(formData.compareAtPrice)) {
+      alert("Price must be less than compareAtPrice!");
+      return false;
+    }
+
+    if (!formData.image) {
+      alert("Each product must have at least one image!");
+      return false;
+    }
+
+    return true;
+  };
+
+  const validateUpdateForm = (formData) => {
+    if (!formData.price || !formData.compareAtPrice) {
+      alert("Both price and compareAtPrice are required!");
+      return false;
+    }
+
+    const price = parseFloat(formData.price);
+    const compareAtPrice = parseFloat(formData.compareAtPrice);
+
+    if (price > compareAtPrice) {
+      alert("Price cannot be greater than CompareAtPrice");
+      return false;
+    }
+    return true;
+  };
+
   const handleSave = async () => {
     console.log("handleSave called");
     console.log("Form Data:", formData);
@@ -213,20 +275,14 @@ const AdminProductManagement = () => {
     const isUpdating = !!productDetail;
     console.log("isUpdating : ", isUpdating);
 
-    // Separate validation logic for Create & Update
-    if (!formData.name || !formData.shortDescription || !formData.category) {
-      setErrorValidation("Missing required fields");
-      return;
+    // Create from validate
+    if (!isUpdating) {
+      if (!validateCreateForm(formData)) return;
     }
 
-    if (!isUpdating && (!formData.price || !formData.image)) {
-      setErrorValidation("For new products, price and image are required");
-      return;
-    }
-
-    if (!isUpdating && !formData.detailedDescription?.trim()) {
-      setErrorValidation("Detailed description is required for new products");
-      return;
+    // Update form validate
+    if (isUpdating) {
+      if (!validateUpdateForm(formData)) return;
     }
 
     try {
@@ -301,14 +357,14 @@ const AdminProductManagement = () => {
         ).unwrap();
 
         console.log("product-details: ", productDetail);
-        console.log("product variant: ", !!productDetail.variants[0].sku);
+        console.log("product variant: ", !!productDetail.variants[0]._id);
 
         // Update variant separately if needed
-        if (productDetail.variants?.[0]?.sku) {
+        if (productDetail.variants?.[0]?._id) {
           // format selected product variant for backend
           const updatedVariant = {
             productId: productDetail._id,
-            variantId: productDetail.variants[0]._id,
+            variantId: productDetail.variants?.[0]?._id,
             price: parseFloat(formData.price),
             compareAtPrice: formData.compareAtPrice
               ? parseFloat(formData.compareAtPrice)
@@ -323,6 +379,8 @@ const AdminProductManagement = () => {
             // ),
             isDefault: formData.isDefault,
           };
+
+          console.log("updatd variant details : ", updatedVariant);
 
           await dispatch(updateVariant(updatedVariant)).unwrap();
         }
@@ -358,374 +416,381 @@ const AdminProductManagement = () => {
 
   return (
     <div className="flex flex-col h-screen">
-    {/* Admin Navbar placed on top */}
-    <AdminNavbar />
-    
-    <div className="flex flex-1">
-      {/* Sidebar on the left */}
-      <Sidebar />
-      
-      {/* Main content area */}
-      <div className="flex-1 p-0 overflow-y-auto">
-      <div className="p-0 sm:p-8 md:p-10 lg:p-12 w-full mx-auto">
+      {/* Admin Navbar placed on top */}
+      <AdminNavbar />
 
-      <div className="bg-white shadow-xl rounded-none p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-semibold text-gray-800">
-            Product Management
-          </h2>
+      <div className="flex flex-1">
+        {/* Sidebar on the left */}
+        <Sidebar />
 
-          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-            <button
-              onClick={openCategoryModal}
-              className="flex items-center justify-center bg-indigo-600 text-white px-6 py-3 rounded-lg shadow hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 w-full sm:w-auto"
-            >
-              Manage Categories
-            </button>
+        {/* Main content area */}
+        <div className="flex-1 p-0 overflow-y-auto">
+          <div className="p-0 sm:p-8 md:p-10 lg:p-12 w-full mx-auto">
+            <div className="bg-white shadow-xl rounded-none p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-semibold text-gray-800">
+                  Product Management
+                </h2>
 
-            <button
-              onClick={() => openModal()}
-              className="flex items-center justify-center bg-teal-500 text-white px-6 py-3 rounded-lg shadow hover:bg-teal-600 focus:ring-4 focus:ring-teal-300 w-full sm:w-auto"
-            >
-              <Plus className="w-5 h-5 mr-2" /> Add Product
-            </button>
-          </div>
-        </div>
+                <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+                  <button
+                    onClick={openCategoryModal}
+                    className="flex items-center justify-center bg-indigo-600 text-white px-6 py-3 rounded-lg shadow hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 w-full sm:w-auto"
+                  >
+                    Manage Categories
+                  </button>
 
-        {/* Filters -----------------------------------------------------------------*/}
-        <div className="p-4 bg-gray-100 rounded-lg">
-          {/* Top Row: Search, Price Range, Reset */}
-          <div className="flex flex-wrap items-center gap-4 mb-4">
-            {/* Search Input */}
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={filters.search}
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  search: e.target.value,
-                  page: 1,
-                }))
-              }
-              className="px-3 py-2 border rounded-md w-60"
-            />
+                  <button
+                    onClick={() => openModal()}
+                    className="flex items-center justify-center bg-teal-500 text-white px-6 py-3 rounded-lg shadow hover:bg-teal-600 focus:ring-4 focus:ring-teal-300 w-full sm:w-auto"
+                  >
+                    <Plus className="w-5 h-5 mr-2" /> Add Product
+                  </button>
+                </div>
+              </div>
 
-            {/* Price Range */}
-            <div className="flex items-center space-x-2">
-              <input
-                type="number"
-                value={filters.priceRange[0]}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    priceRange: [Number(e.target.value), prev.priceRange[1]],
-                    page: 1,
-                  }))
-                }
-                className="px-3 py-2 border rounded-md w-30"
-                placeholder="Min Price"
-              />
-              <span>-</span>
-              <input
-                type="number"
-                value={filters.priceRange[1]}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    priceRange: [prev.priceRange[0], Number(e.target.value)],
-                    page: 1,
-                  }))
-                }
-                className="px-3 py-2 border rounded-md w-30"
-                placeholder="Max Price"
-              />
-            </div>
+              {/* Filters -----------------------------------------------------------------*/}
+              <div className="p-4 bg-gray-100 rounded-lg">
+                {/* Top Row: Search, Price Range, Reset */}
+                <div className="flex flex-wrap items-center gap-4 mb-4">
+                  {/* Search Input */}
+                  <input
+                    type="text"
+                    placeholder="Search products..."
+                    value={filters.search}
+                    onChange={(e) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        search: e.target.value,
+                        page: 1,
+                      }))
+                    }
+                    className="px-3 py-2 border rounded-md w-60"
+                  />
 
-            {/* Reset Button */}
-            <button
-              onClick={() =>
-                setFilters({
-                  search: "",
-                  category: "All Categories",
-                  brand: "All Brands",
-                  sortBy: "",
-                  sortOrder: "",
-                  priceRange: [0, 1000000],
-                  page: 1,
-                  limit: 10,
-                })
-              }
-              className="px-4 py-2 bg-purple-500 text-white rounded-md"
-            >
-              Reset All Filters
-            </button>
-          </div>
-
-          {/* Bottom Row: Category, Brand, Sorting, Order */}
-          <div className="flex justify-between items-center gap-4 mb-4">
-            {/* Category Dropdown */}
-            <div className="flex-1">
-              <select
-                value={filters.category}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    category: e.target.value,
-                    page: 1,
-                  }))
-                }
-                className="px-3 py-2 border rounded-md w-full"
-              >
-                <option>All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat.slug}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Brand Dropdown */}
-            <div className="flex-1">
-              <select
-                value={filters.brand}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    brand: e.target.value,
-                    page: 1,
-                  }))
-                }
-                className="px-3 py-2 border rounded-md w-full"
-              >
-                <option>All Brands</option>
-                {brands.map((brand) => (
-                  <option key={brand} value={brand}>
-                    {brand}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Sort By Dropdown */}
-            <div className="flex-1">
-              <select
-                value={filters.sortBy}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    sortBy: e.target.value,
-                    page: 1,
-                  }))
-                }
-                className="px-3 py-2 border rounded-md w-full"
-              >
-                <option value="">Sort By</option>
-                <option value="ratings">Ratings</option>
-                <option value="price">Price</option>
-              </select>
-            </div>
-
-            {/* Sort Order Dropdown */}
-            <div className="flex-1">
-              <select
-                value={filters.sortOrder}
-                onChange={(e) =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    sortOrder: e.target.value,
-                    page: 1,
-                  }))
-                }
-                className="px-3 py-2 border rounded-md w-full"
-                disabled={!filters.sortBy}
-              >
-                <option value="">Order</option>
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {loading ? (
-          // Show Loading State with Centered HashLoader
-          <div className="flex flex-col justify-center items-center py-[50px] mx-auto text-gray-700 font-semibold">
-            <HashLoader color="#a855f7" size={50} />
-            <span className="mt-3">Loading products...</span>
-          </div>
-        ) : error ? (
-          // Show Error Message Instead of Table
-          <div className="text-center my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
-            <span className="mt-3">Error: {error}</span>
-          </div>
-        ) : (
-          // Show Table Only If There’s No Loading/Error -----------------------------------------------------------------
-          <table className="min-w-full table-auto border-collapse">
-            <thead>
-              <tr>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  No.
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Image
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Name
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Description
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Price
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Stock
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Category
-                </th>
-                <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
-                  Brand
-                </th>
-                <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((product, index) => (
-                <tr key={product._id} className="border-t">
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    <img
-                      src={
-                        product.defaultVariant?.image?.url || placeholderImage
+                  {/* Price Range */}
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="number"
+                      value={filters.priceRange[0]}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          priceRange: [
+                            Number(e.target.value),
+                            prev.priceRange[1],
+                          ],
+                          page: 1,
+                        }))
                       }
-                      alt={
-                        product.defaultVariant?.image?.alt || "Product Image"
-                      }
-                      onError={(e) => {
-                        e.target.src = placeholderImage;
-                      }}
-                      className="w-12 h-12 object-cover rounded-lg shadow-md"
+                      className="px-3 py-2 border rounded-md w-30"
+                      placeholder="Min Price"
                     />
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {product.name}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {product.description?.short ? (
-                      <span className="text-gray-700">
-                        Description Provided
-                      </span>
-                    ) : (
-                      <span className="text-yellow-500">N/A</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {product.defaultVariant?.price || "N/A"} MVR
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {product.defaultVariant?.stock || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {product.category?.name || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {product.brand || "N/A"}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-right space-x-2">
-                    <button
-                      onClick={() => openModal(product.slug)}
-                      className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-400 transition-all duration-200"
+                    <span>-</span>
+                    <input
+                      type="number"
+                      value={filters.priceRange[1]}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          priceRange: [
+                            prev.priceRange[0],
+                            Number(e.target.value),
+                          ],
+                          page: 1,
+                        }))
+                      }
+                      className="px-3 py-2 border rounded-md w-30"
+                      placeholder="Max Price"
+                    />
+                  </div>
+
+                  {/* Reset Button */}
+                  <button
+                    onClick={() =>
+                      setFilters({
+                        search: "",
+                        category: "All Categories",
+                        brand: "All Brands",
+                        sortBy: "",
+                        sortOrder: "",
+                        priceRange: [0, 1000000],
+                        page: 1,
+                        limit: 10,
+                      })
+                    }
+                    className="px-4 py-2 bg-purple-500 text-white rounded-md"
+                  >
+                    Reset All Filters
+                  </button>
+                </div>
+
+                {/* Bottom Row: Category, Brand, Sorting, Order */}
+                <div className="flex justify-between items-center gap-4 mb-4">
+                  {/* Category Dropdown */}
+                  <div className="flex-1">
+                    <select
+                      value={filters.category}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          category: e.target.value,
+                          page: 1,
+                        }))
+                      }
+                      className="px-3 py-2 border rounded-md w-full"
                     >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(product)}
-                      className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-500 transition-all duration-200"
+                      <option>All Categories</option>
+                      {categories.map((cat) => (
+                        <option key={cat._id} value={cat.slug}>
+                          {cat.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Brand Dropdown */}
+                  <div className="flex-1">
+                    <select
+                      value={filters.brand}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          brand: e.target.value,
+                          page: 1,
+                        }))
+                      }
+                      className="px-3 py-2 border rounded-md w-full"
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        <div className="flex justify-end mt-4">
-          <button
-            onClick={() => handlePageChange(filters.page - 1)}
-            disabled={filters.page === 1}
-            className="px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="px-4 py-2">Page {filters.page}</span>
-          <button
-            onClick={() => handlePageChange(filters.page + 1)}
-            disabled={isNextPageDisabled}
-            className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
-          >
-            Next
-          </button>
+                      <option>All Brands</option>
+                      {brands.map((brand) => (
+                        <option key={brand} value={brand}>
+                          {brand}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Sort By Dropdown */}
+                  <div className="flex-1">
+                    <select
+                      value={filters.sortBy}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          sortBy: e.target.value,
+                          page: 1,
+                        }))
+                      }
+                      className="px-3 py-2 border rounded-md w-full"
+                    >
+                      <option value="">Sort By</option>
+                      <option value="ratings">Ratings</option>
+                      <option value="price">Price</option>
+                    </select>
+                  </div>
+
+                  {/* Sort Order Dropdown */}
+                  <div className="flex-1">
+                    <select
+                      value={filters.sortOrder}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          sortOrder: e.target.value,
+                          page: 1,
+                        }))
+                      }
+                      className="px-3 py-2 border rounded-md w-full"
+                      disabled={!filters.sortBy}
+                    >
+                      <option value="">Order</option>
+                      <option value="asc">Ascending</option>
+                      <option value="desc">Descending</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {loading ? (
+                // Show Loading State with Centered HashLoader
+                <div className="flex flex-col justify-center items-center py-[50px] mx-auto text-gray-700 font-semibold">
+                  <HashLoader color="#a855f7" size={50} />
+                  <span className="mt-3">Loading products...</span>
+                </div>
+              ) : error ? (
+                // Show Error Message Instead of Table
+                <div className="text-center my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
+                  <span className="mt-3">Error: {error}</span>
+                </div>
+              ) : (
+                // Show Table Only If There’s No Loading/Error -----------------------------------------------------------------
+                <table className="min-w-full table-auto border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        No.
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        Image
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        Name
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        Description
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        Price
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        Stock
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        Category
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        Brand
+                      </th>
+                      <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {items.map((product, index) => (
+                      <tr key={product._id} className="border-t">
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {index + 1}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          <img
+                            src={
+                              product.defaultVariant?.image?.url ||
+                              placeholderImage
+                            }
+                            alt={
+                              product.defaultVariant?.image?.alt ||
+                              "Product Image"
+                            }
+                            onError={(e) => {
+                              e.target.src = placeholderImage;
+                            }}
+                            className="w-12 h-12 object-cover rounded-lg shadow-md"
+                          />
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {product.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {product.description?.short ? (
+                            <span className="text-gray-700">
+                              Description Provided
+                            </span>
+                          ) : (
+                            <span className="text-yellow-500">N/A</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {product.defaultVariant?.price || "N/A"} MVR
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {product.defaultVariant?.stock || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {product.category?.name || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {product.brand || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-right space-x-2">
+                          <button
+                            onClick={() => openModal(product.slug)}
+                            className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-400 transition-all duration-200"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(product)}
+                            className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-500 transition-all duration-200"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={() => handlePageChange(filters.page - 1)}
+                  disabled={filters.page === 1}
+                  className="px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="px-4 py-2">Page {filters.page}</span>
+                <button
+                  onClick={() => handlePageChange(filters.page + 1)}
+                  disabled={isNextPageDisabled}
+                  className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+
+            {modalOpen && (
+              <ProductModal
+                isOpen={openModal}
+                onClose={closeModal}
+                productDetail={productDetail}
+                formData={formData}
+                handleChange={handleChange}
+                handleAttributeChange={handleAttributeChange}
+                handleSave={handleSave}
+                errorValidation={errorValidation}
+                error={error}
+                categories={categories}
+                setFormData={setFormData}
+              />
+            )}
+
+            {deleteModalOpen && (
+              <DeleteModal
+                deleteModalOpen={deleteModalOpen}
+                setDeleteModalOpen={setDeleteModalOpen}
+                handleDelete={handleDelete}
+              />
+            )}
+
+            {successMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="fixed bottom-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg"
+              >
+                {successMessage}
+              </motion.div>
+            )}
+
+            {categoryModalOpen && (
+              <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-xl md:max-w-4xl lg:max-w-5xl mx-auto max-h-[80vh] overflow-y-auto"
+                >
+                  <AdminCategoryManagement />
+                </motion.div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      {modalOpen && (
-        <ProductModal
-          isOpen={openModal}
-          onClose={closeModal}
-          productDetail={productDetail}
-          formData={formData}
-          handleChange={handleChange}
-          handleAttributeChange={handleAttributeChange}
-          handleSave={handleSave}
-          errorValidation={errorValidation}
-          error={error}
-          categories={categories}
-          setFormData={setFormData}
-        />
-      )}
-
-      {deleteModalOpen && (
-        <DeleteModal
-          deleteModalOpen={deleteModalOpen}
-          setDeleteModalOpen={setDeleteModalOpen}
-          handleDelete={handleDelete}
-        />
-      )}
-
-      {successMessage && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="fixed bottom-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg"
-        >
-          {successMessage}
-        </motion.div>
-      )}
-
-      {categoryModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-xl md:max-w-4xl lg:max-w-5xl mx-auto max-h-[80vh] overflow-y-auto"
-          >
-            <AdminCategoryManagement />
-          </motion.div>
-        </div>
-      )}
-    </div>
-    </div>
-    </div>
     </div>
   );
 };
