@@ -111,6 +111,7 @@ export const getProduct = async (req, res, next) => {
         ratings: 1,
         brand: 1,
         variants: {
+          _id: 1,
           attributes: 1,
           price: 1,
           compareAtPrice: 1,
