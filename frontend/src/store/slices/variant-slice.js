@@ -27,7 +27,7 @@ export const updateVariant = createAsyncThunk(
         `/v1/products/${productId}/variants/${variantId}`,
         updateData
       );
-      console.log("updated varien : ", response.data);
+      console.log("updated variant slice response : ", response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);

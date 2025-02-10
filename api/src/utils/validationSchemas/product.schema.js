@@ -251,7 +251,7 @@ export const updateVariantSchema = Joi.object({
           .valid(...validAttribtues)
           .required(),
         value: Joi.string().trim().lowercase().required(),
-        id: Joi.string()
+        _id: Joi.string()
           .regex(/^[0-9a-fA-F]{24}$/)
           .required()
           .messages({
