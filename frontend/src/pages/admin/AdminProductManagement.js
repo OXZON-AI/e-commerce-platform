@@ -51,6 +51,7 @@ const AdminProductManagement = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
+  const [deleteProductId, setDeleteProductId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -212,12 +213,45 @@ const AdminProductManagement = () => {
   };
 
   const handleAttributeChange = (index, e) => {
-    const newAttributes = [...formData.attributes];
-    newAttributes[index] = {
-      ...newAttributes[index],
-      [e.target.name]: e.target.value,
-    };
-    setFormData({ ...formData, attributes: newAttributes });
+    const { name, value } = e.target;
+    // Create a new array with updated attributes
+    const updatedAttributes = formData.attributes.map((attr, i) =>
+      i === index ? { ...attr, [name]: value } : attr
+    );
+    setFormData({
+      ...formData,
+      attributes: updatedAttributes,
+      toChange: { attributes: updatedAttributes },
+    });
+  };
+
+  // Allow users to add more attribute fields
+  const addAttributeField = () => {
+    setFormData({
+      ...formData,
+      attributes: [...formData.attributes, { name: "", value: "" }],
+      toAdd: {
+        attributes: [
+          ...(formData.toAdd?.attributes || []),
+          { name: "", value: "" },
+        ],
+      },
+    });
+  };
+
+  // Let users remove an attribute if necessary
+  const removeAttributeField = (index) => {
+    const updatedAttributes = formData.attributes.filter((_, i) => i !== index);
+    setFormData({
+      ...formData,
+      attributes: updatedAttributes,
+      toRemove: {
+        attributes: [
+          ...(formData.toRemove?.attributes || []),
+          formData.attributes[index]._id,
+        ],
+      },
+    });
   };
 
   const validateCreateForm = (formData) => {
@@ -361,6 +395,12 @@ const AdminProductManagement = () => {
 
         // Update variant separately if needed
         if (productDetail.variants?.[0]?._id) {
+          // Separate existing attributes and new attributes
+          const existingAttributes =
+            formData.attributes?.filter((attr) => attr._id) || [];
+          const newAttributes =
+            formData.attributes?.filter((attr) => !attr._id) || [];
+
           // format selected product variant for backend
           const updatedVariant = {
             productId: productDetail._id,
@@ -371,18 +411,59 @@ const AdminProductManagement = () => {
               : undefined,
             cost: formData.cost ? parseFloat(formData.cost) : undefined,
             stock: parseInt(formData.stock) || 0,
+            isDefault: formData.isDefault,
+            // Include attributes and images - Only send new attributes & images to `toAdd`
+            toAdd: {
+              attributes: newAttributes.length
+                ? newAttributes.map((attr) => ({
+                    name: attr.name,
+                    value: attr.value,
+                  }))
+                : undefined,
+              images: formData.toAdd?.images?.length
+                ? formData.toAdd.images
+                : [],
+            },
+            // Only send existing attributes to `toChange`
+            toChange: {
+              attributes: existingAttributes.length
+                ? existingAttributes.map((attr) => ({
+                    _id: attr._id,
+                    name: attr.name,
+                    value: attr.value,
+                  }))
+                : undefined,
+              images: formData.toChange?.images?.length
+                ? formData.toChange.images
+                : [],
+            },
+            toRemove: {
+              // Remove empty or null attributes from `toRemove`
+              attributes:
+                formData.toRemove?.attributes?.filter((attr) => attr) ||
+                undefined,
+              images:
+                formData.toRemove?.images?.filter((img) => img) || undefined,
+            },
             // image: formData.image
             //   ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
             //   : [],
             // attributes: formData.attributes.filter(
             //   (attr) => attr.name && attr.value
             // ),
-            isDefault: formData.isDefault,
           };
 
           console.log("updatd variant details : ", updatedVariant);
 
           await dispatch(updateVariant(updatedVariant)).unwrap();
+
+          // Clear toAdd, toChange, and toRemove after update
+          setFormData((prevData) => ({
+            ...prevData,
+            toAdd: {},
+            toChange: {},
+            toRemove: {},
+          }));
         }
 
         setSuccessMessage("Product updated successfully!");
@@ -397,12 +478,13 @@ const AdminProductManagement = () => {
   };
 
   const openDeleteModal = (productId) => {
-    dispatch(fetchProductDetails(productId)); // change the product in state to want to delete product
+    setDeleteProductId(productId);
     setDeleteModalOpen(true);
   };
 
-  const handleDelete = async () => {
-    await dispatch(deleteProduct(productDetail._id)).unwrap();
+  const handleDelete = async (productId) => {
+    await dispatch(deleteProduct(productId)).unwrap();
+    setDeleteProductId(null);
     setDeleteModalOpen(false);
     setSuccessMessage("Product deleted successfully!");
     dispatch(fetchProducts());
@@ -711,7 +793,7 @@ const AdminProductManagement = () => {
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => openDeleteModal(product)}
+                            onClick={() => openDeleteModal(product._id)}
                             className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-500 transition-all duration-200"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -754,6 +836,8 @@ const AdminProductManagement = () => {
                 error={error}
                 categories={categories}
                 setFormData={setFormData}
+                addAttributeField={addAttributeField}
+                removeAttributeField={removeAttributeField}
               />
             )}
 
@@ -762,6 +846,7 @@ const AdminProductManagement = () => {
                 deleteModalOpen={deleteModalOpen}
                 setDeleteModalOpen={setDeleteModalOpen}
                 handleDelete={handleDelete}
+                productId={deleteProductId}
               />
             )}
 
