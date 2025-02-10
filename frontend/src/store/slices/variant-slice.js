@@ -22,6 +22,7 @@ export const updateVariant = createAsyncThunk(
   "variant/updateVariant",
   async ({ productId, variantId, ...updateData }, { rejectWithValue }) => {
     try {
+      console.log("updated data in slice : ", updateData);
       const response = await axiosInstance.put(
         `/v1/products/${productId}/variants/${variantId}`,
         updateData
