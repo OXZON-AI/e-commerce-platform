@@ -14,6 +14,8 @@ const ProductModal = ({
   error,
   categories,
   setFormData,
+  addAttributeField,
+  removeAttributeField,
 }) => {
   if (!isOpen) return null;
 
@@ -199,7 +201,7 @@ const ProductModal = ({
                   Attributes
                 </label>
                 {formData.attributes?.map((attr, index) => (
-                  <div key={index} className="flex gap-2">
+                  <div key={index} className="flex gap-2 items-center mb-3">
                     <input
                       type="text"
                       name="name"
@@ -216,8 +218,22 @@ const ProductModal = ({
                       placeholder="Attribute Value"
                       className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
                     />
+                    <button
+                      type="button"
+                      onClick={() => removeAttributeField(index)}
+                      className="bg-red-500 text-white px-3 py-2 rounded"
+                    >
+                      ✕
+                    </button>
                   </div>
                 ))}
+                <button
+                  type="button"
+                  onClick={addAttributeField}
+                  className="mt-2 bg-green-500 text-white px-4 py-2 rounded"
+                >
+                  + Add Attribute
+                </button>
               </div>
               <div className="flex items-center space-x-2 mt-4">
                 <input

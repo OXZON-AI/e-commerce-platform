@@ -212,13 +212,34 @@ const AdminProductManagement = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // const handleAttributeChange = (index, e) => {
+  //   const { name, value } = e.target;
+  //   const updatedAttributes = [...formData.attributes];
+  //   updatedAttributes[index][name] = value;
+  //   setFormData({ ...formData, attributes: updatedAttributes });
+  // };
+
   const handleAttributeChange = (index, e) => {
-    const newAttributes = [...formData.attributes];
-    newAttributes[index] = {
-      ...newAttributes[index],
-      [e.target.name]: e.target.value,
-    };
-    setFormData({ ...formData, attributes: newAttributes });
+    const { name, value } = e.target;
+    // Create a new array with updated attributes
+    const updatedAttributes = formData.attributes.map((attr, i) =>
+      i === index ? { ...attr, [name]: value } : attr
+    );
+    setFormData({ ...formData, attributes: updatedAttributes });
+  };
+
+  // Allow users to add more attribute fields
+  const addAttributeField = () => {
+    setFormData({
+      ...formData,
+      attributes: [...formData.attributes, { name: "", value: "" }],
+    });
+  };
+
+  // Let users remove an attribute if necessary
+  const removeAttributeField = (index) => {
+    const updatedAttributes = formData.attributes.filter((_, i) => i !== index);
+    setFormData({ ...formData, attributes: updatedAttributes });
   };
 
   const validateCreateForm = (formData) => {
@@ -756,6 +777,8 @@ const AdminProductManagement = () => {
                 error={error}
                 categories={categories}
                 setFormData={setFormData}
+                addAttributeField={addAttributeField}
+                removeAttributeField={removeAttributeField}
               />
             )}
 
