@@ -200,7 +200,7 @@ export const updateVariant = async (req, res, next) => {
         return next(error);
       }
 
-      if (price) {
+      if (price && !compareAtPrice) {
         if (price > variant.compareAtPrice) {
           const error = customError(
             400,
@@ -212,7 +212,7 @@ export const updateVariant = async (req, res, next) => {
         }
       }
 
-      if (compareAtPrice) {
+      if (compareAtPrice && !price) {
         if (compareAtPrice < variant.price) {
           const error = customError(
             400,
