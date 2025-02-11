@@ -4,12 +4,13 @@ import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
 import axios from "axios";
-import { clearUser } from "../../store/slices/user-slice";
+import { clearUser, signoutUser } from "../../store/slices/user-slice";
 import Cookie from "js-cookie";
 
 const IconGroup = ({ iconWhiteClass }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const {loading, success, error } = useSelector((state) => state.user)
 
   const handleClick = (e) => {
     e.currentTarget.nextSibling.classList.toggle("active");
@@ -26,11 +27,7 @@ const IconGroup = ({ iconWhiteClass }) => {
 
   const logoutHandler = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/v1/auth/signout");
-      dispatch(clearUser()); // Clear the Redux user state
-      localStorage.removeItem("persist:frontend"); // Remove persisted Redux state
-      Cookie.remove("token");
-      console.log(response.data.message);
+      dispatch(signoutUser()).unwrap();
       alert("Signed out successfully!");
 
       navigate("/login-register"); // Redirect to login page

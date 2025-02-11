@@ -1,12 +1,16 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
-import axiosInstance from "../../axiosConfig";
 import LayoutOne from "../../layouts/LayoutOne";
 import ReCAPTCHA from "react-google-recaptcha";
-import { setUser } from "../../store/slices/user-slice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loginUser,
+  registerUser,
+  clearError,
+  clearSuccess,
+} from "../../store/slices/user-slice";
 
 const LoginRegister = () => {
   const [email, setEmail] = useState("");
@@ -15,12 +19,28 @@ const LoginRegister = () => {
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
-  const [serverSuccess, setServerSuccess] = useState("");
   const loginCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is login form ReCaptcha element
   const registerCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is register form ReCaptcha element
+
   const dispatch = useDispatch(); // Get the dispatch function
   const navigate = useNavigate();
+  const { loading, error, success, userInfo } = useSelector(
+    (state) => state.user
+  );
+
+  // Efect hook for if user already on the state redirection
+  useEffect(() => {
+    if (userInfo) {
+      navigate(userInfo.role === "admin" ? "/admin-product" : "/");
+    }
+  }, [userInfo, navigate]);
+
+  // Clear timeout on component unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout();
+    };
+  }, []);
 
   // Helper function to validate email
   const validateEmail = (email) => {
@@ -83,50 +103,84 @@ const LoginRegister = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // recaptch check
+  const executeReCaptcha = async (captchaRef) => {
+    if (!captchaRef.current) return null;
+
+    captchaRef.current.reset(); // Reset ReCAPTCHA before executing
+
+    let timeoutId;
+    try {
+      return await Promise.race([
+        captchaRef.current.executeAsync(),
+        new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject("ReCAPTCHA timeout"), 100000); // 100 seconds
+        }),
+      ]);
+    } catch (error) {
+      console.error("ReCAPTCHA Error:", error);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        recaptcha:
+          error.response?.data?.message ||
+          error.message ||
+          "An unknown error occurred on ReCAPTCHA",
+      }));
+      return null;
+    } finally {
+      clearTimeout(timeoutId); // Ensure timeout is cleared when execution finishes
+    }
+  };
+
   // Register Form Handler
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setErrors({}); // clear previous error state
-    setServerError(""); // clear previous server error state
-    setServerSuccess(""); // clear previous server success state
+    clearError(null); // clear previous server error state
 
     // Calling register form validation to check validations
     if (!validateRegisterForm()) {
       return;
     }
-
     try {
       // Concatenating name
       const fullName = `${firstName} ${lastName}`;
 
       // ReCaptcha Token
-      const token = await loginCaptchaRef.current.executeAsync();
-      if (!token) {
-        setServerError("ReCAPTCHA verification failed. Please try again.");
+      const recaptchaToken = await executeReCaptcha(loginCaptchaRef);
+      if (!recaptchaToken) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          recaptcha: "ReCAPTCHA verification failed. Please try again.",
+        }));
         return;
       }
-      loginCaptchaRef.current.reset(); // allow to re-excute the reCapture check
 
-      const response = await axiosInstance.post("/v1/auth/signup", {
+      const userdata = {
         email,
         password,
         name: fullName, //using concatenated value for name
         phone,
-        token,
-      });
-      setServerSuccess(response.data.message);
+        token: recaptchaToken,
+      };
+      dispatch(registerUser(userdata)).unwrap();
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "An error occurred during signup.";
-      setServerError(errorMessage);
+      console.error("Login Error:", err);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        register:
+          err.response?.data?.message ||
+          err.message ||
+          "An unknown error occurred on login",
+      }));
     }
   };
 
   // Login Form Handler
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setServerSuccess("");
-    setServerError("");
+    setErrors({});
+    clearError(null);
 
     // Calling login form validation to check validations
     if (!validateLoginForm()) {
@@ -135,30 +189,24 @@ const LoginRegister = () => {
 
     try {
       // ReCaptcha Token
-      const token = await registerCaptchaRef.current.executeAsync();
-      if (!token) {
-        setServerError("ReCAPTCHA verification failed. Please try again.");
+      const recaptchaToken = await executeReCaptcha(registerCaptchaRef);
+      if (!recaptchaToken) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          recaptcha: "ReCAPTCHA verification failed. Please try again.",
+        }));
         return;
       }
-      registerCaptchaRef.current.reset(); // allow to re-excute the reCapture check
-
-      const response = await axiosInstance.post("/v1/auth/signin", {
-        email,
-        password,
-      });
-
-      const userData = response.data.user; // catching user data from response
-      dispatch(setUser(userData)); // save user data to redux
-
-      if (userData.role === "admin"){
-        navigate("/admin-product")
-      } else {
-        navigate("/");
-      }
-
-      setServerSuccess("User signed in as " + response.data.user.name);
+      await dispatch(loginUser({ email, password })).unwrap(); // save user data to redux
     } catch (err) {
-      setServerError(err.response?.data?.message || "Login failed!");
+      console.error("Login Error:", err);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        login:
+          err.response?.data?.message ||
+          err.message ||
+          "An unknown error occurred",
+      }));
     }
   };
 
@@ -184,16 +232,20 @@ const LoginRegister = () => {
                       </Nav.Item>
                     </Nav>
                     <Tab.Content>
+                      {errors.recaptcha && (
+                        <p className="text-red-600 mb-3">{errors.recaptcha}</p>
+                      )}
+
                       <Tab.Pane eventKey="login">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            {serverSuccess && (
-                              <p className="text-green-600 mb-3">
-                                {serverSuccess}
-                              </p>
+                            {error && (
+                              <p className="text-red-600 mb-3">{error}</p>
                             )}
-                            {serverError && (
-                              <p className="text-red-600 mb-3">{serverError}</p>
+                            {errors.login && (
+                              <p className="text-red-600 mb-3">
+                                {errors.login}
+                              </p>
                             )}
                             <form onSubmit={handleLoginSubmit}>
                               {errors.email && (
@@ -258,8 +310,11 @@ const LoginRegister = () => {
                                   <button
                                     type="submit"
                                     className="bg-indigo-600 text-black px-6 py-2 rounded-md hover:bg-indigo-700"
+                                    disabled={loading}
                                   >
-                                    <span>Login</span>
+                                    <span>
+                                      {loading ? "Logging in..." : "Login"}
+                                    </span>
                                   </button>
                                 </div>
                               </div>
@@ -270,13 +325,13 @@ const LoginRegister = () => {
                       <Tab.Pane eventKey="register">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            {serverSuccess && (
-                              <p className="text-green-600 mb-3">
-                                {serverSuccess}
-                              </p>
+                            {error && (
+                              <p className="text-red-600 mb-3">{error}</p>
                             )}
-                            {serverError && (
-                              <p className="text-red-600 mb-3">{serverError}</p>
+                            {errors.register && (
+                              <p className="text-red-600 mb-3">
+                                {errors.register}
+                              </p>
                             )}
                             <form onSubmit={handleRegisterSubmit}>
                               {errors.firstName && (
@@ -381,8 +436,11 @@ const LoginRegister = () => {
                                 <button
                                   type="submit"
                                   className="bg-indigo-600 text-black px-6 py-2 rounded-md hover:bg-indigo-700"
+                                  disabled={loading}
                                 >
-                                  <span>Register</span>
+                                  <span>
+                                    {loading ? "Registering..." : "Register"}
+                                  </span>
                                 </button>
                               </div>
                             </form>

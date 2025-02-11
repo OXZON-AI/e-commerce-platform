@@ -1,5 +1,46 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../axiosConfig";
+import Cookie from "js-cookie";
+
+// Async thunk for user login
+export const loginUser = createAsyncThunk(
+  "user/loginUser",
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/v1/auth/signin", {
+        email,
+        password,
+      });
+      return response.data.user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Login failed!");
+    }
+  }
+);
+
+// Async thunk for user registration
+export const registerUser = createAsyncThunk(
+  "user/registerUser",
+  async ({ email, password, name, phone, token }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/v1/auth/signup", {
+        email,
+        password,
+        name,
+        phone,
+        token,
+      });
+
+      console.log("User-slice Register : ", response.data.message);
+
+      return true;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Registration failed!"
+      );
+    }
+  }
+);
 
 // Async thunk to update user details
 export const updateUser = createAsyncThunk(
@@ -12,6 +53,26 @@ export const updateUser = createAsyncThunk(
       );
 
       return response.data.user; // Return updated user info
+    } catch (error) {
+      return rejectWithValue(
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message
+      );
+    }
+  }
+);
+
+// Async thunk to signout user
+export const signoutUser = createAsyncThunk(
+  "user/signout",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        "http://localhost:3000/v1/auth/signout"
+      );
+      console.log("User-slice signout : ", response.data.message);
+      return true;
     } catch (error) {
       return rejectWithValue(
         error.response && error.response.data.message
@@ -48,6 +109,33 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userInfo = action.payload;
+        state.success = true;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = action.payload;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -59,6 +147,22 @@ const userSlice = createSlice({
         state.userInfo = action.payload; // Update user info with response
       })
       .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(signoutUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(signoutUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.userInfo = null; // Clear user info
+        localStorage.removeItem("persist:frontend"); // Remove persisted Redux state
+        Cookie.remove("token"); // Remove auth token from cookies
+      })
+      .addCase(signoutUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

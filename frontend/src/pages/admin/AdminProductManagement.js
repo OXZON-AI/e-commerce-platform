@@ -428,7 +428,7 @@ const AdminProductManagement = () => {
             toChange: {
               attributes: existingAttributes.length
                 ? existingAttributes.map((attr) => ({
-                    _id: attr._id,
+                    id: attr._id,
                     name: attr.name,
                     value: attr.value,
                   }))
