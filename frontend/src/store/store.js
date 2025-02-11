@@ -17,6 +17,8 @@ import compareReducer from "./slices/compare-slice";
 import wishlistReducer from "./slices/wishlist-slice";
 import userReducer from './slices/user-slice';
 import adminUserReducer from './slices/admin-user-slice';
+import categoryReducer from './slices/category-slice';
+import variantReducer from './slices/variant-slice';
 
 const persistConfig = {
     key: "frontend",
@@ -32,6 +34,8 @@ export const rootReducer = combineReducers({
     wishlist: wishlistReducer,
     user: userReducer,
     users: adminUserReducer,
+    categories: categoryReducer,
+    variant: variantReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -54,15 +58,3 @@ export const store = configureStore({
 });
 
 export const persistor = persistStore(store);
-
-
-// import { configureStore, combineReducers } from '@reduxjs/toolkit';
-// import userReducer from './slices/user-slice';
-
-// const store = configureStore({
-//     reducer: {
-//         user: userReducer,
-//     },
-// })
-
-// export default store;

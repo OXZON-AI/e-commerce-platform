@@ -5,6 +5,7 @@ import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
 import axios from "axios";
 import { clearUser } from "../../store/slices/user-slice";
+import Cookie from "js-cookie";
 
 const IconGroup = ({ iconWhiteClass }) => {
   const navigate = useNavigate();
@@ -25,36 +26,25 @@ const IconGroup = ({ iconWhiteClass }) => {
 
   const logoutHandler = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/v1/auth/signout"
-      );
+      const response = await axios.get("http://localhost:3000/v1/auth/signout");
       dispatch(clearUser()); // Clear the Redux user state
-      localStorage.removeItem('persist:frontend'); // Remove persisted Redux state
+      localStorage.removeItem("persist:frontend"); // Remove persisted Redux state
+      Cookie.remove("token");
       console.log(response.data.message);
-      alert('Signed out successfully!');
+      alert("Signed out successfully!");
 
       navigate("/login-register"); // Redirect to login page
     } catch (error) {
-      console.error("Error logging out:", error.response?.data?.message || error.message);
-      alert('Failed to sign out. Please try again.');
+      console.error(
+        "Error logging out:",
+        error.response?.data?.message || error.message
+      );
+      alert("Failed to sign out. Please try again.");
     }
   };
 
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)}>
-      <div className="same-style header-search d-none d-lg-block">
-        <button className="search-active" onClick={(e) => handleClick(e)}>
-          <i className="pe-7s-search" />
-        </button>
-        <div className="search-content">
-          <form action="#">
-            <input type="text" placeholder="Search" />
-            <button className="button-search">
-              <i className="pe-7s-search" />
-            </button>
-          </form>
-        </div>
-      </div>
       <div className="same-style account-setting d-none d-lg-block">
         <button
           className="account-setting-active"

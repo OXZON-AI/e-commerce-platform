@@ -3,6 +3,9 @@ import ScrollToTop from "./helpers/scroll-top";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/router-protector/ProtectedRoute";
 import AdminRouteProtector from "./components/router-protector/AdminRouteProtector";
+import SampleProductCatalogue from "./pages/other/SampleProductCatalogue";
+import UnauthorizedPage from "./pages/admin/Unauthorized_Page";
+// import SampleProductDetail from "./pages/other/SampleProductDetail";
 
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
 const ForgotPassword = lazy(() => import("./pages/other/ForgotPassword"));
@@ -11,13 +14,28 @@ const MyAccount = lazy(() => import("./pages/other/MyAccount"));
 
 // product pages
 const ProductListPage = lazy(() => import("./pages/products/ProductListPage"));
+const ProductDetailPage = lazy(() =>
+  import("./pages/products/ProductDetailPage")
+);
 
-//Admin User Management Page
+//Admin Management Page
 const RegisteredUsers = lazy(() => import("./pages/admin/RegisteredUsers"));
+const AdminProductManagement = lazy(() =>
+  import("./pages/admin/AdminProductManagement")
+);
+
+const AdminCategoryManagement = lazy(() =>
+  import("./pages/admin/AdminCategoryManagement")
+);
 
 const App = () => {
   return (
-    <Router>
+    <Router
+      future={{
+        v7_startTransition: true, // Keep the previous flag!
+        v7_relativeSplatPath: true, // Add the new flag
+      }}
+    >
       <ScrollToTop>
         <Suspense
           fallback={
@@ -43,10 +61,24 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/reset-password"}
               element={<ResetPassword />}
             />
-
             <Route
               path={process.env.PUBLIC_URL + "/product-list"}
+              element={<SampleProductCatalogue />}
+            />
+            {/* <Route
+              path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
+              element={<SampleProductDetail />}
+            /> */}
+
+            <Route
+              path={process.env.PUBLIC_URL + "/"}
               element={<ProductListPage />}
+            />
+
+            {/* Route for individual product detail page with dynamic product ID */}
+            <Route
+              path={process.env.PUBLIC_URL + "/product/:slug"}
+              element={<ProductDetailPage />}
             />
 
             {/* Protected routes for not logged in user */}
@@ -68,6 +100,28 @@ const App = () => {
                 </AdminRouteProtector>
               }
             />
+
+            {/* Admin Product Management */}
+            <Route
+              path={process.env.PUBLIC_URL + "/admin-product"}
+              element={
+                <AdminRouteProtector>
+                  <AdminProductManagement />
+                </AdminRouteProtector>
+              }
+            />
+
+            {/* Admin Category Management */}
+            <Route
+              path="/manage-categories"
+              element={
+                <AdminRouteProtector>
+                  <AdminCategoryManagement />
+                </AdminRouteProtector>
+              }
+            />
+
+            <Route path="/unauthorized-access" element={<UnauthorizedPage />} />
           </Routes>
         </Suspense>
       </ScrollToTop>

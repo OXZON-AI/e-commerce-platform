@@ -1,3 +1,5 @@
+import { Category } from "../models/category.model.js";
+
 export const buildCategoryTree = (categories) => {
   const findChildren = (parentId) => {
     return categories
@@ -25,4 +27,23 @@ export const buildCategoryTree = (categories) => {
     }));
 
   return rootCategories;
+};
+
+export const getIdsForDelete = async (parent) => {
+  const idsForDelete = [parent];
+  let queue = [parent];
+
+  while (queue.length) {
+    let currentParent = queue.pop();
+
+    const children = await Category.find({ parent: currentParent }, { _id: 1 });
+
+    if (children.length) {
+      const childIds = children.map((child) => child._id.toString());
+      idsForDelete.push(...childIds);
+      queue.push(...childIds);
+    }
+  }
+
+  return idsForDelete;
 };

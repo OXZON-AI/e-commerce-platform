@@ -1,12 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUsers, deleteUser } from "../../store/slices/admin-user-slice";
+import { fetchUsers, deleteUser, clearError } from "../../store/slices/admin-user-slice";
+
+import Sidebar from "./components/Sidebar";
+import AdminNavbar from "./components/AdminNavbar";
 
 const RegisteredUsers = () => {
   const dispatch = useDispatch();
   const { users, loading, error } = useSelector((state) => state.users);
 
   useEffect(() => {
+    dispatch(clearError());
     dispatch(fetchUsers()); // Fetch all registered users on component mount
   }, [dispatch]);
 
@@ -17,8 +21,19 @@ const RegisteredUsers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-lg p-6">
+    <div className="flex flex-col h-screen">
+    {/* Admin Navbar placed on top */}
+    <AdminNavbar />
+    
+    <div className="flex flex-1">
+      {/* Sidebar on the left */}
+      <Sidebar />
+      
+      {/* Main content area */}
+      <div className="flex-1 p-0 overflow-y-auto">
+      <div className="p-0 sm:p-8 md:p-10 lg:p-12 w-full mx-auto">
+
+      <div className=" bg-white rounded-none shadow-md p-6">
         <h1 className="text-2xl font-semibold text-gray-800 text-center mb-6">
           Registered Users
         </h1>
@@ -90,6 +105,9 @@ const RegisteredUsers = () => {
           </table>
         </div>
       </div>
+    </div>
+    </div>
+    </div>
     </div>
   );
 };
