@@ -18,6 +18,12 @@ const ProductDetailPage = lazy(() =>
   import("./pages/products/ProductDetailPage")
 );
 
+//Cart Checkout
+const Cart = lazy(() => import("./pages/other/Cart"));
+const Checkout = lazy(() => import("./pages/other/Checkout"));
+
+
+
 //Admin Management Page
 const RegisteredUsers = lazy(() => import("./pages/admin/RegisteredUsers"));
 const AdminProductManagement = lazy(() =>
@@ -69,6 +75,10 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
               element={<SampleProductDetail />}
             /> */}
+
+
+<Route path={process.env.PUBLIC_URL + "/cart"} element={<Cart />} />
+<Route path={process.env.PUBLIC_URL + "/checkout"} element={<Checkout />} />
 
             <Route
               path={process.env.PUBLIC_URL + "/"}
