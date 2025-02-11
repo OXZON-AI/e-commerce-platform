@@ -67,7 +67,7 @@ const AdminProductManagement = () => {
     sortOrder: "", // Sort order (ascending or descending)
     priceRange: [0, 1000000], // Price range filter (min, max)
     page: 1, // Current page for pagination
-    limit: 2, // Number of products per page
+    limit: 10, // Number of products per page
   });
 
   const buildFilters = (filters) => {
