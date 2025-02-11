@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy } from "react";
 import ScrollToTop from "./helpers/scroll-top";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/router-protector/ProtectedRoute";
@@ -34,10 +34,6 @@ const AdminCategoryManagement = lazy(() =>
 );
 
 const App = () => {
-  useEffect(() => {
-    const checkToken = () => {};
-  });
-
   return (
     <Router
       future={{

@@ -119,6 +119,8 @@ const productSlice = createSlice({
         state.loading = false;
         state.items = action.payload.products;
         state.pagination = action.payload.paginationInfo;
+        console.log("pagination-product-slice: ", action.payload.paginationInfo);
+        console.log("brand-action-load: ", action.payload.products);
         
         //Exact unique brands only when products are fetched for the first time
         if (state.brands.length === 0) {
