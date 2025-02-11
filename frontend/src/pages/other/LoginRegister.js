@@ -2,7 +2,6 @@ import React, { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
-import axiosInstance from "../../axiosConfig";
 import LayoutOne from "../../layouts/LayoutOne";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,8 +19,6 @@ const LoginRegister = () => {
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
-  const [serverSuccess, setServerSuccess] = useState("");
   const loginCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is login form ReCaptcha element
   const registerCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is register form ReCaptcha element
 
@@ -36,7 +33,12 @@ const LoginRegister = () => {
     if (userInfo) {
       navigate(userInfo.role === "admin" ? "/admin-product" : "/");
     }
-  }, [userInfo, navigate]);
+    if (success) {
+      setTimeout(() => {
+        dispatch(clearSuccess());
+      }, 3000); // after 3 sec success masseges will be cleared
+    }
+  }, [userInfo, success, navigate, dispatch]);
 
   // Helper function to validate email
   const validateEmail = (email) => {
@@ -103,45 +105,38 @@ const LoginRegister = () => {
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setErrors({}); // clear previous error state
-    setServerError(""); // clear previous server error state
-    setServerSuccess(""); // clear previous server success state
+    clearError(null); // clear previous server error state
 
     // Calling register form validation to check validations
     if (!validateRegisterForm()) {
       return;
     }
 
-    try {
-      // Concatenating name
-      const fullName = `${firstName} ${lastName}`;
+    // Concatenating name
+    const fullName = `${firstName} ${lastName}`;
 
-      // ReCaptcha Token
-      const token = await loginCaptchaRef.current.executeAsync();
-      if (!token) {
-        setServerError("ReCAPTCHA verification failed. Please try again.");
-        return;
-      }
-      loginCaptchaRef.current.reset(); // allow to re-excute the reCapture check
-
-      const response = await axiosInstance.post("/v1/auth/signup", {
-        email,
-        password,
-        name: fullName, //using concatenated value for name
-        phone,
-        token,
-      });
-      setServerSuccess(response.data.message);
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || "An error occurred during signup.";
-      setServerError(errorMessage);
+    // ReCaptcha Token
+    const recaptchaToken = await loginCaptchaRef.current.executeAsync();
+    if (!recaptchaToken) {
+      setErrors("ReCAPTCHA verification failed. Please try again.");
+      return;
     }
+    loginCaptchaRef.current.reset(); // allow to re-excute the reCapture check
+
+    const userdata = {
+      email,
+      password,
+      name: fullName, //using concatenated value for name
+      phone,
+      token: recaptchaToken,
+    };
+    dispatch(registerUser(userdata));
   };
 
   // Login Form Handler
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    setServerSuccess("");
+    setErrors({});
     clearError(null);
 
     // Calling login form validation to check validations
@@ -150,14 +145,13 @@ const LoginRegister = () => {
     }
 
     // ReCaptcha Token
-    const token = await registerCaptchaRef.current.executeAsync();
-    if (!token) {
-      setServerError("ReCAPTCHA verification failed. Please try again.");
+    const recaptchaToken = await registerCaptchaRef.current.executeAsync();
+    if (!recaptchaToken) {
+      errors("ReCAPTCHA verification failed. Please try again.");
       return;
     }
     registerCaptchaRef.current.reset(); // allow to re-excute the reCapture check
     dispatch(loginUser({ email, password })); // save user data to redux
-    setServerSuccess("User signed in as " + userInfo.name);
   };
 
   return (
@@ -185,13 +179,13 @@ const LoginRegister = () => {
                       <Tab.Pane eventKey="login">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            {serverSuccess && (
+                            {success && (
                               <p className="text-green-600 mb-3">
-                                {serverSuccess}
+                                Login successful!
                               </p>
                             )}
-                            {serverError && (
-                              <p className="text-red-600 mb-3">{serverError}</p>
+                            {error && (
+                              <p className="text-red-600 mb-3">{error}</p>
                             )}
                             <form onSubmit={handleLoginSubmit}>
                               {errors.email && (
@@ -256,8 +250,9 @@ const LoginRegister = () => {
                                   <button
                                     type="submit"
                                     className="bg-indigo-600 text-black px-6 py-2 rounded-md hover:bg-indigo-700"
+                                    disabled={loading}
                                   >
-                                    <span>Login</span>
+                                    <span>{loading ? "Logging in..." : "Login"}</span>
                                   </button>
                                 </div>
                               </div>
@@ -268,13 +263,13 @@ const LoginRegister = () => {
                       <Tab.Pane eventKey="register">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            {serverSuccess && (
+                            {success && (
                               <p className="text-green-600 mb-3">
-                                {serverSuccess}
+                                Registration successful!
                               </p>
                             )}
-                            {serverError && (
-                              <p className="text-red-600 mb-3">{serverError}</p>
+                            {error && (
+                              <p className="text-red-600 mb-3">{error}</p>
                             )}
                             <form onSubmit={handleRegisterSubmit}>
                               {errors.firstName && (
@@ -379,8 +374,9 @@ const LoginRegister = () => {
                                 <button
                                   type="submit"
                                   className="bg-indigo-600 text-black px-6 py-2 rounded-md hover:bg-indigo-700"
+                                  disabled={loading}
                                 >
-                                  <span>Register</span>
+                                  <span>{loading ? "Registering..." : "Register"}</span>
                                 </button>
                               </div>
                             </form>
