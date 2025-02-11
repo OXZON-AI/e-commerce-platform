@@ -33,12 +33,14 @@ const LoginRegister = () => {
     if (userInfo) {
       navigate(userInfo.role === "admin" ? "/admin-product" : "/");
     }
-    if (success) {
-      setTimeout(() => {
-        dispatch(clearSuccess());
-      }, 3000); // after 3 sec success masseges will be cleared
-    }
-  }, [userInfo, success, navigate, dispatch]);
+  }, [userInfo, navigate]);
+
+  // Clear timeout on component unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout();
+    };
+  }, []);
 
   // Helper function to validate email
   const validateEmail = (email) => {
@@ -104,18 +106,29 @@ const LoginRegister = () => {
   // recaptch check
   const executeReCaptcha = async (captchaRef) => {
     if (!captchaRef.current) return null;
-    captchaRef.current.reset(); // allow to re-excute the reCapture check
+
+    captchaRef.current.reset(); // Reset ReCAPTCHA before executing
+
+    let timeoutId;
     try {
-      const token = await Promise.race([
+      return await Promise.race([
         captchaRef.current.executeAsync(),
-        new Promise((_, reject) =>
-          setTimeout(() => reject("ReCAPTCHA timeout"), 5000)
-        ),
+        new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject("ReCAPTCHA timeout"), 100000); // 100 seconds
+        }),
       ]);
-      return token;
     } catch (error) {
       console.error("ReCAPTCHA Error:", error);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        recaptcha:
+          error.response?.data?.message ||
+          error.message ||
+          "An unknown error occurred on ReCAPTCHA",
+      }));
       return null;
+    } finally {
+      clearTimeout(timeoutId); // Ensure timeout is cleared when execution finishes
     }
   };
 
@@ -136,7 +149,10 @@ const LoginRegister = () => {
       // ReCaptcha Token
       const recaptchaToken = await executeReCaptcha(loginCaptchaRef);
       if (!recaptchaToken) {
-        setErrors("ReCAPTCHA verification failed. Please try again.");
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          recaptcha: "ReCAPTCHA verification failed. Please try again.",
+        }));
         return;
       }
 
@@ -150,7 +166,13 @@ const LoginRegister = () => {
       dispatch(registerUser(userdata)).unwrap();
     } catch (err) {
       console.error("Login Error:", err);
-      setErrors("Login Error:", err);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        register:
+          err.response?.data?.message ||
+          err.message ||
+          "An unknown error occurred on login",
+      }));
     }
   };
 
@@ -169,13 +191,22 @@ const LoginRegister = () => {
       // ReCaptcha Token
       const recaptchaToken = await executeReCaptcha(registerCaptchaRef);
       if (!recaptchaToken) {
-        errors("ReCAPTCHA verification failed. Please try again.");
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          recaptcha: "ReCAPTCHA verification failed. Please try again.",
+        }));
         return;
       }
       await dispatch(loginUser({ email, password })).unwrap(); // save user data to redux
     } catch (err) {
       console.error("Login Error:", err);
-      setErrors("Login Error:", err);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        login:
+          err.response?.data?.message ||
+          err.message ||
+          "An unknown error occurred",
+      }));
     }
   };
 
@@ -201,16 +232,20 @@ const LoginRegister = () => {
                       </Nav.Item>
                     </Nav>
                     <Tab.Content>
+                      {errors.recaptcha && (
+                        <p className="text-red-600 mb-3">{errors.recaptcha}</p>
+                      )}
+
                       <Tab.Pane eventKey="login">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            {success && (
-                              <p className="text-green-600 mb-3">
-                                Login successful!
-                              </p>
-                            )}
                             {error && (
                               <p className="text-red-600 mb-3">{error}</p>
+                            )}
+                            {errors.login && (
+                              <p className="text-red-600 mb-3">
+                                {errors.login}
+                              </p>
                             )}
                             <form onSubmit={handleLoginSubmit}>
                               {errors.email && (
@@ -290,13 +325,13 @@ const LoginRegister = () => {
                       <Tab.Pane eventKey="register">
                         <div className="login-form-container">
                           <div className="login-register-form">
-                            {success && (
-                              <p className="text-green-600 mb-3">
-                                Registration successful!
-                              </p>
-                            )}
                             {error && (
                               <p className="text-red-600 mb-3">{error}</p>
+                            )}
+                            {errors.register && (
+                              <p className="text-red-600 mb-3">
+                                {errors.register}
+                              </p>
                             )}
                             <form onSubmit={handleRegisterSubmit}>
                               {errors.firstName && (
