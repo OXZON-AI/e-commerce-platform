@@ -101,6 +101,24 @@ const LoginRegister = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // recaptch check
+  const executeReCaptcha = async (captchaRef) => {
+    if (!captchaRef.current) return null;
+    captchaRef.current.reset(); // allow to re-excute the reCapture check
+    try {
+      const token = await Promise.race([
+        captchaRef.current.executeAsync(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject("ReCAPTCHA timeout"), 5000)
+        ),
+      ]);
+      return token;
+    } catch (error) {
+      console.error("ReCAPTCHA Error:", error);
+      return null;
+    }
+  };
+
   // Register Form Handler
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
@@ -111,26 +129,29 @@ const LoginRegister = () => {
     if (!validateRegisterForm()) {
       return;
     }
+    try {
+      // Concatenating name
+      const fullName = `${firstName} ${lastName}`;
 
-    // Concatenating name
-    const fullName = `${firstName} ${lastName}`;
+      // ReCaptcha Token
+      const recaptchaToken = await executeReCaptcha(loginCaptchaRef);
+      if (!recaptchaToken) {
+        setErrors("ReCAPTCHA verification failed. Please try again.");
+        return;
+      }
 
-    // ReCaptcha Token
-    const recaptchaToken = await loginCaptchaRef.current.executeAsync();
-    if (!recaptchaToken) {
-      setErrors("ReCAPTCHA verification failed. Please try again.");
-      return;
+      const userdata = {
+        email,
+        password,
+        name: fullName, //using concatenated value for name
+        phone,
+        token: recaptchaToken,
+      };
+      dispatch(registerUser(userdata)).unwrap();
+    } catch (err) {
+      console.error("Login Error:", err);
+      setErrors("Login Error:", err);
     }
-    loginCaptchaRef.current.reset(); // allow to re-excute the reCapture check
-
-    const userdata = {
-      email,
-      password,
-      name: fullName, //using concatenated value for name
-      phone,
-      token: recaptchaToken,
-    };
-    dispatch(registerUser(userdata));
   };
 
   // Login Form Handler
@@ -144,14 +165,18 @@ const LoginRegister = () => {
       return;
     }
 
-    // ReCaptcha Token
-    const recaptchaToken = await registerCaptchaRef.current.executeAsync();
-    if (!recaptchaToken) {
-      errors("ReCAPTCHA verification failed. Please try again.");
-      return;
+    try {
+      // ReCaptcha Token
+      const recaptchaToken = await executeReCaptcha(registerCaptchaRef);
+      if (!recaptchaToken) {
+        errors("ReCAPTCHA verification failed. Please try again.");
+        return;
+      }
+      await dispatch(loginUser({ email, password })).unwrap(); // save user data to redux
+    } catch (err) {
+      console.error("Login Error:", err);
+      setErrors("Login Error:", err);
     }
-    registerCaptchaRef.current.reset(); // allow to re-excute the reCapture check
-    dispatch(loginUser({ email, password })); // save user data to redux
   };
 
   return (
@@ -252,7 +277,9 @@ const LoginRegister = () => {
                                     className="bg-indigo-600 text-black px-6 py-2 rounded-md hover:bg-indigo-700"
                                     disabled={loading}
                                   >
-                                    <span>{loading ? "Logging in..." : "Login"}</span>
+                                    <span>
+                                      {loading ? "Logging in..." : "Login"}
+                                    </span>
                                   </button>
                                 </div>
                               </div>
@@ -376,7 +403,9 @@ const LoginRegister = () => {
                                   className="bg-indigo-600 text-black px-6 py-2 rounded-md hover:bg-indigo-700"
                                   disabled={loading}
                                 >
-                                  <span>{loading ? "Registering..." : "Register"}</span>
+                                  <span>
+                                    {loading ? "Registering..." : "Register"}
+                                  </span>
                                 </button>
                               </div>
                             </form>
