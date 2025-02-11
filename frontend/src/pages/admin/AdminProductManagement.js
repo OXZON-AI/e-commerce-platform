@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import AdminNavbar from "./components/AdminNavbar";
 
-import { FiUpload } from "react-icons/fi";
+// import { FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import placeholderImage from "../../assets/images/placeholder_image.png";
@@ -23,7 +23,6 @@ import {
   fetchProducts,
   updateProduct,
 } from "../../store/slices/product-slice";
-import AdminCategoryManagement from "./AdminCategoryManagement";
 import ProductModal from "./Modals/ProductModal";
 import DeleteModal from "./Modals/DeleteModal";
 import { updateVariant } from "../../store/slices/variant-slice";
@@ -34,19 +33,13 @@ const AdminProductManagement = () => {
   const navigate = useNavigate();
   const {
     items = [],
+    pagination,
     brands = [],
     productDetail,
     loading,
     error,
   } = useSelector((state) => state.product);
-  const {
-    categories = [],
-    loadingCategories,
-    errorCategory,
-  } = useSelector((state) => state.categories);
-  // const selectedProductDetails = useSelector((state) => state.product.productDetail);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
+  const { categories = [] } = useSelector((state) => state.categories);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -163,11 +156,15 @@ const AdminProductManagement = () => {
 
   // Handle pagination
   const handlePageChange = (newPage) => {
-    if (newPage < 1) return; // Prevent going below page 1
+    const parsedPage = Number(newPage);
+    if (
+      isNaN(parsedPage) ||
+      parsedPage < 1 ||
+      parsedPage > pagination.totalPages
+    )
+      return; // Prevent invalid pages and prevent not number page value
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
-
-  const isNextPageDisabled = items.length < 10; // If the length of the current items is less than 10, disable next
 
   const openModal = (productSlug = null) => {
     dispatch(clearProductDetail()); // Always clear previous data first
@@ -804,18 +801,28 @@ const AdminProductManagement = () => {
                   </tbody>
                 </table>
               )}
-              <div className="flex justify-end mt-4">
+
+              <div className="flex justify-end items-center mt-4 space-x-4">
+                {/* Previous Button */}
                 <button
                   onClick={() => handlePageChange(filters.page - 1)}
                   disabled={filters.page === 1}
-                  className="px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50"
+                  className={
+                    "px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                  }
                 >
                   Previous
                 </button>
-                <span className="px-4 py-2">Page {filters.page}</span>
+
+                {/* Page Indicator */}
+                <span className="text-gray-700">
+                  Page {filters.page} of {pagination.totalPages}
+                </span>
+
+                {/* Next Button */}
                 <button
                   onClick={() => handlePageChange(filters.page + 1)}
-                  disabled={isNextPageDisabled}
+                  disabled={filters.page >= pagination.totalPages}
                   className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
                 >
                   Next
@@ -859,19 +866,6 @@ const AdminProductManagement = () => {
               >
                 {successMessage}
               </motion.div>
-            )}
-
-            {categoryModalOpen && (
-              <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-xl md:max-w-4xl lg:max-w-5xl mx-auto max-h-[80vh] overflow-y-auto"
-                >
-                  <AdminCategoryManagement />
-                </motion.div>
-              </div>
             )}
           </div>
         </div>

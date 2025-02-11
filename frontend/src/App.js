@@ -22,9 +22,8 @@ const ProductDetailPage = lazy(() =>
 const Cart = lazy(() => import("./pages/other/Cart"));
 const Checkout = lazy(() => import("./pages/other/Checkout"));
 
-
-
 //Admin Management Page
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const RegisteredUsers = lazy(() => import("./pages/admin/RegisteredUsers"));
 const AdminProductManagement = lazy(() =>
   import("./pages/admin/AdminProductManagement")
@@ -76,9 +75,11 @@ const App = () => {
               element={<SampleProductDetail />}
             /> */}
 
-
-<Route path={process.env.PUBLIC_URL + "/cart"} element={<Cart />} />
-<Route path={process.env.PUBLIC_URL + "/checkout"} element={<Checkout />} />
+            <Route path={process.env.PUBLIC_URL + "/cart"} element={<Cart />} />
+            <Route
+              path={process.env.PUBLIC_URL + "/checkout"}
+              element={<Checkout />}
+            />
 
             <Route
               path={process.env.PUBLIC_URL + "/"}
@@ -98,6 +99,16 @@ const App = () => {
                 <ProtectedRoute>
                   <MyAccount />
                 </ProtectedRoute>
+              }
+            />
+
+            {/* Admin Dashboard */}
+            <Route
+              path="/dashboard"
+              element={
+                <AdminRouteProtector>
+                  <Dashboard />
+                </AdminRouteProtector>
               }
             />
 

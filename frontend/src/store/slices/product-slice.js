@@ -88,6 +88,7 @@ const productSlice = createSlice({
   name: "product",
   initialState: {
     items: [],
+    pagination: { page: 1, totalPages: 1 },
     brands: [],
     productDetail: null,
     loading: false,
@@ -96,6 +97,7 @@ const productSlice = createSlice({
   reducers: {
     clearProducts: (state) => {
       state.items = [];
+      state.pagination = { page: 1, totalPages: 1 };
     },
     clearProductDetail: (state) => {
       state.productDetail = null;
@@ -116,6 +118,8 @@ const productSlice = createSlice({
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload.products;
+        state.pagination = action.payload.paginationInfo;
+        console.log("pagination-product-slice: ", action.payload.paginationInfo);
         console.log("brand-action-load: ", action.payload.products);
         
         //Exact unique brands only when products are fetched for the first time
