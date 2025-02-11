@@ -1,6 +1,46 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../axiosConfig";
 
+// Async thunk for user login
+export const loginUser = createAsyncThunk(
+  "user/loginUser",
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/v1/auth/signin", {
+        email,
+        password,
+      });
+      return response.data.user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Login failed!");
+    }
+  }
+);
+
+// Async thunk for user registration
+export const registerUser = createAsyncThunk(
+  "user/registerUser",
+  async ({ email, password, name, phone, token }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/v1/auth/signup", {
+        email,
+        password,
+        name,
+        phone,
+        token,
+      });
+
+      console.log("User-slice Register : ", response.data.message);
+
+      return true;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Registration failed!"
+      );
+    }
+  }
+);
+
 // Async thunk to update user details
 export const updateUser = createAsyncThunk(
   "user/updateUser",
@@ -48,6 +88,30 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userInfo = action.payload;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = action.payload;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
         state.error = null;
