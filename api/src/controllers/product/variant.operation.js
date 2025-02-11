@@ -161,7 +161,7 @@ export const updateVariant = async (req, res, next) => {
     for (const attribute of toChange.attributes) {
       bulkOperations.push({
         updateOne: {
-          filter: { _id: vid, "attributes._id": attribute._id },
+          filter: { _id: vid, "attributes._id": attribute.id },
           update: {
             $set: {
               "attributes.$.name": attribute.name,
@@ -175,7 +175,7 @@ export const updateVariant = async (req, res, next) => {
     for (const image of toChange.images) {
       bulkOperations.push({
         updateOne: {
-          filter: { _id: vid, "images._id": image._id },
+          filter: { _id: vid, "images._id": image.id },
           update: {
             $set: {
               "images.$.url": image.url,

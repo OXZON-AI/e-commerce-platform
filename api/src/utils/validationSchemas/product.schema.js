@@ -243,38 +243,42 @@ export const updateVariantSchema = Joi.object({
       .default([]),
   }),
   toChange: Joi.object({
-    attributes: Joi.array().items(
-      Joi.object({
-        name: Joi.string()
-          .trim()
-          .lowercase()
-          .valid(...validAttribtues)
-          .required(),
-        value: Joi.string().trim().lowercase().required(),
-        _id: Joi.string()
-          .regex(/^[0-9a-fA-F]{24}$/)
-          .required()
-          .messages({
-            "string.pattern.base": "Attribute id must be a valid ObjectId",
+    attributes: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string()
+            .trim()
+            .lowercase()
+            .valid(...validAttribtues)
+            .required(),
+          value: Joi.string().trim().lowercase().required(),
+          id: Joi.string()
+            .regex(/^[0-9a-fA-F]{24}$/)
+            .required()
+            .messages({
+              "string.pattern.base": "Attribute id must be a valid ObjectId",
+            }),
+        })
+      )
+      .default([]),
+    images: Joi.array()
+      .items(
+        Joi.object({
+          url: Joi.string().uri().trim().messages({
+            "string.empty": "Image url cannot be empty",
+            "string.uri": "Image url must be a valid URI",
           }),
-      })
-    ),
-    images: Joi.array().items(
-      Joi.object({
-        url: Joi.string().uri().trim().required().messages({
-          "string.empty": "Image url cannot be empty",
-          "string.uri": "Image url must be a valid URI",
-        }),
-        alt: Joi.string().trim(),
-        isDefault: Joi.boolean(),
-        id: Joi.string()
-          .regex(/^[0-9a-fA-F]{24}$/)
-          .required()
-          .messages({
-            "string.pattern.base": "Image id must be a valid ObjectId",
-          }),
-      })
-    ),
+          alt: Joi.string().trim(),
+          isDefault: Joi.boolean(),
+          id: Joi.string()
+            .regex(/^[0-9a-fA-F]{24}$/)
+            .required()
+            .messages({
+              "string.pattern.base": "Image id must be a valid ObjectId",
+            }),
+        })
+      )
+      .default([]),
   }),
   toRemove: Joi.object({
     attributes: Joi.array()
