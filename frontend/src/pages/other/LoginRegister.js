@@ -147,7 +147,7 @@ const LoginRegister = () => {
         password,
       });
 
-      const userData = response.data.user; // catching user data from response
+      const userData = response.data.user; // catching user data from response  
       dispatch(setUser(userData)); // save user data to redux
 
       if (userData.role === "admin"){
