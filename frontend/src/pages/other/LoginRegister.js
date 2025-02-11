@@ -1,12 +1,17 @@
-import React, { Fragment, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
 import axiosInstance from "../../axiosConfig";
 import LayoutOne from "../../layouts/LayoutOne";
 import ReCAPTCHA from "react-google-recaptcha";
-import { setUser } from "../../store/slices/user-slice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  loginUser,
+  registerUser,
+  clearError,
+  clearSuccess,
+} from "../../store/slices/user-slice";
 
 const LoginRegister = () => {
   const [email, setEmail] = useState("");
@@ -19,8 +24,19 @@ const LoginRegister = () => {
   const [serverSuccess, setServerSuccess] = useState("");
   const loginCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is login form ReCaptcha element
   const registerCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is register form ReCaptcha element
+
   const dispatch = useDispatch(); // Get the dispatch function
   const navigate = useNavigate();
+  const { loading, error, success, userInfo } = useSelector(
+    (state) => state.user
+  );
+
+  // Efect hook for if user already on the state redirection
+  useEffect(() => {
+    if (userInfo) {
+      navigate(userInfo.role === "admin" ? "/admin-product" : "/");
+    }
+  }, [userInfo, navigate]);
 
   // Helper function to validate email
   const validateEmail = (email) => {
@@ -126,40 +142,22 @@ const LoginRegister = () => {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setServerSuccess("");
-    setServerError("");
+    clearError(null);
 
     // Calling login form validation to check validations
     if (!validateLoginForm()) {
       return;
     }
 
-    try {
-      // ReCaptcha Token
-      const token = await registerCaptchaRef.current.executeAsync();
-      if (!token) {
-        setServerError("ReCAPTCHA verification failed. Please try again.");
-        return;
-      }
-      registerCaptchaRef.current.reset(); // allow to re-excute the reCapture check
-
-      const response = await axiosInstance.post("/v1/auth/signin", {
-        email,
-        password,
-      });
-
-      const userData = response.data.user; // catching user data from response  
-      dispatch(setUser(userData)); // save user data to redux
-
-      if (userData.role === "admin"){
-        navigate("/admin-product")
-      } else {
-        navigate("/");
-      }
-
-      setServerSuccess("User signed in as " + response.data.user.name);
-    } catch (err) {
-      setServerError(err.response?.data?.message || "Login failed!");
+    // ReCaptcha Token
+    const token = await registerCaptchaRef.current.executeAsync();
+    if (!token) {
+      setServerError("ReCAPTCHA verification failed. Please try again.");
+      return;
     }
+    registerCaptchaRef.current.reset(); // allow to re-excute the reCapture check
+    dispatch(loginUser({ email, password })); // save user data to redux
+    setServerSuccess("User signed in as " + userInfo.name);
   };
 
   return (
