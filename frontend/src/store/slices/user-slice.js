@@ -66,11 +66,9 @@ export const updateUser = createAsyncThunk(
 // Async thunk to signout user
 export const signoutUser = createAsyncThunk(
   "user/signout",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      const response = await axiosInstance.get(
-        "http://localhost:3000/v1/auth/signout"
-      );
+      const response = await axiosInstance.get("/v1/auth/signout");
       console.log("User-slice signout : ", response.data.message);
       return true;
     } catch (error) {
@@ -79,6 +77,10 @@ export const signoutUser = createAsyncThunk(
           ? error.response.data.message
           : error.message
       );
+    } finally {
+      dispatch(clearUser()); // Explicitly reset Redux state
+      localStorage.removeItem("persist:frontend"); // Remove Redux persist
+      Cookie.remove("token"); // Remove token from cookies
     }
   }
 );
@@ -157,10 +159,8 @@ const userSlice = createSlice({
       })
       .addCase(signoutUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.success = true;
+        state.success = action.payload;
         state.userInfo = null; // Clear user info
-        localStorage.removeItem("persist:frontend"); // Remove persisted Redux state
-        Cookie.remove("token"); // Remove auth token from cookies
       })
       .addCase(signoutUser.rejected, (state, action) => {
         state.loading = false;
