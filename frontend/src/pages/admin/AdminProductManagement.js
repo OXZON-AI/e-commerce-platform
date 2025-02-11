@@ -34,6 +34,7 @@ const AdminProductManagement = () => {
   const navigate = useNavigate();
   const {
     items = [],
+    pagination,
     brands = [],
     productDetail,
     loading,
@@ -74,7 +75,7 @@ const AdminProductManagement = () => {
     sortOrder: "", // Sort order (ascending or descending)
     priceRange: [0, 1000000], // Price range filter (min, max)
     page: 1, // Current page for pagination
-    limit: 10, // Number of products per page
+    limit: 2, // Number of products per page
   });
 
   const buildFilters = (filters) => {
@@ -163,11 +164,15 @@ const AdminProductManagement = () => {
 
   // Handle pagination
   const handlePageChange = (newPage) => {
-    if (newPage < 1) return; // Prevent going below page 1
+    const parsedPage = Number(newPage);
+    if (
+      isNaN(parsedPage) ||
+      parsedPage < 1 ||
+      parsedPage > pagination.totalPages
+    )
+      return; // Prevent invalid pages and prevent not number page value
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
-
-  const isNextPageDisabled = items.length < 10; // If the length of the current items is less than 10, disable next
 
   const openModal = (productSlug = null) => {
     dispatch(clearProductDetail()); // Always clear previous data first
@@ -804,18 +809,32 @@ const AdminProductManagement = () => {
                   </tbody>
                 </table>
               )}
+
               <div className="flex justify-end mt-4">
+                {/* Previous Button */}
                 <button
-                  onClick={() => handlePageChange(filters.page - 1)}
-                  disabled={filters.page === 1}
-                  className="px-4 py-2 bg-gray-300 rounded-md mr-2 disabled:opacity-50"
+                  onClick={() => handlePageChange(pagination.page - 1)}
+                  disabled={pagination.page === 1}
+                  className={`px-4 py-2 rounded-md transition 
+                    ${
+                      pagination.page === 1
+                        ? "bg-gray-300 cursor-not-allowed"
+                        : "bg-indigo-600 text-white hover:bg-indigo-700"
+                    }
+                  `}
                 >
                   Previous
                 </button>
-                <span className="px-4 py-2">Page {filters.page}</span>
+
+                {/* Page Indicator */}
+                <span className="text-gray-700">
+                  Page {pagination.page} of {pagination.totalPages}
+                </span>
+
+                {/* Next Button */}
                 <button
-                  onClick={() => handlePageChange(filters.page + 1)}
-                  disabled={isNextPageDisabled}
+                  onClick={() => handlePageChange(pagination.page + 1)}
+                  disabled={pagination.page >= pagination.totalPages}
                   className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
                 >
                   Next
