@@ -475,7 +475,8 @@ const AdminProductManagement = () => {
         setSuccessMessage("Product updated successfully!");
       }
 
-      dispatch(fetchProducts());
+      const filterQuery = buildFilters(filters);
+      await dispatch(fetchProducts(filterQuery));
       closeModal();
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
@@ -499,7 +500,8 @@ const AdminProductManagement = () => {
       setDeleteProductId(null);
       setDeleteModalOpen(false);
       setSuccessMessage("Product deleted successfully!");
-      dispatch(fetchProducts());
+      const filterQuery = buildFilters(filters);
+      await dispatch(fetchProducts(filterQuery)); // filters is need cuz pagination work properly
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (err) {
       console.log("Error deleting product : ", err);
