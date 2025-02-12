@@ -188,19 +188,6 @@ const ProductModal = ({
                   className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
                 />
               </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Image
-                </label>
-                <input
-                  type="text"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  placeholder="Paste Image URL"
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                />
-              </div>
               <div className="relative w-full">
                 {/* Hidden File Input */}
                 <input
