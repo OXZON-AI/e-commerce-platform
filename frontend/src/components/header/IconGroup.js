@@ -10,7 +10,7 @@ import Cookie from "js-cookie";
 const IconGroup = ({ iconWhiteClass }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const {loading, success, error } = useSelector((state) => state.user)
+  const { loading, success, error } = useSelector((state) => state.user);
 
   const handleClick = (e) => {
     e.currentTarget.nextSibling.classList.toggle("active");
@@ -49,6 +49,7 @@ const IconGroup = ({ iconWhiteClass }) => {
         >
           <i className="pe-7s-user-female" />
         </button>
+
         <div className="account-dropdown">
           <ul>
             <li>
@@ -59,14 +60,16 @@ const IconGroup = ({ iconWhiteClass }) => {
                 Register
               </Link>
             </li>
+
             <li>
               <Link to={process.env.PUBLIC_URL + "/my-account"}>
                 my account
               </Link>
             </li>
-
             <li>
-              <button onClick={logoutHandler}>Log out</button>
+              <Link to="#" onClick={logoutHandler}>
+                Log out
+              </Link>
             </li>
           </ul>
         </div>
