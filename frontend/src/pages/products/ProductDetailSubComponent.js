@@ -58,6 +58,13 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
             <p>
               <strong>Category:</strong> {prodDetails.category?.name}
             </p>
+
+            {prodDetails &&
+              prodDetails.variants?.[0]?.attributes.map((attr) => (
+                <p>
+                  <strong>{attr.name} :</strong> {attr.value}
+                </p>
+              ))}
           </div>
         )}
         {activeTab === "description" && (
