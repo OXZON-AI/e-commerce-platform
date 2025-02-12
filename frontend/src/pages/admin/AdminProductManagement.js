@@ -5,6 +5,12 @@ import { motion } from "framer-motion";
 import Sidebar from "./components/Sidebar";
 import AdminNavbar from "./components/AdminNavbar";
 
+// imports for cloudinary image upload
+import { Cloudinary } from "@cloudinary/url-gen";
+import { auto } from "@cloudinary/url-gen/actions/resize";
+import { autoGravity } from "@cloudinary/url-gen/qualifiers/gravity";
+import { AdvancedImage } from "@cloudinary/react";
+
 // import { FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,6 +33,7 @@ import ProductModal from "./Modals/ProductModal";
 import DeleteModal from "./Modals/DeleteModal";
 import { updateVariant } from "../../store/slices/variant-slice";
 import HashLoader from "react-spinners/HashLoader";
+import axios from "axios";
 
 const AdminProductManagement = () => {
   const dispatch = useDispatch();
@@ -46,6 +53,7 @@ const AdminProductManagement = () => {
   const [serverError, setServerError] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
   const [deleteProductId, setDeleteProductId] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -56,7 +64,7 @@ const AdminProductManagement = () => {
     cost: "",
     category: "",
     brand: "",
-    image: "",
+    images: [{ url: "", alt: "", isDefault: true }],
     attributes: [{ name: "color", value: "" }],
     isDefault: true,
   });
@@ -95,6 +103,38 @@ const AdminProductManagement = () => {
     return query;
   };
 
+  // setup cloudinary configuration
+  const cld = new Cloudinary({
+    cloud: { cloudName: process.env.REACT_APP_CLOUDINARY_CLOUD_NAME },
+  });
+
+  // Image Upload Handler
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+
+    // Show local preview before upload
+    const previewUrl = URL.createObjectURL(file);
+    setImageUrl(previewUrl); // Temporarily show preview image
+
+    const imgFormData = new FormData();
+    imgFormData.append("file", file);
+    imgFormData.append(
+      "upload_preset",
+      process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+    ); // Set in Cloudinary settings
+
+    try {
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        imgFormData
+      );
+
+      setImageUrl(response.data.secure_url); // take saved image url in Cloudinary
+    } catch (error) {
+      console.error("Image upload failed", error);
+    }
+  };
+
   // effect hook for asign error in state to servererror local state
   useEffect(() => {
     setServerError(error);
@@ -125,7 +165,7 @@ const AdminProductManagement = () => {
         stock: productDetail?.variants[0]?.stock || null,
         category: productDetail?.category?._id || "",
         brand: productDetail?.brand || "",
-        image: productDetail?.variants[0]?.images[0]?.url || "",
+        images: productDetail?.variants[0]?.images || [],
         attributes: productDetail?.variants[0]?.attributes || [],
         isDefault: productDetail?.variants[0]?.isDefault,
       });
@@ -141,7 +181,7 @@ const AdminProductManagement = () => {
         stock: null,
         category: "",
         brand: "",
-        image: "",
+        images: [{ url: "", alt: "", isDefault: true }],
         attributes: [{ name: "color", value: "" }],
         isDefault: true,
       });
@@ -204,7 +244,7 @@ const AdminProductManagement = () => {
       stock: null,
       category: "",
       brand: "",
-      image: "",
+      images: [{ url: "", alt: "", isDefault: true }],
       attributes: [{ name: "color", value: "" }],
       isDefault: true,
     });
@@ -283,7 +323,7 @@ const AdminProductManagement = () => {
       return false;
     }
 
-    if (!formData.image) {
+    if (!formData.images) {
       alert("Each product must have at least one image!");
       return false;
     }
@@ -348,15 +388,24 @@ const AdminProductManagement = () => {
                 ? parseFloat(formData.compareAtPrice)
                 : undefined,
               cost: formData.cost ? parseFloat(formData.cost) : undefined,
-              images: formData.image
+              images: imageUrl
                 ? [
                     {
-                      url: formData.image,
+                      url: imageUrl,
                       alt: "Product Image",
                       isDefault: true,
                     },
                   ]
                 : [],
+              // images: formData.image
+              //   ? [
+              //       {
+              //         url: formData.image,
+              //         alt: "Product Image",
+              //         isDefault: true,
+              //       },
+              //     ]
+              //   : [],
               attributes: formData.attributes.filter(
                 (attr) => attr.name && attr.value
               ),
@@ -407,6 +456,9 @@ const AdminProductManagement = () => {
           const newAttributes =
             formData.attributes?.filter((attr) => !attr._id) || [];
 
+          // Get default image id
+          const imgId = productDetail.variants[0].images[0]._id;
+
           // format selected product variant for backend
           const updatedVariant = {
             productId: productDetail._id,
@@ -439,9 +491,19 @@ const AdminProductManagement = () => {
                     value: attr.value,
                   }))
                 : undefined,
-              images: formData.toChange?.images?.length
-                ? formData.toChange.images
+              images: imageUrl
+                ? [
+                    {
+                      id: imgId,
+                      url: imageUrl,
+                      alt: "Product Image",
+                      isDefault: true,
+                    },
+                  ]
                 : [],
+              // images: formData.toChange?.images?.length
+              //   ? formData.toChange.images
+              //   : [],
             },
             toRemove: {
               // Remove empty or null attributes from `toRemove`
@@ -866,6 +928,8 @@ const AdminProductManagement = () => {
                 setFormData={setFormData}
                 addAttributeField={addAttributeField}
                 removeAttributeField={removeAttributeField}
+                imageUrl={imageUrl}
+                handleImageUpload={handleImageUpload}
               />
             )}
 
