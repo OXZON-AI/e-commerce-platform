@@ -234,7 +234,7 @@ const ProductListPage = () => {
                 <input
                   type="range"
                   min="0"
-                  max="1000"
+                  max={"1000000"}
                   step="10"
                   name="minPrice"
                   value={filters.priceRange[0]}
@@ -244,7 +244,7 @@ const ProductListPage = () => {
                 <input
                   type="range"
                   min="0"
-                  max="1000"
+                  max={"1000000"}
                   step="10"
                   name="maxPrice"
                   value={filters.priceRange[1]}
