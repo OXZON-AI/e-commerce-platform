@@ -307,16 +307,15 @@ export const getProducts = async (req, res, next) => {
   }
 
   pipeline.push({
-    $skip: skip,
-  });
-
-  pipeline.push({
-    $limit: limit,
-  });
-
-  pipeline.push({
     $facet: {
-      products: [],
+      products: [
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
+        },
+      ],
       count: [{ $count: "totalCount" }],
     },
   });
