@@ -5,6 +5,8 @@ import ProtectedRoute from "./components/router-protector/ProtectedRoute";
 import AdminRouteProtector from "./components/router-protector/AdminRouteProtector";
 import SampleProductCatalogue from "./pages/other/SampleProductCatalogue";
 import UnauthorizedPage from "./pages/admin/Unauthorized_Page";
+import Unauthorized_Client_Page from "./pages/admin/Unauthorized_Client_Page";
+import ClientRouteProtector from "./components/router-protector/ClientRouteProtector";
 // import SampleProductDetail from "./pages/other/SampleProductDetail";
 
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
@@ -68,7 +70,11 @@ const App = () => {
             />
             <Route
               path={process.env.PUBLIC_URL + "/product-list"}
-              element={<SampleProductCatalogue />}
+              element={
+                <ClientRouteProtector>
+                  <SampleProductCatalogue />
+                </ClientRouteProtector>
+              }
             />
             {/* <Route
               path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
@@ -78,18 +84,30 @@ const App = () => {
             <Route path={process.env.PUBLIC_URL + "/cart"} element={<Cart />} />
             <Route
               path={process.env.PUBLIC_URL + "/checkout"}
-              element={<Checkout />}
+              element={
+                <ClientRouteProtector>
+                  <Checkout />
+                </ClientRouteProtector>
+              }
             />
 
             <Route
               path={process.env.PUBLIC_URL + "/"}
-              element={<ProductListPage />}
+              element={
+                <ClientRouteProtector>
+                  <ProductListPage />
+                </ClientRouteProtector>
+              }
             />
 
             {/* Route for individual product detail page with dynamic product ID */}
             <Route
               path={process.env.PUBLIC_URL + "/product/:slug"}
-              element={<ProductDetailPage />}
+              element={
+                <ClientRouteProtector>
+                  <ProductDetailPage />
+                </ClientRouteProtector>
+              }
             />
 
             {/* Protected routes for not logged in user */}
@@ -143,6 +161,7 @@ const App = () => {
             />
 
             <Route path="/unauthorized-access" element={<UnauthorizedPage />} />
+            <Route path="/unauthorized-admin-access" element={<Unauthorized_Client_Page />} />
           </Routes>
         </Suspense>
       </ScrollToTop>
