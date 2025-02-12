@@ -10,7 +10,7 @@ export const fetchProducts = createAsyncThunk(
         params: filters,
       });
       console.log("product-slice : ", response.data);
-      
+
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -107,7 +107,7 @@ const productSlice = createSlice({
     },
     clearProductError: (state) => {
       state.error = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -119,9 +119,12 @@ const productSlice = createSlice({
         state.loading = false;
         state.items = action.payload.products;
         state.pagination = action.payload.paginationInfo;
-        console.log("pagination-product-slice: ", action.payload.paginationInfo);
+        console.log(
+          "pagination-product-slice: ",
+          action.payload.paginationInfo
+        );
         console.log("brand-action-load: ", action.payload.products);
-        
+
         //Exact unique brands only when products are fetched for the first time
         if (state.brands.length === 0) {
           const brandsSet = new Set(); // Set ensures each brand appears only once, removing duplicates.
@@ -190,6 +193,11 @@ const productSlice = createSlice({
   },
 });
 
-export const { clearProducts, clearProductDetail, clearBrands, clearProductError } =
-  productSlice.actions;
+export const {
+  clearProducts,
+  clearProductDetail,
+  clearBrands,
+  clearProductError,
+} = productSlice.actions;
+console.log("Exporting Product Reducer:", productSlice.reducer);
 export default productSlice.reducer;

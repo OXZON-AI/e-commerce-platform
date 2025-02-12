@@ -10,7 +10,7 @@ import {
     REGISTER,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-import productReducer from './slices/product-slice';
+import productReducer from "./slices/product-slice";
 import currencyReducer from "./slices/currency-slice";
 import cartReducer from "./slices/cart-slice";
 import compareReducer from "./slices/compare-slice";
@@ -19,6 +19,9 @@ import userReducer from './slices/user-slice';
 import adminUserReducer from './slices/admin-user-slice';
 import categoryReducer from './slices/category-slice';
 import variantReducer from './slices/variant-slice';
+
+console.log("Product Reducer:", productReducer);
+console.log("User Reducer:", userReducer);
 
 const persistConfig = {
     key: "frontend",

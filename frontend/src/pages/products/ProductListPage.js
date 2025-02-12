@@ -150,7 +150,7 @@ const ProductListPage = () => {
     }));
   };
 
-  const totalPages = Math.ceil(items.length / filters.limit);
+  const totalPages = Math.ceil(items?.length / filters.limit);
 
   return (
     <Fragment>
@@ -234,7 +234,7 @@ const ProductListPage = () => {
                 <input
                   type="range"
                   min="0"
-                  max="1000"
+                  max={"1000000"}
                   step="10"
                   name="minPrice"
                   value={filters.priceRange[0]}
@@ -244,7 +244,7 @@ const ProductListPage = () => {
                 <input
                   type="range"
                   min="0"
-                  max="1000"
+                  max={"1000000"}
                   step="10"
                   name="maxPrice"
                   value={filters.priceRange[1]}
@@ -351,7 +351,7 @@ const ProductListPage = () => {
 
             {/* Showing Results */}
             <p className="mb-6 text-gray-600 text-lg">
-              Showing {items.length} results
+              Showing {items?.length} results
             </p>
 
             {/* Product Grid View */}
