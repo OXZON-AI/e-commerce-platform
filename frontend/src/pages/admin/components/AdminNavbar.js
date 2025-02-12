@@ -1,13 +1,30 @@
 import { useState } from "react";
 import { MagnifyingGlassIcon, UserIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { signoutUser } from "../../../store/slices/user-slice";
 
 const AdminNavbar = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
   const handleSearch = (e) => {
     setSearchQuery(e.target.value);
+  };
+
+  // Handle logout as admin
+  const handleLogout = async () => {
+    try {
+      await dispatch(signoutUser()).unwrap();
+      navigate("/login-register"); // Redirect to Client Home AFTER successful logout
+    } catch (error) {
+      console.error(
+        "Logout failed:",
+        error.response?.data?.message || error.message
+      );
+    }
   };
 
   return (
@@ -50,7 +67,7 @@ const AdminNavbar = () => {
           {showDropdown && (
             <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl p-2 space-y-2">
               <Link
-                to="/profile"
+                to="/my-account"
                 className="block px-4 py-2 text-gray-300 hover:bg-gray-700 rounded-md"
               >
                 Profile
@@ -61,7 +78,11 @@ const AdminNavbar = () => {
               >
                 Settings
               </Link>
-              <button className="block w-full px-4 py-2 text-left text-gray-300 hover:text-red-500 hover:bg-gray-700 rounded-md">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="block w-full px-4 py-2 text-left text-gray-300 hover:text-red-500 hover:bg-gray-700 rounded-md"
+              >
                 Logout
               </button>
             </div>
