@@ -25,7 +25,7 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
               {t("collection")}
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link to={process.env.PUBLIC_URL + "/"}>
               {t("pages")}
               {sidebarMenu ? (
@@ -62,7 +62,7 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
                 </Link>
               </li>
             </ul>
-          </li>
+          </li> */}
         </ul>
       </nav>
     </div>
