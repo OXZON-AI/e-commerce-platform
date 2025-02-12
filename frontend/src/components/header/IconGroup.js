@@ -25,7 +25,9 @@ const IconGroup = ({ iconWhiteClass }) => {
 
   const { cartItems } = useSelector((state) => state.cart);
 
-  const logoutHandler = async () => {
+  const logoutHandler = async (e) => {
+    e.preventDefault();
+    
     try {
       dispatch(signoutUser()).unwrap();
       alert("Signed out successfully!");
