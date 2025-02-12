@@ -43,6 +43,7 @@ const AdminProductManagement = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [serverError, setServerError] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
   const [deleteProductId, setDeleteProductId] = useState(null);
   const [formData, setFormData] = useState({
@@ -93,6 +94,11 @@ const AdminProductManagement = () => {
 
     return query;
   };
+
+  // effect hook for asign error in state to servererror local state
+  useEffect(() => {
+    setServerError(error);
+  });
 
   useEffect(() => {
     const filterQuery = buildFilters(filters);
@@ -182,6 +188,9 @@ const AdminProductManagement = () => {
     if (productDetail) {
       dispatch(clearProductDetail());
     }
+
+    // clear server error
+    setServerError("");
 
     // clear the form
     setFormData({
@@ -479,13 +488,22 @@ const AdminProductManagement = () => {
     setDeleteModalOpen(true);
   };
 
-  const handleDelete = async (productId) => {
-    await dispatch(deleteProduct(productId)).unwrap();
-    setDeleteProductId(null);
+  const closeDeleteModal = () => {
+    setServerError(""); // clear server errors when modal close
     setDeleteModalOpen(false);
-    setSuccessMessage("Product deleted successfully!");
-    dispatch(fetchProducts());
-    setTimeout(() => setSuccessMessage(""), 3000);
+  };
+
+  const handleDelete = async (productId) => {
+    try {
+      await dispatch(deleteProduct(productId)).unwrap();
+      setDeleteProductId(null);
+      setDeleteModalOpen(false);
+      setSuccessMessage("Product deleted successfully!");
+      dispatch(fetchProducts());
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (err) {
+      console.log("Error deleting product : ", err);
+    }
   };
 
   const openCategoryModal = () => {
@@ -697,10 +715,10 @@ const AdminProductManagement = () => {
                   <HashLoader color="#a855f7" size={50} />
                   <span className="mt-3">Loading products...</span>
                 </div>
-              ) : error ? (
+              ) : serverError ? (
                 // Show Error Message Instead of Table
                 <div className="text-center my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
-                  <span className="mt-3">Error: {error}</span>
+                  <span className="mt-3">Error: {serverError}</span>
                 </div>
               ) : (
                 // Show Table Only If There’s No Loading/Error -----------------------------------------------------------------
@@ -832,6 +850,7 @@ const AdminProductManagement = () => {
 
             {modalOpen && (
               <ProductModal
+                loading={loading}
                 isOpen={openModal}
                 onClose={closeModal}
                 productDetail={productDetail}
@@ -840,7 +859,7 @@ const AdminProductManagement = () => {
                 handleAttributeChange={handleAttributeChange}
                 handleSave={handleSave}
                 errorValidation={errorValidation}
-                error={error}
+                serverError={serverError}
                 categories={categories}
                 setFormData={setFormData}
                 addAttributeField={addAttributeField}
@@ -850,10 +869,12 @@ const AdminProductManagement = () => {
 
             {deleteModalOpen && (
               <DeleteModal
+                loading={loading}
                 deleteModalOpen={deleteModalOpen}
-                setDeleteModalOpen={setDeleteModalOpen}
+                closeDeleteModal={closeDeleteModal}
                 handleDelete={handleDelete}
                 productId={deleteProductId}
+                serverError={serverError}
               />
             )}
 

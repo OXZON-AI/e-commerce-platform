@@ -1,8 +1,10 @@
 // ProductModal.js
 import React from "react";
 import { motion } from "framer-motion";
+import PuffLoader from "react-spinners/PuffLoader";
 
 const ProductModal = ({
+  loading,
   isOpen,
   onClose,
   productDetail,
@@ -11,7 +13,7 @@ const ProductModal = ({
   handleAttributeChange,
   handleSave,
   errorValidation,
-  error,
+  serverError,
   categories,
   setFormData,
   addAttributeField,
@@ -32,12 +34,12 @@ const ProductModal = ({
           className="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-lg w-full max-h-[90vh] overflow-auto"
         >
           {/* Error Messages */}
-          {error && (
+          {serverError && (
             <div className="w-full bg-red-100 border border-red-500 text-red-700 p-4 rounded-md mb-4">
-              <p className="text-sm font-medium text-red-700">{error}</p>
+              <p className="text-sm font-medium text-red-700">{serverError}</p>
             </div>
           )}
-          {errorValidation && !error && (
+          {errorValidation && !serverError && (
             <div className="w-full bg-red-100 border border-red-500 text-red-700 p-4 rounded-md mb-4">
               <p className="text-sm font-medium text-red-700">
                 {errorValidation}
@@ -261,13 +263,26 @@ const ProductModal = ({
             >
               Cancel
             </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="bg-purple-500 text-white px-5 py-3 rounded-lg hover:bg-purple-600 transition"
-            >
-              Save
-            </button>
+            <div className="relative inline-block">
+              {/* HashLoader behind the button */}
+              {loading && (
+                <div className="absolute inset-0 flex justify-center items-center z-0">
+                  <PuffLoader color="#a855f7" size={40} />
+                </div>
+              )}
+
+              {/* Save button (appears above the loader) */}
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={loading}
+                className={`relative bg-purple-500 text-white px-5 py-3 rounded-lg hover:bg-purple-600 transition ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                } z-10`}
+              >
+                Save
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>

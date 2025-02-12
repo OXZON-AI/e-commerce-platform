@@ -150,7 +150,7 @@ const ProductListPage = () => {
     }));
   };
 
-  const totalPages = Math.ceil(items.length / filters.limit);
+  const totalPages = Math.ceil(items?.length / filters.limit);
 
   return (
     <Fragment>
@@ -351,7 +351,7 @@ const ProductListPage = () => {
 
             {/* Showing Results */}
             <p className="mb-6 text-gray-600 text-lg">
-              Showing {items.length} results
+              Showing {items?.length} results
             </p>
 
             {/* Product Grid View */}
