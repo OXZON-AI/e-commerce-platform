@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import PuffLoader from "react-spinners/PuffLoader";
+import { Upload } from "lucide-react"; // Import Upload icon
 
 const ProductModal = ({
   loading,
@@ -18,6 +19,8 @@ const ProductModal = ({
   setFormData,
   addAttributeField,
   removeAttributeField,
+  imageUrl,
+  handleImageUpload,
 }) => {
   if (!isOpen) return null;
 
@@ -197,6 +200,35 @@ const ProductModal = ({
                   placeholder="Paste Image URL"
                   className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
                 />
+              </div>
+              <div className="relative w-full">
+                {/* Hidden File Input */}
+                <input
+                  type="file"
+                  id="fileInput"
+                  onChange={handleImageUpload}
+                  className="hidden" // Hide the default file input
+                />
+
+                {/* Custom Upload Button */}
+                <label
+                  htmlFor="fileInput"
+                  className="w-full flex items-center justify-center gap-2 p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
+                >
+                  <Upload className="w-5 h-5 text-purple-500" />
+                  <span className="text-gray-700">Upload Image</span>
+                </label>
+
+                {/* Show preview near input */}
+                {imageUrl && (
+                  <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
+                    <img
+                      src={imageUrl}
+                      alt="Selected"
+                      className="w-10 h-10 rounded-full border border-gray-400 object-cover"
+                    />
+                  </div>
+                )}
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-gray-700">
