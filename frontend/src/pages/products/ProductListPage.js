@@ -17,6 +17,7 @@ const ProductListPage = () => {
   const navigate = useNavigate();
   const {
     items = [],
+    pagination,
     brands = [],
     loading,
     error,
@@ -143,11 +144,16 @@ const ProductListPage = () => {
     setViewLayout(layout); // Update layout based on the selected view
   };
 
-  const handlePageChange = (pageNumber) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      page: pageNumber,
-    }));
+  // Handle pagination
+  const handlePageChange = (newPage) => {
+    const parsedPage = Number(newPage);
+    if (
+      isNaN(parsedPage) ||
+      parsedPage < 1 ||
+      parsedPage > pagination.totalPages
+    )
+      return; // Prevent invalid pages and prevent not number page value
+    setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
   const totalPages = Math.ceil(items?.length / filters.limit);
@@ -517,20 +523,37 @@ const ProductListPage = () => {
             </div>
 
             {/* Pagination */}
-            <div className="flex justify-center mt-8 space-x-4">
-              {Array.from({ length: totalPages }, (_, index) => (
-                <button
-                  key={index + 1}
-                  className={`px-6 py-3 rounded-lg font-semibold ${
-                    filters.page === index + 1
-                      ? "bg-purple-600 text-white"
-                      : "bg-gray-200 hover:bg-gray-300"
-                  }`}
-                  onClick={() => handlePageChange(index + 1)}
-                >
-                  {index + 1}
-                </button>
-              ))}
+            <div className="flex justify-end items-center mt-4 space-x-4">
+              {/* Previous Button */}
+              <button
+                onClick={() => handlePageChange(filters.page - 1)}
+                disabled={filters.page === 1}
+                className={`px-4 py-2 rounded-md ${
+                  filters.page === 1
+                    ? "bg-gray-100 text-gray-400"
+                    : "bg-purple-600 text-white"
+                }`}
+              >
+                Previous
+              </button>
+
+              {/* Page Indicator */}
+              <span className="text-black-700">
+                Page {filters.page} of {pagination.totalPages}
+              </span>
+
+              {/* Next Button */}
+              <button
+                onClick={() => handlePageChange(filters.page + 1)}
+                disabled={filters.page >= pagination.totalPages}
+                className={`px-4 py-2 rounded-md ${
+                  filters.page >= pagination.totalPages
+                    ? "bg-gray-100 text-gray-400"
+                    : "bg-purple-600 text-white"
+                }`}
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>

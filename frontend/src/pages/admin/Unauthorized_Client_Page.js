@@ -13,7 +13,7 @@ const Authorized_Client_Page = () => {
   const handleLogout = async () => {
     try {
       await dispatch(signoutUser()).unwrap();
-      navigate("/login-register"); // Redirect AFTER successful logout
+      navigate("/"); // Redirect to Client Home AFTER successful logout
     } catch (error) {
       console.error("Logout failed:", error);
     }
