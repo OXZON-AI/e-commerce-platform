@@ -1,52 +1,59 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import LayoutOne from "../../layouts/LayoutOne";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearCart,
+  fetchCart,
+  removeFromCart,
+  updateCartItem,
+} from "../../store/slices/cart-slice";
 
 const Cart = () => {
-  let cartTotalPrice = 0;
-  let { pathname } = useLocation();
+  const dispatch = useDispatch();
+  const {
+    items: cartItems,
+    total,
+    status,
+    error,
+  } = useSelector((state) => state.cart);
 
-  const initialCartItems = [
-    {
-      id: 1,
-      name: "Wireless Headphones",
-      price: 120,
-      discount: 15,
-      quantity: 2,
-      image: ["https://dummyimage.com/600x800/808080/fff.png"],
-      selectedProductColor: "Black",
-      selectedProductSize: "One Size",
-    },
-    {
-      id: 2,
-      name: "Smartphone Charger",
-      price: 30,
-      discount: 5,
-      quantity: 1,
-      image: ["https://dummyimage.com/600x800/808080/fff.png"],
-      selectedProductColor: "White",
-      selectedProductSize: "One Size",
-    },
-  ];
+  useEffect(() => {
+    dispatch(fetchCart()); // Fetch cart when component mounts
+  }, [dispatch]);
 
-  const [cartItems, setCartItems] = useState(initialCartItems);
-
-  const handleQuantityChange = (id, quantity) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
-      )
-    );
+  const handleQuantityChange = (variantId, quantity) => {
+    if (quantity < 1) return;
+    dispatch(updateCartItem({ variantId, quantity }));
   };
 
-  const handleRemoveItem = (id) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  const handleRemoveItem = (variantId) => {
+    dispatch(removeFromCart(variantId));
   };
 
   const clearCart = () => {
-    setCartItems([]);
+    dispatch(clearCart()); // Dispatch Redux action to clear cart
   };
+
+  let cartTotalPrice = 0;
+  let { pathname } = useLocation();
+
+  // const handleQuantityChange = (id, quantity) => {
+  //   setCartItems((prevItems) =>
+  //     prevItems.map((item) =>
+  //       item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+  //     )
+  //   );
+  // };
+
+  // const handleRemoveItem = (id) => {
+  //   setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  // };
+
+  // const clearCart = () => {
+  //   setCartItems([]);
+  // };
 
   return (
     <Fragment>
@@ -68,18 +75,13 @@ const Cart = () => {
                 </thead>
                 <tbody>
                   {cartItems.map((cartItem, key) => {
-                    const discountedPrice =
-                      cartItem.price -
-                      (cartItem.price * cartItem.discount) / 100;
-                    cartTotalPrice += discountedPrice * cartItem.quantity;
-
                     return (
                       <tr key={key} className="border-b">
                         <td className="p-4">
                           <img
                             className="w-16 h-16 rounded-none object-cover"
-                            src={cartItem.image[0]}
-                            alt={cartItem.name}
+                            src={cartItem.variant?.images?.[0].url}
+                            alt={cartItem.variant?.images?.[0].alt}
                           />
                         </td>
                         <td className="p-4">
@@ -87,15 +89,11 @@ const Cart = () => {
                             to={`/product/${cartItem.id}`}
                             className="text-blue-500 hover:underline"
                           >
-                            {cartItem.name}
+                            {cartItem.variant?.product?.name}
                           </Link>
-                          <div className="text-sm text-gray-500">
-                            Color: {cartItem.selectedProductColor} | Size:{" "}
-                            {cartItem.selectedProductSize}
-                          </div>
                         </td>
                         <td className="p-4 text-gray-700">
-                          ${discountedPrice.toFixed(2)}
+                          {cartItem.variant?.price.toFixed(2)} MVR
                         </td>
                         <td className="p-4 text-gray-700">
                           <input
@@ -104,7 +102,7 @@ const Cart = () => {
                             min="1"
                             onChange={(e) =>
                               handleQuantityChange(
-                                cartItem.id,
+                                cartItem.variant?._id,
                                 parseInt(e.target.value, 10)
                               )
                             }
@@ -112,11 +110,11 @@ const Cart = () => {
                           />
                         </td>
                         <td className="p-4 text-gray-700">
-                          ${(discountedPrice * cartItem.quantity).toFixed(2)}
+                          {(cartItem.subTotal).toFixed(2)} MVR
                         </td>
                         <td className="p-4 text-gray-700">
                           <button
-                            onClick={() => handleRemoveItem(cartItem.id)}
+                            onClick={() => handleRemoveItem(cartItem.variant?._id)}
                             className="bg-gray-400 text-white p-2 rounded-md hover:bg-black"
                           >
                             <XMarkIcon className="w-5 h-5" />
@@ -153,7 +151,7 @@ const Cart = () => {
               Clear Shopping Cart
             </button>
             <span className="text-lg font-semibold">
-              Total: ${cartTotalPrice.toFixed(2)}
+              Total: {total.toFixed(2)} MVR
             </span>
           </div>
 
@@ -209,14 +207,14 @@ const Cart = () => {
               <h5 className="text-md text-gray-700 mt-3 flex justify-between">
                 Total Products:
                 <span className="font-semibold text-gray-900">
-                  ${cartTotalPrice.toFixed(2)}
+                  {total.toFixed(2)} MVR
                 </span>
               </h5>
 
               <h4 className="text-xl font-bold text-gray-900 mt-4 border-t pt-4 flex justify-between">
                 Grand Total:
                 <span className="text-purple-600">
-                  ${cartTotalPrice.toFixed(2)}
+                  {total.toFixed(2)} MVR
                 </span>
               </h4>
 

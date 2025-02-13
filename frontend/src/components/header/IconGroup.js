@@ -3,9 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
-import axios from "axios";
 import { clearUser, signoutUser } from "../../store/slices/user-slice";
-import Cookie from "js-cookie";
 
 const IconGroup = ({ iconWhiteClass }) => {
   const navigate = useNavigate();
@@ -23,7 +21,7 @@ const IconGroup = ({ iconWhiteClass }) => {
     offcanvasMobileMenu.classList.add("active");
   };
 
-  const { cartItems } = useSelector((state) => state.cart);
+  const { items: cartItems } = useSelector((state) => state.cart);
 
   const logoutHandler = async (e) => {
     e.preventDefault();

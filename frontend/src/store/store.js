@@ -20,9 +20,6 @@ import adminUserReducer from './slices/admin-user-slice';
 import categoryReducer from './slices/category-slice';
 import variantReducer from './slices/variant-slice';
 
-console.log("Product Reducer:", productReducer);
-console.log("User Reducer:", userReducer);
-
 const persistConfig = {
     key: "frontend",
     version: 1.1,
