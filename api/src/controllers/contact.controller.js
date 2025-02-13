@@ -12,7 +12,7 @@ export const handleContact = async (req, res, next) => {
     await Promise.all([
       sendEmails(email, "We've Received Your Message", {}, "auto-response"),
       sendEmails(
-        process.env.MAILER_EMAIL,
+        process.env.CONTACT_EMAIL,
         "New Inquiry",
         { name, phone, subject, email, inquiry },
         "admin-notification"
@@ -20,7 +20,7 @@ export const handleContact = async (req, res, next) => {
     ]);
 
     logger.info(
-      `Messages sent to customer ${email} and admin ${process.env.MAILER_EMAIL}.`
+      `Messages sent to customer ${email} and admin ${process.env.CONTACT_EMAIL}.`
     );
     return res.status(200).json({ message: "Your message has been received" });
   } catch (error) {
