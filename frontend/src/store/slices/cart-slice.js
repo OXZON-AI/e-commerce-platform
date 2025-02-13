@@ -7,6 +7,8 @@ export const fetchCart = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/v1/carts/");
+      console.log("Cart Items slice: ", response.data);
+      
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to fetch cart!");
@@ -19,10 +21,12 @@ export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ variantId, quantity }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post("/v1/carts/", {
+      const response = await axiosInstance.post("/v1/carts/items", {
         variant: variantId,
         quantity,
       });
+      console.log("add to cart in slice: ", response.data);
+      
       return { variantId, quantity, message: response.data.message };
     } catch (error) {
       return rejectWithValue(
@@ -98,6 +102,7 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(addToCart.fulfilled, (state, action) => {
+        state.status = "succeeded";
         const { variantId, quantity } = action.payload;
         const existingItem = state.items.find(
           (item) => item.variant._id === variantId
@@ -123,6 +128,7 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(updateCartItem.fulfilled, (state, action) => {
+        state.status = "succeeded";
         const { variantId, quantity } = action.payload;
         const item = state.items.find((item) => item.variant._id === variantId);
         if (item) {
@@ -140,6 +146,7 @@ const cartSlice = createSlice({
         state.error = null;
       })
       .addCase(removeFromCart.fulfilled, (state, action) => {
+        state.status = "succeeded";
         const { variantId } = action.payload;
         state.items = state.items.filter(
           (item) => item.variant._id !== variantId

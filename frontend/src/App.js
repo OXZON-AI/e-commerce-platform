@@ -7,6 +7,7 @@ import SampleProductCatalogue from "./pages/other/SampleProductCatalogue";
 import UnauthorizedPage from "./pages/admin/Unauthorized_Page";
 import Unauthorized_Client_Page from "./pages/admin/Unauthorized_Client_Page";
 import ClientRouteProtector from "./components/router-protector/ClientRouteProtector";
+import MenuCart from "./components/header/sub-components/MenuCart";
 // import SampleProductDetail from "./pages/other/SampleProductDetail";
 
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
@@ -59,6 +60,10 @@ const App = () => {
             <Route
               path={process.env.PUBLIC_URL + "/login-register"}
               element={<LoginRegister />}
+            />
+            <Route
+              path={process.env.PUBLIC_URL + "/menu_cart"}
+              element={<MenuCart />}
             />
             <Route
               path={process.env.PUBLIC_URL + "/forgot-password"}
