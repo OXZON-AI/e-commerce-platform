@@ -28,6 +28,9 @@ app.use(
     credentials: true,
   })
 );
+
+app.use("/v1/checkout/webhook", express.raw({ type: "application/json" }));
+
 app.use(express.json());
 app.use(
   helmet({
