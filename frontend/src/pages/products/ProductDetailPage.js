@@ -107,7 +107,7 @@ const ProductDetailPage = () => {
                         key={index}
                         src={img.url || placeholderImage}
                         alt={`${productDetail.name} ${index + 1}`}
-                        className="w-full rounded-lg shadow-lg"
+                        className="w-full rounded-lg shadow-lg my-2"
                         onError={(e) => {
                           e.target.src = placeholderImage;
                         }}
