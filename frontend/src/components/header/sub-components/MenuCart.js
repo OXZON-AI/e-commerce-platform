@@ -70,7 +70,7 @@ const MenuCart = () => {
                     />
                   </h6>
                   <span>
-                    <span>${cartItem.subTotal.toFixed(2)}</span>
+                    <span>{cartItem.subTotal.toFixed(2)} MVR</span>
                   </span>
                 </div>
                 <div className="shopping-cart-delete">
@@ -85,7 +85,7 @@ const MenuCart = () => {
           </ul>
           <div className="shopping-cart-total">
             <h4>
-              Total : <span className="shop-total">${total.toFixed(2)}</span>
+              Total : <span className="shop-total">{total.toFixed(2)} MVR</span>
             </h4>
           </div>
           <div className="shopping-cart-btn btn-hover text-center">

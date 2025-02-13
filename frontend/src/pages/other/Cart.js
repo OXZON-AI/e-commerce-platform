@@ -93,7 +93,7 @@ const Cart = () => {
                           </Link>
                         </td>
                         <td className="p-4 text-gray-700">
-                          ${cartItem.variant?.price.toFixed(2)}
+                          {cartItem.variant?.price.toFixed(2)} MVR
                         </td>
                         <td className="p-4 text-gray-700">
                           <input
@@ -110,7 +110,7 @@ const Cart = () => {
                           />
                         </td>
                         <td className="p-4 text-gray-700">
-                          ${(cartItem.subTotal).toFixed(2)}
+                          {(cartItem.subTotal).toFixed(2)} MVR
                         </td>
                         <td className="p-4 text-gray-700">
                           <button
@@ -151,7 +151,7 @@ const Cart = () => {
               Clear Shopping Cart
             </button>
             <span className="text-lg font-semibold">
-              Total: ${total.toFixed(2)}
+              Total: {total.toFixed(2)} MVR
             </span>
           </div>
 
@@ -207,14 +207,14 @@ const Cart = () => {
               <h5 className="text-md text-gray-700 mt-3 flex justify-between">
                 Total Products:
                 <span className="font-semibold text-gray-900">
-                  ${total.toFixed(2)}
+                  {total.toFixed(2)} MVR
                 </span>
               </h5>
 
               <h4 className="text-xl font-bold text-gray-900 mt-4 border-t pt-4 flex justify-between">
                 Grand Total:
                 <span className="text-purple-600">
-                  ${total.toFixed(2)}
+                  {total.toFixed(2)} MVR
                 </span>
               </h4>
 
