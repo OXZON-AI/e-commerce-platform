@@ -1,6 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Slider from "react-slick";
+import PuffLoader from "react-spinners/PuffLoader";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ProductDetailSubComponent from "./ProductDetailSubComponent";
@@ -11,6 +12,7 @@ import {
   clearProductDetail,
   fetchProductDetails,
 } from "../../store/slices/product-slice";
+import { addToCart } from "../../store/slices/cart-slice";
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -20,6 +22,7 @@ const ProductDetailPage = () => {
   );
   const [quantity, setQuantity] = useState(1);
   const [notification, setNotification] = useState(null);
+  const { status, error: cartError } = useSelector((state) => state.cart);
 
   useEffect(() => {
     dispatch(fetchProductDetails(slug));
@@ -41,12 +44,23 @@ const ProductDetailPage = () => {
     }
   };
 
-  const addToCart = () => {
+  const addToCartHandler = () => {
     if (productDetail.variants[0]?.stock > 0) {
-      setNotification({
-        type: "success",
-        message: `${quantity} item(s) added to cart!`,
-      });
+      dispatch(
+        addToCart({
+          variantId: productDetail.variants[0]._id,
+          quantity,
+        })
+      );
+      if (status === "succeeded") {
+        setNotification({
+          type: "success",
+          message: `${quantity} item(s) added to cart!`,
+        });
+      }
+      if (cartError && status === "failed") {
+        setNotification({ type: "error", message: `${cartError}` });
+      }
     } else {
       setNotification({ type: "error", message: "Out of stock!" });
     }
@@ -166,18 +180,25 @@ const ProductDetailPage = () => {
                         ? "bg-purple-600 hover:bg-purple-700"
                         : "bg-gray-400 cursor-not-allowed"
                     }`}
-                    disabled={productDetail.variants?.[0]?.stock === 0}
-                    onClick={addToCart}
+                    disabled={
+                      productDetail.variants?.[0]?.stock === 0 ||
+                      status === "loading"
+                    }
+                    onClick={addToCartHandler}
                   >
-                    {productDetail.variants?.[0]?.stock > 0
-                      ? `Add ${quantity} to Cart`
-                      : "Unavailable"}
+                    {status === "loading" ? (
+                      <PuffLoader size={20} color="#fff" />
+                    ) : productDetail.variants?.[0]?.stock > 0 ? (
+                      `Add ${quantity} to Cart`
+                    ) : (
+                      "Unavailable"
+                    )}
                   </button>
                 </div>
               </div>
             </div>
             <div className="mt-8">
-              <ProductDetailSubComponent prodDetails={productDetail}/>
+              <ProductDetailSubComponent prodDetails={productDetail} />
             </div>
             {notification && (
               <div
