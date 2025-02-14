@@ -21,6 +21,11 @@ const ProductDetailPage = lazy(() =>
   import("./pages/products/ProductDetailPage")
 );
 
+//home pages
+const AboutUs = lazy(() => import("./pages/home/AboutUs"));
+const ContactUs = lazy(() => import("./pages/home/ContactUs"));
+const FAQ = lazy(() => import("./pages/home/FAQ"));
+
 //Cart Checkout
 const Cart = lazy(() => import("./pages/other/Cart"));
 const Checkout = lazy(() => import("./pages/other/Checkout"));
@@ -85,6 +90,18 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
               element={<SampleProductDetail />}
             /> */}
+
+            <Route
+              path={process.env.PUBLIC_URL + "/about"}
+              element={<AboutUs />}
+            />
+
+            <Route
+              path={process.env.PUBLIC_URL + "/contact"}
+              element={<ContactUs />}
+            />
+
+            <Route path={process.env.PUBLIC_URL + "/faqs"} element={<FAQ />} />
 
             <Route path={process.env.PUBLIC_URL + "/cart"} element={<Cart />} />
             <Route
@@ -166,7 +183,10 @@ const App = () => {
             />
 
             <Route path="/unauthorized-access" element={<UnauthorizedPage />} />
-            <Route path="/unauthorized-admin-access" element={<Unauthorized_Client_Page />} />
+            <Route
+              path="/unauthorized-admin-access"
+              element={<Unauthorized_Client_Page />}
+            />
           </Routes>
         </Suspense>
       </ScrollToTop>

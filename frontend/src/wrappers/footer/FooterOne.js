@@ -96,7 +96,7 @@ const FooterOne = ({
                   </li>
 
                   <li>
-                    <Link to={process.env.PUBLIC_URL + "#/"}>FAQs</Link>
+                    <Link to={process.env.PUBLIC_URL + "/faqs"}>FAQs</Link>
                   </li>
                 </ul>
               </div>
