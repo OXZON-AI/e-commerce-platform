@@ -10,7 +10,7 @@ const Checkout = () => {
 
   let { pathname } = useLocation();
   const currency = useSelector((state) => state.currency);
-  const { cartItems } = useSelector((state) => state.cart);
+  const { items: cartItems } = useSelector((state) => state.cart);
 
   return (
     <Fragment>

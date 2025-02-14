@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { loadStripe } from "@stripe/react-stripe-js";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import LayoutOne from "../../layouts/LayoutOne";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,6 +10,7 @@ import {
   removeFromCart,
   updateCartItem,
 } from "../../store/slices/cart-slice";
+import { processCheckout } from "../../store/slices/checkout-slice";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -18,6 +20,9 @@ const Cart = () => {
     status,
     error,
   } = useSelector((state) => state.cart);
+  const { loading: checkoutLoading, error: checkoutError } = useSelector(
+    (state) => state.checkout
+  );
 
   useEffect(() => {
     dispatch(fetchCart()); // Fetch cart when component mounts
@@ -36,8 +41,15 @@ const Cart = () => {
     dispatch(clearCart()); // Dispatch Redux action to clear cart
   };
 
-  let cartTotalPrice = 0;
-  let { pathname } = useLocation();
+  // Checkout button handler - Payment Integration - Stripe Payment Gateway
+  const checkoutHandler = async (e) => {
+    if (checkoutLoading || checkoutError) {
+      e.preventDefault(); // Prevent navigation when loading or if there's an error
+      if (checkoutError) dispatch(processCheckout()); // Retry on error
+    } else {
+      dispatch(processCheckout());
+    }
+  };
 
   // const handleQuantityChange = (id, quantity) => {
   //   setCartItems((prevItems) =>
@@ -110,11 +122,13 @@ const Cart = () => {
                           />
                         </td>
                         <td className="p-4 text-gray-700">
-                          {(cartItem.subTotal).toFixed(2)} MVR
+                          {cartItem.subTotal.toFixed(2)} MVR
                         </td>
                         <td className="p-4 text-gray-700">
                           <button
-                            onClick={() => handleRemoveItem(cartItem.variant?._id)}
+                            onClick={() =>
+                              handleRemoveItem(cartItem.variant?._id)
+                            }
                             className="bg-gray-400 text-white p-2 rounded-md hover:bg-black"
                           >
                             <XMarkIcon className="w-5 h-5" />
@@ -213,17 +227,30 @@ const Cart = () => {
 
               <h4 className="text-xl font-bold text-gray-900 mt-4 border-t pt-4 flex justify-between">
                 Grand Total:
-                <span className="text-purple-600">
-                  {total.toFixed(2)} MVR
-                </span>
+                <span className="text-purple-600">{total.toFixed(2)} MVR</span>
               </h4>
 
               <Link
+                to={"#"}
+                onClick={checkoutHandler}
+                className={`mt-5 block text-center ${
+                  checkoutLoading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-purple-500 hover:bg-purple-600"
+                } text-white font-medium px-6 py-2 rounded-md transition`}
+              >
+                {checkoutLoading
+                  ? "Processing..."
+                  : checkoutError
+                  ? "Try Again"
+                  : "Proceed to Checkout"}
+              </Link>
+              {/* <Link
                 to={process.env.PUBLIC_URL + "/checkout"}
                 className="mt-5 block text-center bg-purple-500 text-white font-medium px-6 py-2 rounded-md hover:bg-purple-600 transition"
               >
                 Proceed to Checkout
-              </Link>
+              </Link> */}
             </div>
           </div>
         </div>
