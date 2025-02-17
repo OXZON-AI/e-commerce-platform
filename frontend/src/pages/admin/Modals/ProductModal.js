@@ -24,6 +24,22 @@ const ProductModal = ({
 }) => {
   if (!isOpen) return null;
 
+  const attributeOptions = [
+    "color",
+    "size",
+    "storage",
+    "ram",
+    "processor",
+    "display",
+    "battery",
+    "operating system",
+    "camera",
+    "connectivity",
+    "gpu",
+    "ports",
+    "weight",
+  ];
+
   return (
     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-slate-300 rounded-md p-10 sm:p-12 md:p-14 lg:p-16 xl:p-20 max-w-full sm:max-w-5xl lg:max-w-7xl w-full mx-auto">
@@ -223,14 +239,19 @@ const ProductModal = ({
                 </label>
                 {formData.attributes?.map((attr, index) => (
                   <div key={index} className="flex gap-2 items-center mb-3">
-                    <input
-                      type="text"
+                    <select
                       name="name"
                       value={attr.name}
                       onChange={(e) => handleAttributeChange(index, e)}
-                      placeholder="Attribute Name"
                       className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                    />
+                    >
+                      <option value="">Select Attribute</option>
+                      {attributeOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option.charAt(0).toUpperCase() + option.slice(1)}
+                        </option>
+                      ))}
+                    </select>
                     <input
                       type="text"
                       name="value"
