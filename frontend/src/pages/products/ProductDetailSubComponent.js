@@ -53,7 +53,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         {activeTab === "specs" && (
           <div>
             <p>
-              <strong>Brand:</strong> {prodDetails.name}
+              <strong>Brand:</strong> {prodDetails.brand}
             </p>
             <p>
               <strong>Category:</strong> {prodDetails.category?.name}
