@@ -23,7 +23,11 @@ const checkoutSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearCheckoutError: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(processCheckout.pending, (state) => {
@@ -41,4 +45,5 @@ const checkoutSlice = createSlice({
   },
 });
 
+export const { clearCheckoutError } = checkoutSlice.actions;
 export default checkoutSlice.reducer;

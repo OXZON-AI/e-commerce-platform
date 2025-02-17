@@ -7,7 +7,7 @@ import {
   removeFromCart,
   updateCartItem,
 } from "../../../store/slices/cart-slice";
-import { processCheckout } from "../../../store/slices/checkout-slice";
+import { clearCheckoutError, processCheckout } from "../../../store/slices/checkout-slice";
 
 const MenuCart = () => {
   const dispatch = useDispatch();
@@ -28,6 +28,7 @@ const MenuCart = () => {
   const [localQuantities, setLocalQuantities] = useState({});
 
   useEffect(() => {
+    dispatch(clearCheckoutError()); // Clear Checkour errors on page mounting
     dispatch(fetchCart()); // Fetch the latest cart on load
   }, [dispatch]);
 

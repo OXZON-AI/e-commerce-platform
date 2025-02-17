@@ -10,7 +10,7 @@ import {
   removeFromCart,
   updateCartItem,
 } from "../../store/slices/cart-slice";
-import { processCheckout } from "../../store/slices/checkout-slice";
+import { clearCheckoutError, processCheckout } from "../../store/slices/checkout-slice";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -25,6 +25,7 @@ const Cart = () => {
   );
 
   useEffect(() => {
+    dispatch(clearCheckoutError()); // Clear checkout error
     dispatch(fetchCart()); // Fetch cart when component mounts
   }, [dispatch]);
 
