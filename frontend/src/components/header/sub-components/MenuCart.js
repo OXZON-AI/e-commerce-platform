@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 // import { getDiscountPrice } from "../../../helpers/product";
 import {
@@ -7,10 +7,14 @@ import {
   removeFromCart,
   updateCartItem,
 } from "../../../store/slices/cart-slice";
-import { clearCheckoutError, processCheckout } from "../../../store/slices/checkout-slice";
+import {
+  clearCheckoutError,
+  processCheckout,
+} from "../../../store/slices/checkout-slice";
 
 const MenuCart = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   // const currency = useSelector((state) => state.currency);
   const {
     items: cartItems,
@@ -21,6 +25,7 @@ const MenuCart = () => {
   const { loading: checkoutLoading, error: checkoutError } = useSelector(
     (state) => state.checkout
   );
+  const { userInfo } = useSelector((state) => state.user);
 
   console.log("cartItems in cartmenu : ", cartItems);
 
@@ -44,12 +49,21 @@ const MenuCart = () => {
 
   // Checkout button handler - Payment Integration - Stripe Payment Gateway
   const checkoutHandler = async (e) => {
-    if (checkoutLoading || checkoutError) {
-      e.preventDefault(); // Prevent navigation when loading or if there's an error
-      if (checkoutError) dispatch(processCheckout()); // Retry on error
-    } else {
-      dispatch(processCheckout());
+    if (e?.preventDefault) e.preventDefault(); // Prevent errors
+
+    if (!userInfo) {
+      navigate("/login-register");
+      return;
     }
+
+    if (checkoutLoading || checkoutError) {
+      if (checkoutError) {
+        dispatch(processCheckout()); // Retry on error
+      }
+      return;
+    }
+
+    dispatch(processCheckout());
   };
 
   return (
@@ -113,10 +127,10 @@ const MenuCart = () => {
               // to={process.env.PUBLIC_URL + "/checkout"}
             >
               {checkoutLoading
-                  ? "Processing..."
-                  : checkoutError
-                  ? "Checkout Failed! [Try Again]"
-                  : "Checkout"}
+                ? "Processing..."
+                : checkoutError
+                ? "Checkout Failed! [Try Again]"
+                : "Checkout"}
             </Link>
           </div>
         </Fragment>

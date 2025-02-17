@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/react-stripe-js";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import LayoutOne from "../../layouts/LayoutOne";
@@ -17,6 +17,7 @@ import {
 
 const Cart = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const {
     items: cartItems,
     total,
@@ -26,6 +27,7 @@ const Cart = () => {
   const { loading: checkoutLoading, error: checkoutError } = useSelector(
     (state) => state.checkout
   );
+  const { userInfo } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(clearCheckoutError()); // Clear checkout error
@@ -41,18 +43,27 @@ const Cart = () => {
     dispatch(removeFromCart(variantId));
   };
 
-  const clearCart = () => {
+  const clearCartHandler = () => {
     dispatch(clearCart()); // Dispatch Redux action to clear cart
   };
 
   // Checkout button handler - Payment Integration - Stripe Payment Gateway
   const checkoutHandler = async (e) => {
-    if (checkoutLoading || checkoutError) {
-      e.preventDefault(); // Prevent navigation when loading or if there's an error
-      if (checkoutError) dispatch(processCheckout()); // Retry on error
-    } else {
-      dispatch(processCheckout());
+    if (e?.preventDefault) e.preventDefault(); // Prevent errors
+
+    if (!userInfo) {
+      navigate("/login-register");
+      return;
     }
+
+    if (checkoutLoading || checkoutError) {
+      if (checkoutError) {
+        dispatch(processCheckout()); // Retry on error
+      }
+      return;
+    }
+
+    dispatch(processCheckout());
   };
 
   // const handleQuantityChange = (id, quantity) => {
@@ -163,13 +174,13 @@ const Cart = () => {
           )}
           <div className="mt-6 flex justify-between">
             <button
-              onClick={clearCart}
+              onClick={() => navigate("/")}
               className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-purple-500"
             >
               Continue Shopping
             </button>
             <button
-              onClick={clearCart}
+              onClick={clearCartHandler}
               className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-red-500"
             >
               Clear Shopping Cart
