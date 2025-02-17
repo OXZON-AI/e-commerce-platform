@@ -147,7 +147,7 @@ const AdminProductManagement = () => {
     // Cleanup function to clear products when component unmounts or filters change
     return () => {
       dispatch(clearProducts()); // This is called whenever the component is about to unmount or when the filters object changes. This is useful for clearing any previous product data before new products are fetched based on updated filters.
-      clearProductError();
+      dispatch(clearProductError());
     };
   }, [dispatch, filters]);
 

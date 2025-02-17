@@ -7,6 +7,7 @@ import {
   removeFromCart,
   updateCartItem,
 } from "../../../store/slices/cart-slice";
+import { clearCheckoutError, processCheckout } from "../../../store/slices/checkout-slice";
 
 const MenuCart = () => {
   const dispatch = useDispatch();
@@ -17,7 +18,9 @@ const MenuCart = () => {
     status,
     error,
   } = useSelector((state) => state.cart);
-  let cartTotalPrice = 0;
+  const { loading: checkoutLoading, error: checkoutError } = useSelector(
+    (state) => state.checkout
+  );
 
   console.log("cartItems in cartmenu : ", cartItems);
 
@@ -25,6 +28,7 @@ const MenuCart = () => {
   const [localQuantities, setLocalQuantities] = useState({});
 
   useEffect(() => {
+    dispatch(clearCheckoutError()); // Clear Checkour errors on page mounting
     dispatch(fetchCart()); // Fetch the latest cart on load
   }, [dispatch]);
 
@@ -36,6 +40,16 @@ const MenuCart = () => {
   // cart item remove handler
   const cartItemDeleteHandler = (variantId) => {
     dispatch(removeFromCart(variantId));
+  };
+
+  // Checkout button handler - Payment Integration - Stripe Payment Gateway
+  const checkoutHandler = async (e) => {
+    if (checkoutLoading || checkoutError) {
+      e.preventDefault(); // Prevent navigation when loading or if there's an error
+      if (checkoutError) dispatch(processCheckout()); // Retry on error
+    } else {
+      dispatch(processCheckout());
+    }
   };
 
   return (
@@ -93,10 +107,16 @@ const MenuCart = () => {
               view cart
             </Link>
             <Link
+              to={"#"}
+              onClick={checkoutHandler}
               className="default-btn"
-              to={process.env.PUBLIC_URL + "/checkout"}
+              // to={process.env.PUBLIC_URL + "/checkout"}
             >
-              checkout
+              {checkoutLoading
+                  ? "Processing..."
+                  : checkoutError
+                  ? "Checkout Failed! [Try Again]"
+                  : "Checkout"}
             </Link>
           </div>
         </Fragment>
