@@ -140,7 +140,6 @@ const ProductDetailPage = () => {
                 </h1>
                 <p className="text-gray-700 mb-2">
                   {productDetail.description.short}
-                  {productDetail.variants?.[0]?.price}
                 </p>
                 <p className="text-2xl font-semibold mb-2">
                   {productDetail.variants?.[0]?.price} MVR

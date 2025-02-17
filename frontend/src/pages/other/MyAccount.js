@@ -26,7 +26,6 @@ const MyAccount = () => {
 
   useEffect(() => {
     if (success) {
-      setSuccessMessage("Profile updated successfully!");
       dispatch(clearSuccess());
       setPassword("");
       setConfirmPassword("");
@@ -103,6 +102,7 @@ const MyAccount = () => {
     };
 
     dispatch(updateUser({ userId: userInfo._id, userData: updatedData }));
+    setSuccessMessage("User Information updated successfully!");
 
     // Clear form2 errors when success is achieved in form1
     setForm2Errors({});
@@ -124,6 +124,7 @@ const MyAccount = () => {
     };
 
     dispatch(updateUser({ userId: userInfo._id, userData: updatedData }));
+    setSuccessMessage("Password updated successfully!");
 
     // Clear form1 errors when success is achieved in form2
     setForm1Errors({});
