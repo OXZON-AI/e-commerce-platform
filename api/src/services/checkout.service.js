@@ -14,6 +14,6 @@ export const getDiscount = (points, amount) => {
     case points >= 200 && amount >= 10:
       return { code: process.env.DISCOUNT_2, usedPoints: 200 };
     default:
-      return { code: null, usedPoints: 0 };
+      return { code: undefined, usedPoints: 0 };
   }
 };
