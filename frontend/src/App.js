@@ -22,6 +22,7 @@ const ProductDetailPage = lazy(() =>
 );
 
 //home pages
+const HomeElectronics = lazy(() => import("./pages/home/HomeElectronics"));
 const AboutUs = lazy(() => import("./pages/home/AboutUs"));
 const ContactUs = lazy(() => import("./pages/home/ContactUs"));
 const FAQ = lazy(() => import("./pages/home/FAQ"));
@@ -90,6 +91,11 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
               element={<SampleProductDetail />}
             /> */}
+
+            <Route
+              path={process.env.PUBLIC_URL + "/home"}
+              element={<HomeElectronics />}
+            />
 
             <Route
               path={process.env.PUBLIC_URL + "/about"}
