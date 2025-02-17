@@ -25,6 +25,7 @@ const persistConfig = {
   key: "frontend",
   version: 1.1,
   storage,
+  whitelist: ["user", "cart"], // Only persist necessary slices
 };
 
 export const rootReducer = combineReducers({
@@ -40,6 +41,7 @@ export const rootReducer = combineReducers({
   checkout: checkoutReducer,
 });
 
+
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
@@ -51,5 +53,6 @@ export const store = configureStore({
       },
     }),
 });
+
 
 export const persistor = persistStore(store);
