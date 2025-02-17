@@ -21,6 +21,10 @@ const ProductDetailPage = lazy(() =>
   import("./pages/products/ProductDetailPage")
 );
 
+//success_fail
+const PaymentSuccess = lazy(() => import("./pages/other/PaymentSuccess"));
+const PaymentFailure = lazy(() => import("./pages/other/PaymentFailure"));
+
 //home pages
 const HomeElectronics = lazy(() => import("./pages/home/HomeElectronics"));
 const AboutUs = lazy(() => import("./pages/home/AboutUs"));
@@ -91,6 +95,9 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
               element={<SampleProductDetail />}
             /> */}
+
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/payment-failure" element={<PaymentFailure />} />
 
             <Route
               path={process.env.PUBLIC_URL + "/home"}
