@@ -10,7 +10,10 @@ import {
   removeFromCart,
   updateCartItem,
 } from "../../store/slices/cart-slice";
-import { clearCheckoutError, processCheckout } from "../../store/slices/checkout-slice";
+import {
+  clearCheckoutError,
+  processCheckout,
+} from "../../store/slices/checkout-slice";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -83,7 +86,7 @@ const Cart = () => {
                     <th className="p-4 text-left">Unit Price</th>
                     <th className="p-4 text-left">Quantity</th>
                     <th className="p-4 text-left">Subtotal</th>
-                    <th className="p-4 text-left">Actions</th>
+                    <th className="p-4 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -109,31 +112,37 @@ const Cart = () => {
                           {cartItem.variant?.price.toFixed(2)} MVR
                         </td>
                         <td className="p-4 text-gray-700">
-                          <input
-                            type="number"
-                            value={cartItem.quantity}
-                            min="1"
-                            onChange={(e) =>
-                              handleQuantityChange(
-                                cartItem.variant?._id,
-                                parseInt(e.target.value, 10)
-                              )
-                            }
-                            className="w-16 px-2 py-1 border rounded-md"
-                          />
+                          {cartItem.quantity}{" "}
+                          {/* Displaying only the selected quantity */}
                         </td>
                         <td className="p-4 text-gray-700">
                           {cartItem.subTotal.toFixed(2)} MVR
                         </td>
                         <td className="p-4 text-gray-700">
-                          <button
-                            onClick={() =>
-                              handleRemoveItem(cartItem.variant?._id)
-                            }
-                            className="bg-gray-400 text-white p-2 rounded-md hover:bg-black"
-                          >
-                            <XMarkIcon className="w-5 h-5" />
-                          </button>
+                          <div className="flex items-center justify-evenly">
+                            {/* Quantity input on the left side */}
+                            <input
+                              type="number"
+                              value={cartItem.quantity}
+                              min="1"
+                              onChange={(e) =>
+                                handleQuantityChange(
+                                  cartItem.variant?._id,
+                                  parseInt(e.target.value, 10)
+                                )
+                              }
+                              className="w-16 px-2 py-1 border rounded-md"
+                            />
+                            {/* X mark icon on the right side */}
+                            <button
+                              onClick={() =>
+                                handleRemoveItem(cartItem.variant?._id)
+                              }
+                              className="bg-gray-400 text-white p-2 rounded-md hover:bg-black"
+                            >
+                              <XMarkIcon className="w-5 h-5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -165,37 +174,12 @@ const Cart = () => {
             >
               Clear Shopping Cart
             </button>
-            <span className="text-lg font-semibold">
+            <span className="text-lg font-semibold px-6 py-2 bg-gray-300 rounded-md">
               Total: {total.toFixed(2)} MVR
             </span>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Estimate Shipping And Tax */}
-            <div className="p-6 bg-gray-100 rounded-lg shadow-md">
-              <h4 className="font-semibold text-lg text-gray-800">
-                Estimate Shipping And Tax
-              </h4>
-              <p className="text-sm text-gray-600 mt-1">
-                Enter your destination to get a shipping estimate.
-              </p>
-
-              <select className="w-full p-2 mt-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option>United States</option>
-                <option>Canada</option>
-              </select>
-
-              <input
-                type="text"
-                placeholder="Zip/Postal Code"
-                className="w-full p-2 mt-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-
-              <button className="w-full mt-4 bg-purple-500 text-white font-medium p-2 rounded-md hover:bg-purple-600 transition">
-                Get A Quote
-              </button>
-            </div>
-
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-40 p-4">
             {/* Use Coupon Code */}
             <div className="p-6 bg-gray-100 rounded-lg shadow-md">
               <h4 className="font-semibold text-lg text-gray-800">
