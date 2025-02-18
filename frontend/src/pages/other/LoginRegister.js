@@ -306,13 +306,13 @@ const LoginRegister = () => {
       // }));
 
       toast.error("Login failed. Please check your credentials."); // Display error message
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        login:
-          err.response?.data?.message ||
-          err.message ||
-          "An unknown error occurred",
-      }));
+      // setErrors((prevErrors) => ({
+      //   ...prevErrors,
+      //   login:
+      //     err.response?.data?.message ||
+      //     err.message ||
+      //     "An unknown error occurred",
+      // }));
 
     }
   };
