@@ -12,7 +12,9 @@ import { clearUser, signoutUser } from "../../store/slices/user-slice";
 const IconGroup = ({ iconWhiteClass }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading, success, error } = useSelector((state) => state.user);
+  const { userInfo, loading, success, error } = useSelector(
+    (state) => state.user
+  );
 
   const handleClick = (e) => {
     e.currentTarget.nextSibling.classList.toggle("active");
@@ -26,23 +28,6 @@ const IconGroup = ({ iconWhiteClass }) => {
   };
 
   const { items: cartItems } = useSelector((state) => state.cart);
-
-  // const logoutHandler = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     dispatch(signoutUser()).unwrap();
-  //     alert("Signed out successfully!");
-
-  //     navigate("/login-register"); // Redirect to login page
-  //   } catch (error) {
-  //     console.error(
-  //       "Error logging out:",
-  //       error.response?.data?.message || error.message
-  //     );
-  //     alert("Failed to sign out. Please try again.");
-  //   }
-  // };
 
   const logoutHandler = async (e) => {
     e.preventDefault();
@@ -73,27 +58,31 @@ const IconGroup = ({ iconWhiteClass }) => {
         </button>
 
         <div className="account-dropdown">
-          <ul>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/login-register"}>Login</Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/login-register"}>
-                Register
-              </Link>
-            </li>
-
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/my-account"}>
-                my account
-              </Link>
-            </li>
-            <li>
+          {!userInfo ? (
+            <ul>
+              <li>
+                <Link to={process.env.PUBLIC_URL + "/login-register"}>
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link to={process.env.PUBLIC_URL + "/login-register"}>
+                  Register
+                </Link>
+              </li>
+            </ul>
+          ) : (
+            <ul>
+              <li>
+                <Link to={process.env.PUBLIC_URL + "/my-account"}>
+                  my account
+                </Link>
+              </li>
               <Link to="#" onClick={logoutHandler}>
                 Log out
               </Link>
-            </li>
-          </ul>
+            </ul>
+          )}
         </div>
       </div>
 

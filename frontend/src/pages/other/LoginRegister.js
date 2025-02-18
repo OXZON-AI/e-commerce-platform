@@ -223,13 +223,6 @@ const LoginRegister = () => {
           // Corrected this line
           console.error("Registration Error:", err);
           toast.error("Registration failed. Please try again."); // Display error message
-          setErrors((prevErrors) => ({
-            ...prevErrors,
-            register:
-              err.response?.data?.message ||
-              err.message ||
-              "An unknown error occurred on registration",
-          }));
         });
     } catch (error) {
       console.error("Unexpected Error:", error);
