@@ -9,6 +9,9 @@ import Unauthorized_Client_Page from "./pages/admin/Unauthorized_Client_Page";
 import ClientRouteProtector from "./components/router-protector/ClientRouteProtector";
 import MenuCart from "./components/header/sub-components/MenuCart";
 // import SampleProductDetail from "./pages/other/SampleProductDetail";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
 const ForgotPassword = lazy(() => import("./pages/other/ForgotPassword"));
@@ -201,6 +204,7 @@ const App = () => {
               element={<Unauthorized_Client_Page />}
             />
           </Routes>
+          <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
         </Suspense>
       </ScrollToTop>
     </Router>
