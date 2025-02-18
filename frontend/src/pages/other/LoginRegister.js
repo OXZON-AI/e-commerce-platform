@@ -200,13 +200,13 @@ const LoginRegister = () => {
       await dispatch(loginUser({ email, password })).unwrap(); // save user data to redux
     } catch (err) {
       console.error("Login Error:", err);
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        login:
-          err.response?.data?.message ||
-          err.message ||
-          "An unknown error occurred",
-      }));
+      // setErrors((prevErrors) => ({
+      //   ...prevErrors,
+      //   login:
+      //     err.response?.data?.message ||
+      //     err.message ||
+      //     "An unknown error occurred",
+      // }));
     }
   };
 
