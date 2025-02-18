@@ -86,24 +86,13 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/reset-password"}
               element={<ResetPassword />}
             />
-            <Route
-              path={process.env.PUBLIC_URL + "/product-list"}
-              element={
-                <ClientRouteProtector>
-                  <SampleProductCatalogue />
-                </ClientRouteProtector>
-              }
-            />
-            {/* <Route
-              path={process.env.PUBLIC_URL + "/sampleproduct/:slug"}
-              element={<SampleProductDetail />}
-            /> */}
 
             <Route path="/payment-success" element={<PaymentSuccess />} />
+
             <Route path="/payment-failure" element={<PaymentFailure />} />
 
             <Route
-              path={process.env.PUBLIC_URL + "/home"}
+              path={process.env.PUBLIC_URL + "/"}
               element={<HomeElectronics />}
             />
 
@@ -120,6 +109,7 @@ const App = () => {
             <Route path={process.env.PUBLIC_URL + "/faqs"} element={<FAQ />} />
 
             <Route path={process.env.PUBLIC_URL + "/cart"} element={<Cart />} />
+
             <Route
               path={process.env.PUBLIC_URL + "/checkout"}
               element={
@@ -130,7 +120,7 @@ const App = () => {
             />
 
             <Route
-              path={process.env.PUBLIC_URL + "/"}
+              path={process.env.PUBLIC_URL + "/product-catalogue"}
               element={
                 <ClientRouteProtector>
                   <ProductListPage />
