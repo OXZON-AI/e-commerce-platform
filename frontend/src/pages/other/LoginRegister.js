@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Tab from "react-bootstrap/Tab";
 import Nav from "react-bootstrap/Nav";
 import LayoutOne from "../../layouts/LayoutOne";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -19,6 +20,7 @@ const LoginRegister = () => {
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const loginCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is login form ReCaptcha element
   const registerCaptchaRef = useRef(null); // used for to refer DOM element that using reRef const. in this case it is register form ReCaptcha element
 
@@ -271,7 +273,7 @@ const LoginRegister = () => {
                                   {errors.password}
                                 </p>
                               )}
-                              <label htmlFor="user-password">Password</label>
+                              {/* <label htmlFor="user-password">Password</label>
                               <input
                                 id="user-password"
                                 type="password"
@@ -282,7 +284,46 @@ const LoginRegister = () => {
                                 className={`${
                                   errors.password ? "border-red-500" : ""
                                 }`}
-                              />
+                              /> */}
+                              <div className="relative">
+                                <label
+                                  htmlFor="user-password"
+                                  className="block text-sm font-medium"
+                                >
+                                  Password
+                                </label>
+                                <div className="relative">
+                                  <input
+                                    id="user-password"
+                                    type={showPassword ? "text" : "password"}
+                                    name="user-password"
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) =>
+                                      setPassword(e.target.value)
+                                    }
+                                    className={`w-full p-2 border rounded-md pr-10 ${
+                                      errors.password
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                    }`}
+                                  />
+                                  {/* Toggle Button */}
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setShowPassword(!showPassword)
+                                    }
+                                    className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+                                  >
+                                    {showPassword ? (
+                                      <EyeOffIcon size={20} />
+                                    ) : (
+                                      <EyeIcon size={20} />
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
 
                               <div className="button-box">
                                 <div className="login-toggle-btn">
@@ -375,7 +416,7 @@ const LoginRegister = () => {
                                   {errors.password}
                                 </p>
                               )}
-                              <label htmlFor="u-password">Password</label>
+                              {/* <label htmlFor="u-password">Password</label>
                               <input
                                 id="u-password"
                                 type="password"
@@ -386,7 +427,46 @@ const LoginRegister = () => {
                                 className={`${
                                   errors.password ? "border-red-500" : ""
                                 }`}
-                              />
+                              /> */}
+                              <div className="relative">
+                                <label
+                                  htmlFor="user-password"
+                                  className="block text-sm font-medium"
+                                >
+                                  Password
+                                </label>
+                                <div className="relative">
+                                  <input
+                                    id="user-password"
+                                    type={showPassword ? "text" : "password"}
+                                    name="user-password"
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) =>
+                                      setPassword(e.target.value)
+                                    }
+                                    className={`w-full p-2 border rounded-md pr-10 ${
+                                      errors.password
+                                        ? "border-red-500"
+                                        : "border-gray-300"
+                                    }`}
+                                  />
+                                  {/* Toggle Button */}
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setShowPassword(!showPassword)
+                                    }
+                                    className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+                                  >
+                                    {showPassword ? (
+                                      <EyeOffIcon size={20} />
+                                    ) : (
+                                      <EyeIcon size={20} />
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
 
                               {errors.email && (
                                 <p className="text-red-500 text-sm">
