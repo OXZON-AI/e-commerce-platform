@@ -41,7 +41,7 @@ export const clearCart = async (id, role, session = null) => {
     cart.items = [];
     cart.total = 0;
 
-    await cart.save(session ? session : undefined);
+    await cart.save(session ? { session } : undefined);
 
     logger.info(`Cart with id ${cart._id} cleared for user ${id}.`);
   } catch (error) {
