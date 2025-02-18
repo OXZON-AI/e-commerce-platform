@@ -8,7 +8,7 @@ export const fetchCart = createAsyncThunk(
     try {
       const response = await axiosInstance.get("/v1/carts/");
       console.log("Cart Items slice: ", response.data);
-      
+
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to fetch cart!");
@@ -26,7 +26,7 @@ export const addToCart = createAsyncThunk(
         quantity,
       });
       console.log("add to cart in slice: ", response.data);
-      
+
       return { variantId, quantity, message: response.data.message };
     } catch (error) {
       return rejectWithValue(
@@ -80,6 +80,9 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
       state.total = 0;
+    },
+    clearCartError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -160,5 +163,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { clearCart } = cartSlice.actions;
+export const { clearCart, clearCartError } = cartSlice.actions;
 export default cartSlice.reducer;

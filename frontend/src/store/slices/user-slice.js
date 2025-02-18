@@ -79,8 +79,8 @@ export const signoutUser = createAsyncThunk(
       );
     } finally {
       dispatch(clearUser()); // Explicitly reset Redux state
-      localStorage.removeItem("persist:frontend"); // Remove Redux persist
       Cookie.remove("token"); // Remove token from cookies
+      localStorage.removeItem("persist:frontend"); // Remove Redux persist
     }
   }
 );
