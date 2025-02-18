@@ -28,14 +28,14 @@ export const findOrCreateCart = async (id, role, session = null) => {
   return cart;
 };
 
-export const clearCart = async (id, role) => {
+export const clearCart = async (id, role, session = null) => {
   try {
-    let cart = await findOrCreateCart(id, role);
+    let cart = await findOrCreateCart(id, role, session);
 
     cart.items = [];
     cart.total = 0;
 
-    await cart.save();
+    await cart.save(session ? { session } : undefined);
 
     logger.info(`Cart with id ${cart._id} cleared for user ${id}.`);
   } catch (error) {
