@@ -1,22 +1,134 @@
 import { Category } from "../models/category.model.js";
+import {
+  buildCategoryTree,
+  getIdsForDelete,
+} from "../services/category.service.js";
+import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
-import { createCategorySchema } from "../utils/validationSchemas/category.schema.js";
+import {
+  validateCreateCategory,
+  validateDeleteCategory,
+  validateUpdateCategory,
+} from "../utils/validator.util.js";
 
 export const createCategory = async (req, res, next) => {
-  const { error, value } = createCategorySchema.validate(req.body);
+  const { error, value } = validateCreateCategory(req.body);
 
   if (error) return next(error);
 
-  const { name, description, parent, image, level } = value;
+  const { parent, ...rest } = value;
 
   try {
-    const category = new Category({ name, description, parent, image, level });
+    if (parent) {
+      const exist = await Category.exists({ _id: parent });
+
+      if (!exist) {
+        const error = customError(404, "Parent category not found");
+
+        logger.error(`Parent category ${parent} not found: `, error);
+        return next(error);
+      }
+    }
+
+    const category = new Category({ parent: parent ? parent : null, ...rest });
     const { _id } = await category.save();
 
-    logger.info(`Category with id ${_id} created successfully`);
+    logger.info(`Category with id ${_id} created successfully.`);
     return res.status(201).json({ message: "Category created successfully" });
   } catch (error) {
     logger.error("Error creating category: ", error);
+    return next(error);
+  }
+};
+
+export const getCategories = async (req, res, next) => {
+  try {
+    const categories = await Category.find()
+      .select("-createdAt -updatedAt -__v")
+      .lean();
+
+    const categoryTree = buildCategoryTree(categories);
+
+    logger.info(`Categories fetched successfully.`);
+    return res.status(200).json({ categories: categoryTree });
+  } catch (error) {
+    logger.error("Error fetching categories: ", error);
+    return next(error);
+  }
+};
+
+export const updateCategory = async (req, res, next) => {
+  const { error, value } = validateUpdateCategory({
+    cid: req.params.cid,
+    ...req.body,
+  });
+
+  if (error) return next(error);
+
+  const { cid, image, ...rest } = value;
+  try {
+    if (rest.parent) {
+      const exist = await Category.exists({ _id: rest.parent });
+
+      if (!exist) {
+        const error = customError(404, "Parent category not found");
+
+        logger.error(`Parent category ${rest.parent} not found: `, error);
+        return next(error);
+      }
+    }
+
+    const category = await Category.findByIdAndUpdate(
+      cid,
+      {
+        $set: {
+          ...rest,
+          ...(image && { "image.url": image.url, "image.alt": image.alt }),
+        },
+      },
+      { new: true }
+    );
+
+    if (!category) {
+      const error = customError(404, "Category not found");
+      logger.error(`Category with id ${cid} not found: `, error);
+      return next(error);
+    }
+
+    logger.info(`Category with id ${cid} updated successfully`);
+    return res
+      .status(200)
+      .json({ message: "Category updated successfully", category });
+  } catch (error) {
+    logger.error(`Error updating category with id ${cid}: `, error);
+    return next(error);
+  }
+};
+
+export const deleteCategory = async (req, res, next) => {
+  const { error, value } = validateDeleteCategory(req.params);
+
+  if (error) return next(error);
+
+  const { cid } = value;
+
+  try {
+    const ids = await getIdsForDelete(cid);
+
+    const { deletedCount } = await Category.deleteMany({
+      _id: { $in: ids },
+    });
+
+    if (!deletedCount) {
+      const error = customError(404, "Category not found");
+      logger.error(`Category with id ${cid} not found: `, error);
+      return next(error);
+    }
+
+    logger.info(`Category with id ${cid} deleted successfully`);
+    return res.status(200).json({ message: "Category deleted successfully" });
+  } catch (error) {
+    logger.error(`Error deleting category with id ${cid}: `, error);
     return next(error);
   }
 };

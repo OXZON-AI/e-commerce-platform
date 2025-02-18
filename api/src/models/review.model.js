@@ -44,5 +44,6 @@ const reviewSchema = new mongoose.Schema(
 );
 
 reviewSchema.index({ variant: 1 });
+reviewSchema.index({ order: 1, variant: 1 }, { unique: true });
 
 export const Review = mongoose.model("Review", reviewSchema);

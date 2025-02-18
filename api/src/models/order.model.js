@@ -1,21 +1,16 @@
 import mongoose from "mongoose";
 
 const addressSchema = new mongoose.Schema({
-  line1: { type: String, required: true },
+  line1: { type: String },
   line2: { type: String },
-  city: { type: String, required: true },
-  state: { type: String, required: true },
-  country: { type: String, required: true },
-  postalCode: { type: String, required: true },
+  city: { type: String },
+  state: { type: String },
+  country: { type: String },
+  postalCode: { type: String },
 });
 
 const paymentSchema = new mongoose.Schema({
-  type: {
-    type: String,
-    required: true,
-    enum: ["Card", "Points"],
-  },
-  transactionId: String,
+  transactionId: { type: String },
   amount: { type: Number, required: true },
   expYear: {
     type: String,
@@ -24,11 +19,16 @@ const paymentSchema = new mongoose.Schema({
     type: String,
   },
   last4: {
-    type: String,
+    type: Number,
   },
   brand: {
     type: String,
   },
+  discount: {
+    type: Number,
+    default: 0,
+  },
+  refundId: { type: String },
 });
 
 const orderSchema = new mongoose.Schema(
@@ -36,11 +36,18 @@ const orderSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+    },
+    isGuest: {
+      type: Boolean,
+      default: false,
+    },
+    email: {
+      type: String,
       required: true,
     },
     items: [
       {
-        varient: {
+        variant: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Variant",
           required: true,
@@ -70,12 +77,16 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "processing", "shipped", "delivered", "cancelled"],
       default: "pending",
     },
+    earnedPoints: {
+      type: Number,
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-orderSchema.index({ user: 1 });
+orderSchema.index({ user: 1 }, { sparse: true });
 
 export const Order = mongoose.model("Order", orderSchema);

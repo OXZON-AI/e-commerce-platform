@@ -1,0 +1,108 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div
+      style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1a1a1a; line-height: 1.5;"
+    >
+      <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet"
+      />
+
+      <h1
+        style="color: #2a2a7c; text-align: center; margin-bottom: 16px; font-size: 24px; font-weight: 600; letter-spacing: -0.025em;"
+      >Order Cancelled</h1>
+
+      <div
+        style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin: 24px 0; text-align: center;"
+      >
+        <p
+          style="color: #dc2626; font-size: 16px; font-weight: 500; margin: 0;"
+        >
+          Order #{{order._id}}
+          has been cancelled
+        </p>
+      </div>
+
+      <p
+        style="text-align: center; color: #4b5563; margin-bottom: 24px; font-size: 15px; line-height: 1.6;"
+      >
+        We've processed your cancellation request. If you paid for this order, a
+        refund will be issued to your original payment method.
+      </p>
+
+      <div
+        style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 24px 0;"
+      >
+        <h2
+          style="color: #4b5563; font-size: 14px; margin: 0 0 16px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
+        >Cancelled Order Details</h2>
+
+        {{#each order.items}}
+          <div
+            style="border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 12px;"
+          >
+            <p
+              style="font-size: 15px; margin: 0 0 4px 0;"
+            >{{this.variant.product.name}} × {{this.quantity}}</p>
+            <p
+              style="font-size: 14px; color: #6b7280; margin: 0;"
+            >MVR{{this.subTotal}}</p>
+          </div>
+        {{/each}}
+
+        <div
+          style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 500;"
+        >
+          <span>Refund Amount</span>
+          <span>MVR{{order.payment.amount}}</span>
+        </div>
+      </div>
+
+      <div
+        style="background: #f8f9fa; border-radius: 8px; padding: 16px; margin-top: 24px;"
+      >
+        <h3
+          style="color: #4b5563; font-size: 14px; margin: 0 0 12px 0; font-weight: 600;"
+        >Refund Information</h3>
+        <p
+          style="font-size: 15px; margin: 0 0 8px 0; text-transform: uppercase;"
+        >Payment Method:
+          {{order.payment.brand}}
+          ending in
+          {{order.payment.last4}}</p>
+        <p style="font-size: 15px; margin: 0;">Expected refund processing time:
+          3-5 business days</p>
+      </div>
+
+      <div style="margin: 32px 0; text-align: center;">
+        <a
+          href="http://localhost:3000"
+          style="background-color: #2a2a7c; 
+              color: white; 
+              padding: 12px 32px; 
+              border-radius: 6px; 
+              text-decoration: none; 
+              font-weight: 500; 
+              font-size: 15px;
+              display: inline-block;"
+        >
+          Continue Shopping
+        </a>
+      </div>
+
+      <div
+        style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px;"
+      >
+        <p style="margin: 0;">Thank you for shopping with Genuine Electronics</p>
+        <p style="margin: 8px 0;">If you have any questions about your refund,
+          please contact our support team</p>
+        <p style="margin: 8px 0;">We hope to see you again soon!</p>
+      </div>
+    </div>
+  </body>
+</html>

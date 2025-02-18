@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Cart } from "../models/cart.model.js";
 import { logger } from "../utils/logger.util.js";
+import { Variant } from "../models/variant.model.js";
 
 export const createCart = async (options, session = null) => {
   const cart = new Cart(options);
@@ -20,7 +21,12 @@ export const findOrCreateCart = async (id, role, session = null) => {
 
   let cart = await query;
 
-  if (!cart) {
+  if (cart) {
+    await Variant.populate(cart, {
+      path: "items.variant.product",
+      select: "name",
+    });
+  } else {
     cart = await createCart(options, session);
     logger.info(`Cart created for user ${id}.`);
   }

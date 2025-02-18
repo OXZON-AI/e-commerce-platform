@@ -13,6 +13,7 @@ import { cartMigration, createCart } from "../services/cart.service.js";
 import crypto from "crypto";
 import { sendEmails } from "../utils/emailer.util.js";
 import { validateCaptcha } from "../utils/reCAPTCHA.util.js";
+import mongoose from "mongoose";
 
 export const signup = async (req, res, next) => {
   const { error, value } = validateSignup(req.body);
@@ -62,7 +63,7 @@ export const signin = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { email, password } = value;
+  const { email, password, rememberMe } = value;
 
   try {
     const user = await getUser({ email });
@@ -106,13 +107,16 @@ export const signin = async (req, res, next) => {
       }
     );
 
-    const { password: pass, role, ...rest } = user._doc;
+    const { password: pass, ...rest } = user._doc;
 
     logger.info(`User with email ${email} signed in successfully.`);
     return res
-      .cookie("token", token, { httpOnly: true })
+      .cookie("token", token, {
+        httpOnly: true,
+        ...(rememberMe && { maxAge: 24 * 60 * 60 * 1000 }),
+      })
       .status(200)
-      .json({ user: rest });
+      .json({ message: "User signed in successfully", user: rest });
   } catch (error) {
     logger.error(`Signin error for email ${email}: `, error);
     return next(error);
@@ -156,7 +160,10 @@ export const requestPasswordReset = async (req, res, next) => {
     await sendEmails(
       email,
       "Reset your password",
-      `<a href="${process.env.RESET_PASSWORD_URL}?token=${token}">Reset password</a>`
+      {
+        link: `${process.env.RESET_PASSWORD_URL}?token=${token}`,
+      },
+      "reset-password"
     );
 
     logger.info(`Password reset link sent for ${email}`);
@@ -164,8 +171,12 @@ export const requestPasswordReset = async (req, res, next) => {
       .status(200)
       .json({ message: "Password reset link was sent to your email" });
   } catch (error) {
-    logger.error(`Couldn't request password reset for ${email}: `, error);
-    return next(error);
+    const err = customError(
+      500,
+      `Couldn't request password reset for ${email}`
+    );
+    logger.error(`${err.message}:  `, error);
+    return next(err);
   }
 };
 

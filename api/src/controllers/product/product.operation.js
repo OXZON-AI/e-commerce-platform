@@ -1,18 +1,15 @@
 import mongoose from "mongoose";
-import { Product } from "../models/product.model.js";
-import { Variant } from "../models/variant.model.js";
-import { logger } from "../utils/logger.util.js";
+import { Product } from "../../models/product.model.js";
+import { Variant } from "../../models/variant.model.js";
+import { logger } from "../../utils/logger.util.js";
 import {
   validateCreateProduct,
-  validateCreateVariant,
   validateDeleteProduct,
-  validateDeleteVariant,
   validateGetProduct,
   validateGetProducts,
   validateUpdateProduct,
-  validateUpdateVariant,
-} from "../utils/validator.util.js";
-import { customError } from "../utils/error.util.js";
+} from "../../utils/validator.util.js";
+import { customError } from "../../utils/error.util.js";
 
 export const createProduct = async (req, res, next) => {
   const { error, value } = validateCreateProduct(req.body);
@@ -60,71 +57,76 @@ export const createProduct = async (req, res, next) => {
 };
 
 export const getProduct = async (req, res, next) => {
+  const { role } = req.user;
   const { error, value } = validateGetProduct(req.params);
 
   if (error) return next(error);
 
   const { slug } = value;
 
-  try {
-    const product = await Product.aggregate([
-      {
-        $match: {
-          slug,
-        },
+  const pipeline = [
+    {
+      $match: {
+        slug,
       },
-      {
-        $lookup: {
-          from: "variants",
-          localField: "_id",
-          foreignField: "product",
-          as: "variants",
-        },
+    },
+    {
+      $lookup: {
+        from: "variants",
+        localField: "_id",
+        foreignField: "product",
+        as: "variants",
       },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "category",
-        },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
       },
-      {
-        $project: {
-          name: 1,
-          slug: 1,
-          description: 1,
-          category: {
-            $arrayElemAt: [
-              {
-                $map: {
-                  input: "$category",
-                  as: "category",
-                  in: {
-                    _id: "$$category._id",
-                    name: "$$category.name",
-                    slug: "$$category.slug",
-                  },
+    },
+    {
+      $project: {
+        name: 1,
+        slug: 1,
+        description: 1,
+        category: {
+          $arrayElemAt: [
+            {
+              $map: {
+                input: "$category",
+                as: "category",
+                in: {
+                  _id: "$$category._id",
+                  name: "$$category.name",
+                  slug: "$$category.slug",
                 },
               },
+            },
 
-              0,
-            ],
-          },
-          ratings: 1,
-          brand: 1,
-          variants: {
-            attributes: 1,
-            price: 1,
-            compareAtPrice: 1,
-            stock: 1,
-            images: 1,
-            isDefault: 1,
-            sku: 1,
-          },
+            0,
+          ],
+        },
+        ratings: 1,
+        brand: 1,
+        variants: {
+          _id: 1,
+          attributes: 1,
+          price: 1,
+          compareAtPrice: 1,
+          stock: 1,
+          images: 1,
+          isDefault: 1,
+          sku: 1,
+          ...(role === "admin" && { cost: 1 }),
         },
       },
-    ]);
+    },
+  ];
+
+  try {
+    const product = await Product.aggregate(pipeline);
 
     if (!product.length) {
       const error = customError(404, "Product not found");
@@ -157,8 +159,6 @@ export const getProducts = async (req, res, next) => {
     limit,
   } = value;
   const skip = (page - 1) * limit;
-  const sortByField =
-    sortBy === "ratings" ? "ratings.average" : "defaultVariant.price";
 
   const pipeline = [];
 
@@ -174,9 +174,6 @@ export const getProducts = async (req, res, next) => {
             prefixLength: 0,
             maxExpansions: 50,
           },
-        },
-        count: {
-          type: "total",
         },
       },
     });
@@ -299,25 +296,71 @@ export const getProducts = async (req, res, next) => {
     });
   }
 
+  if (sortBy) {
+    const sortByField =
+      sortBy === "ratings" ? "ratings.average" : "defaultVariant.price";
+    pipeline.push({
+      $sort: {
+        [sortByField]: sortOrder === "asc" ? 1 : -1,
+      },
+    });
+  }
+
   pipeline.push({
-    $sort: {
-      [sortByField]: sortOrder === "asc" ? 1 : -1,
+    $facet: {
+      products: [
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
+        },
+      ],
+      count: [{ $count: "totalCount" }],
     },
   });
 
   pipeline.push({
-    $skip: skip,
-  });
-
-  pipeline.push({
-    $limit: limit,
+    $project: {
+      products: 1,
+      paginationInfo: {
+        totalCount: {
+          $ifNull: [
+            {
+              $arrayElemAt: ["$count.totalCount", 0],
+            },
+            0,
+          ],
+        },
+        totalPages: {
+          $ceil: {
+            $divide: [
+              {
+                $ifNull: [
+                  {
+                    $arrayElemAt: ["$count.totalCount", 0],
+                  },
+                  0,
+                ],
+              },
+              limit,
+            ],
+          },
+        },
+      },
+    },
   });
 
   try {
-    const products = await Product.aggregate(pipeline);
+    const result = await Product.aggregate(pipeline);
+
+    const { products, paginationInfo } = result[0];
 
     logger.info("Products fetched successfully.");
-    return res.status(200).json(products);
+    return res.status(200).json({
+      products,
+      paginationInfo,
+    });
   } catch (error) {
     logger.error("Error fetching products: ", error);
     return next(error);
@@ -395,201 +438,5 @@ export const deleteProduct = async (req, res, next) => {
     return next(error);
   } finally {
     await session.endSession();
-  }
-};
-
-export const createVariant = async (req, res, next) => {
-  const { error, value } = validateCreateVariant({
-    pid: req.params.pid,
-    ...req.body,
-  });
-
-  if (error) return next(error);
-
-  const { pid, attributes, price, compareAtPrice, images } = value;
-
-  try {
-    const productExists = await Product.exists({ _id: pid });
-
-    if (!productExists) {
-      const error = customError(404, "Product not found");
-      logger.error(`Product with id ${pid} not found: `, error);
-      return next(error);
-    }
-
-    const variant = new Variant({
-      product: pid,
-      attributes,
-      price,
-      compareAtPrice,
-      images,
-    });
-
-    const { _id } = await variant.save();
-
-    logger.info(`Variant with id ${_id} created successfully.`);
-    return res.status(201).json({ message: "Variant created successfully" });
-  } catch (error) {
-    logger.error("Error creating variant: ", error);
-    return next(error);
-  }
-};
-
-export const updateVariant = async (req, res, next) => {
-  const { error, value } = validateUpdateVariant({
-    pid: req.params.pid,
-    vid: req.params.vid,
-    ...req.body,
-  });
-
-  if (error) return next(error);
-
-  const {
-    pid,
-    vid,
-    toAdd,
-    toChange,
-    toRemove,
-    price,
-    compareAtPrice,
-    isDefault,
-  } = value;
-
-  const bulkOperations = [];
-
-  bulkOperations.push({
-    updateOne: {
-      filter: {
-        _id: vid,
-        product: pid,
-      },
-      update: {
-        $set: {
-          price,
-          compareAtPrice,
-          isDefault,
-        },
-      },
-    },
-  });
-
-  if (toAdd) {
-    bulkOperations.push({
-      updateOne: {
-        filter: {
-          _id: vid,
-          product: pid,
-        },
-        update: {
-          $addToSet: {
-            attributes: {
-              $each: toAdd.attributes,
-            },
-            images: {
-              $each: toAdd.images,
-            },
-          },
-        },
-      },
-    });
-  }
-
-  if (toRemove) {
-    bulkOperations.push({
-      updateOne: {
-        filter: {
-          _id: vid,
-          product: pid,
-        },
-        update: {
-          $pull: {
-            attributes: {
-              _id: {
-                $in: toRemove.attributes,
-              },
-            },
-            images: {
-              _id: {
-                $in: toRemove.images,
-              },
-            },
-          },
-        },
-      },
-    });
-  }
-
-  if (toChange) {
-    for (const attribute of toChange.attributes) {
-      bulkOperations.push({
-        updateOne: {
-          filter: { _id: vid, "attributes._id": attribute._id },
-          update: {
-            $set: {
-              "attributes.$.name": attribute.name,
-              "attributes.$.value": attribute.value,
-            },
-          },
-        },
-      });
-    }
-
-    for (const image of toChange.images) {
-      bulkOperations.push({
-        updateOne: {
-          filter: { _id: vid, "images._id": image._id },
-          update: {
-            $set: {
-              "images.$.url": image.url,
-              "images.$.alt": image.alt,
-              "images.$.isDefault": image.isDefault,
-            },
-          },
-        },
-      });
-    }
-  }
-
-  try {
-    const { matchedCount } = await Variant.bulkWrite(bulkOperations);
-
-    if (!matchedCount) {
-      const error = customError(404, "Variant not found");
-      logger.error(`Variant with id ${vid} not found: `, error);
-      return next(error);
-    }
-
-    logger.info(`Variant with id ${vid} updated successfully.`);
-    return res.status(200).json({ message: "Variant updated successfully" });
-  } catch (error) {
-    logger.error(`Error updating variant with id ${vid}: `, error);
-    return next(error);
-  }
-};
-
-export const deleteVariant = async (req, res, next) => {
-  const { error, value } = validateDeleteVariant({
-    pid: req.params.pid,
-    vid: req.params.vid,
-  });
-
-  if (error) return next(error);
-
-  const { pid, vid } = value;
-
-  try {
-    const variant = await Variant.findOneAndDelete({ _id: vid, product: pid });
-
-    if (!variant) {
-      const error = customError(404, "Variant not found");
-      logger.error(`Variant with id ${vid} not found: `, error);
-      return next(error);
-    }
-
-    logger.info(`Variant with id ${vid} deleted successfully.`);
-    return res.status(200).json({ message: "Variant deleted successfully" });
-  } catch (error) {
-    logger.error(`Error deleting variant with id ${vid}: `, error);
-    return next(error);
   }
 };

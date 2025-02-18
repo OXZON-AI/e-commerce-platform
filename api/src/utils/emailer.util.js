@@ -1,7 +1,21 @@
 import nodemailer from "nodemailer";
 import { logger } from "./logger.util.js";
+import hbs from "nodemailer-express-handlebars";
+import path from "path";
 
-export const sendEmails = async (receivers, subject, html) => {
+const __dirname = import.meta.dirname;
+
+const hbsOptions = {
+  viewEngine: {
+    defaultLayout: false,
+    runtimeOptions: {
+      allowProtoPropertiesByDefault: true,
+    },
+  },
+  viewPath: path.join(__dirname, "../views"),
+};
+
+export const sendEmails = async (receivers, subject, context, template) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     port: 465,
@@ -12,16 +26,16 @@ export const sendEmails = async (receivers, subject, html) => {
     },
   });
 
+  transporter.use("compile", hbs(hbsOptions));
+
   const mailOptions = {
     from: process.env.MAILER_EMAIL,
     to: receivers,
     subject: subject,
-    html: html,
+    template,
+    context,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error)
-      return logger.error(`Error sending email to ${receivers}: `, error);
-    return logger.info(`Email sent to ${receivers}: `, info.response);
-  });
+  const info = await transporter.sendMail(mailOptions);
+  return logger.info(`Email sent to ${receivers}: `, info);
 };
