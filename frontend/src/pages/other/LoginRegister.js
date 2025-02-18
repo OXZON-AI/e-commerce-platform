@@ -12,6 +12,10 @@ import {
   clearSuccess,
 } from "../../store/slices/user-slice";
 
+// Importing Toast Container and Toast Functions
+import { ToastContainer, toast } from "react-toastify"; // Import ToastContainer and toast for notifications
+import "react-toastify/dist/ReactToastify.css"; // Import Toast CSS
+
 const LoginRegister = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -133,6 +137,50 @@ const LoginRegister = () => {
   };
 
   // Register Form Handler
+  // const handleRegisterSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setErrors({}); // clear previous error state
+  //   clearError(null); // clear previous server error state
+
+  //   // Calling register form validation to check validations
+  //   if (!validateRegisterForm()) {
+  //     return;
+  //   }
+  //   try {
+  //     // Concatenating name
+  //     const fullName = `${firstName} ${lastName}`;
+
+  //     // ReCaptcha Token
+  //     const recaptchaToken = await executeReCaptcha(loginCaptchaRef);
+  //     if (!recaptchaToken) {
+  //       setErrors((prevErrors) => ({
+  //         ...prevErrors,
+  //         recaptcha: "ReCAPTCHA verification failed. Please try again.",
+  //       }));
+  //       return;
+  //     }
+
+  //     const userdata = {
+  //       email,
+  //       password,
+  //       name: fullName, //using concatenated value for name
+  //       phone,
+  //       token: recaptchaToken,
+  //     };
+  //     dispatch(registerUser(userdata)).unwrap();
+  //   } catch (err) {
+  //     console.error("Login Error:", err);
+  //     setErrors((prevErrors) => ({
+  //       ...prevErrors,
+  //       register:
+  //         err.response?.data?.message ||
+  //         err.message ||
+  //         "An unknown error occurred on login",
+  //     }));
+  //   }
+  // };
+
+  // Register Form Handler
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setErrors({}); // clear previous error state
@@ -163,18 +211,67 @@ const LoginRegister = () => {
         phone,
         token: recaptchaToken,
       };
-      dispatch(registerUser(userdata)).unwrap();
-    } catch (err) {
-      console.error("Login Error:", err);
-      setErrors((prevErrors) => ({
-        ...prevErrors,
-        register:
-          err.response?.data?.message ||
-          err.message ||
-          "An unknown error occurred on login",
-      }));
+
+      dispatch(registerUser(userdata))
+        .unwrap()
+        .then(() => {
+          toast.success("Registration successful!");
+        })
+        .catch((err) => {
+          // Corrected this line
+          console.error("Registration Error:", err);
+          toast.error("Registration failed. Please try again."); // Display error message
+          setErrors((prevErrors) => ({
+            ...prevErrors,
+            register:
+              err.response?.data?.message ||
+              err.message ||
+              "An unknown error occurred on registration",
+          }));
+        });
+    } catch (error) {
+      console.error("Unexpected Error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     }
   };
+
+  // // Login Form Handler
+  // const handleLoginSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setErrors({});
+  //   clearError(null);
+
+  //   // Calling login form validation to check validations
+  //   if (!validateLoginForm()) {
+  //     return;
+  //   }
+
+  //   try {
+  //     // ReCaptcha Token
+  //     const recaptchaToken = await executeReCaptcha(registerCaptchaRef);
+  //     if (!recaptchaToken) {
+  //       setErrors((prevErrors) => ({
+  //         ...prevErrors,
+  //         recaptcha: "ReCAPTCHA verification failed. Please try again.",
+  //       }));
+  //       return;
+  //     }
+  //     await dispatch(loginUser({ email, password })).unwrap()
+  //     .then(() => {
+  //       toast.success("Login successful!");
+  //   })
+  //    .catch ((err) => {
+  //     console.error("Login Error:", err);
+  //     toast.error("Login failed. Please check your credentials.");  // Display error message
+  //     setErrors((prevErrors) => ({
+  //       ...prevErrors,
+  //       login:
+  //         err.response?.data?.message ||
+  //         err.message ||
+  //         "An unknown error occurred",
+  //     }));
+  //   });
+  // };
 
   // Login Form Handler
   const handleLoginSubmit = async (e) => {
@@ -197,9 +294,15 @@ const LoginRegister = () => {
         }));
         return;
       }
-      await dispatch(loginUser({ email, password })).unwrap(); // save user data to redux
+
+      // Await the dispatch call directly
+      await dispatch(loginUser({ email, password })).unwrap();
+
+      // If successful, show success toast
+      toast.success("Login successful!");
     } catch (err) {
       console.error("Login Error:", err);
+      toast.error("Login failed. Please check your credentials."); // Display error message
       setErrors((prevErrors) => ({
         ...prevErrors,
         login:
@@ -212,6 +315,8 @@ const LoginRegister = () => {
 
   return (
     <Fragment>
+      <ToastContainer autoClose={3000} />{" "}
+      {/* Toast container to display notifications */}
       <LayoutOne>
         <div className="login-register-area pt-100 pb-100">
           <div className="container">

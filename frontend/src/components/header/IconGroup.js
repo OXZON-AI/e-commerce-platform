@@ -3,6 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
+
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { clearUser, signoutUser } from "../../store/slices/user-slice";
 
 const IconGroup = ({ iconWhiteClass }) => {
@@ -23,12 +27,30 @@ const IconGroup = ({ iconWhiteClass }) => {
 
   const { items: cartItems } = useSelector((state) => state.cart);
 
+  // const logoutHandler = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     dispatch(signoutUser()).unwrap();
+  //     alert("Signed out successfully!");
+
+  //     navigate("/login-register"); // Redirect to login page
+  //   } catch (error) {
+  //     console.error(
+  //       "Error logging out:",
+  //       error.response?.data?.message || error.message
+  //     );
+  //     alert("Failed to sign out. Please try again.");
+  //   }
+  // };
+
   const logoutHandler = async (e) => {
     e.preventDefault();
-    
+
     try {
-      dispatch(signoutUser()).unwrap();
-      alert("Signed out successfully!");
+      await dispatch(signoutUser()).unwrap();
+      dispatch(clearUser()); // Clear user data from Redux state
+      toast.success("Signed out successfully!"); // Success toast message
 
       navigate("/login-register"); // Redirect to login page
     } catch (error) {
@@ -36,7 +58,7 @@ const IconGroup = ({ iconWhiteClass }) => {
         "Error logging out:",
         error.response?.data?.message || error.message
       );
-      alert("Failed to sign out. Please try again.");
+      toast.error("Failed to sign out. Please try again."); // Error toast message
     }
   };
 
