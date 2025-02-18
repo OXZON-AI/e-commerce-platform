@@ -40,7 +40,7 @@ const ProductListPage = () => {
     sortOrder: "", // Sort order (ascending or descending)
     priceRange: [0, 1000000], // Price range filter (min, max)
     page: 1, // Current page for pagination
-    limit: 10, // Number of products per page
+    limit: 12, // Number of products per page
   });
 
   // Function to build query params based on the selected filters
