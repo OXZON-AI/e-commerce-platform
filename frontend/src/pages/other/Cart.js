@@ -1,11 +1,11 @@
-import { Fragment, useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { loadStripe } from "@stripe/react-stripe-js";
+import { Fragment, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import LayoutOne from "../../layouts/LayoutOne";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearCart,
+  clearCartError,
   fetchCart,
   removeFromCart,
   updateCartItem,
@@ -21,8 +21,7 @@ const Cart = () => {
   const {
     items: cartItems,
     total,
-    status,
-    error,
+    error: cartError,
   } = useSelector((state) => state.cart);
   const { loading: checkoutLoading, error: checkoutError } = useSelector(
     (state) => state.checkout
@@ -30,6 +29,7 @@ const Cart = () => {
   const { userInfo } = useSelector((state) => state.user);
 
   useEffect(() => {
+    dispatch(clearCartError()); // Clear cart error
     dispatch(clearCheckoutError()); // Clear checkout error
     dispatch(fetchCart()); // Fetch cart when component mounts
   }, [dispatch]);
@@ -87,6 +87,11 @@ const Cart = () => {
       <LayoutOne>
         <div className="container mx-auto px-4 py-12">
           <h2 className="text-2xl font-semibold mb-6">Your Cart Items</h2>
+          {cartError && (
+            <div className="w-full bg-red-100 border border-red-500 text-red-700 p-4 rounded-md mb-4">
+              <p className="text-sm font-medium text-red-700">{cartError}</p>
+            </div>
+          )}
           {cartItems.length >= 1 ? (
             <div className="bg-white shadow-md rounded-lg overflow-hidden">
               <table className="min-w-full border-collapse w-full">

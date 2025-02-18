@@ -12,7 +12,7 @@ import {
   clearProductDetail,
   fetchProductDetails,
 } from "../../store/slices/product-slice";
-import { addToCart } from "../../store/slices/cart-slice";
+import { addToCart, fetchCart } from "../../store/slices/cart-slice";
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -44,22 +44,27 @@ const ProductDetailPage = () => {
     }
   };
 
-  const addToCartHandler = () => {
+  const addToCartHandler = async () => {
     if (productDetail.variants[0]?.stock > 0) {
-      dispatch(
-        addToCart({
-          variantId: productDetail.variants[0]._id,
-          quantity,
-        })
-      );
-      if (status === "succeeded") {
-        setNotification({
-          type: "success",
-          message: `${quantity} item(s) added to cart!`,
-        });
-      }
-      if (cartError && status === "failed") {
-        setNotification({ type: "error", message: `${cartError}` });
+      try {
+        await dispatch(
+          addToCart({
+            variantId: productDetail.variants[0]._id,
+            quantity,
+          })
+        );
+        if (status === "succeeded") {
+          setNotification({
+            type: "success",
+            message: `${quantity} item(s) added to cart!`,
+          });
+
+          await dispatch(fetchCart()); // Wait for addToCart to complete, then fetch the latest cart
+        } else if (cartError && status === "failed") {
+          setNotification({ type: "error", message: `${cartError}` });
+        }
+      } catch (error) {
+        setNotification({ type: "error", message: "Something went wrong!" });
       }
     } else {
       setNotification({ type: "error", message: "Out of stock!" });
