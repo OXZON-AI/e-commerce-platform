@@ -347,6 +347,7 @@ const AdminProductManagement = () => {
     return true;
   };
 
+  // Handler for create or update product
   const handleSave = async () => {
     console.log("handleSave called");
     console.log("Form Data:", formData);
