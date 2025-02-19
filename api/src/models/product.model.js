@@ -29,6 +29,10 @@ const productSchema = new mongoose.Schema(
       type: String,
       default: "No brand",
     },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

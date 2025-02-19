@@ -51,10 +51,10 @@ const Cart = () => {
   const checkoutHandler = async (e) => {
     if (e?.preventDefault) e.preventDefault(); // Prevent errors
 
-    if (!userInfo) {
-      navigate("/login-register");
-      return;
-    }
+    // if (!userInfo) {
+    //   navigate("/login-register");
+    //   return;
+    // }
 
     if (checkoutLoading || checkoutError) {
       if (checkoutError) {

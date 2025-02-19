@@ -417,7 +417,7 @@ const AdminProductManagement = () => {
 
         await dispatch(createProduct(formattedNewProduct)).unwrap();
 
-        setSuccessMessage("Product and variant added successfully!");
+        setSuccessMessage("Product added successfully!");
       }
 
       // If update product

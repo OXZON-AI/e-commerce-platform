@@ -42,7 +42,7 @@ const AdminNavbar = () => {
       </div>
 
       {/* Middle Section - Search Bar */}
-      <div className="flex items-center space-x-3 bg-gray-800 rounded-lg px-4 py-2 w-full max-w-4xl">
+      {/* <div className="flex items-center space-x-3 bg-gray-800 rounded-lg px-4 py-2 w-full max-w-4xl">
         <MagnifyingGlassIcon className="w-5 h-5 text-gray-400" />
         <input
           type="text"
@@ -51,7 +51,7 @@ const AdminNavbar = () => {
           value={searchQuery}
           onChange={handleSearch}
         />
-      </div>
+      </div> */}
 
       {/* Right Section - User Profile & Logout Button */}
       <div className="flex items-center space-x-6 relative">

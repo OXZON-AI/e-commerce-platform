@@ -1,6 +1,6 @@
 import { Category } from "../models/category.model.js";
 
-export const buildCategoryTree = (categories) => {
+export const buildCategoryTree = (categories, role) => {
   const findChildren = (parentId) => {
     return categories
       .filter((category) => {
@@ -8,7 +8,10 @@ export const buildCategoryTree = (categories) => {
           ? category.parent.toString()
           : null;
         const searchParentId = parentId ? parentId.toString() : null;
-        return categoryParent === searchParentId;
+        return (
+          categoryParent === searchParentId &&
+          (role === "admin" || category.isActive)
+        );
       })
       .map((category) => ({
         ...category,
@@ -19,7 +22,10 @@ export const buildCategoryTree = (categories) => {
   };
 
   const rootCategories = categories
-    .filter((category) => category.parent === null)
+    .filter(
+      (category) =>
+        category.parent === null && (role === "admin" || category.isActive)
+    )
     .map((category) => ({
       ...category,
       _id: category._id.toString(),
@@ -29,14 +35,18 @@ export const buildCategoryTree = (categories) => {
   return rootCategories;
 };
 
-export const getIdsForDelete = async (parent) => {
+export const getIdsForDelete = async (parent, session = null) => {
   const idsForDelete = [parent];
   let queue = [parent];
 
   while (queue.length) {
     let currentParent = queue.pop();
 
-    const children = await Category.find({ parent: currentParent }, { _id: 1 });
+    const query = Category.find({ parent: currentParent }, { _id: 1 });
+
+    if (session) query.session(session);
+
+    const children = await query;
 
     if (children.length) {
       const childIds = children.map((child) => child._id.toString());

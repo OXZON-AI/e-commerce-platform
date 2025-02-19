@@ -21,8 +21,8 @@ const NavMenu = ({ menuWhiteClass, sidebarMenu }) => {
           </li>
 
           <li>
-            <Link to={process.env.PUBLIC_URL + "/product-list"}>
-              {t("Collection")}
+            <Link to={process.env.PUBLIC_URL + "/product-catalogue"}>
+              {t("Products")}
             </Link>
           </li>
 
