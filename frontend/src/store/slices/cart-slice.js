@@ -11,7 +11,11 @@ export const fetchCart = createAsyncThunk(
 
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch cart!");
+      console.error(
+        "Error on 'fetchCart' [cart-slice] : ",
+        error.response?.data
+      );
+      return rejectWithValue("Failed to fetch cart!");
     }
   }
 );
@@ -29,9 +33,11 @@ export const addToCart = createAsyncThunk(
 
       return { variantId, quantity, message: response.data.message };
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || "Failed to add item to cart!"
+      console.error(
+        "Error on 'addToCart' [cart-slice] : ",
+        error.response?.data
       );
+      return rejectWithValue("Failed to add item to cart!");
     }
   }
 );
@@ -46,7 +52,11 @@ export const updateCartItem = createAsyncThunk(
       });
       return { variantId, quantity, message: response.data.message };
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to update cart!");
+      console.error(
+        "Error on 'updateCartItem' [cart-slice] : ",
+        error.response?.data
+      );
+      return rejectWithValue("Failed to update cart!");
     }
   }
 );
@@ -61,9 +71,11 @@ export const removeFromCart = createAsyncThunk(
       );
       return { variantId, message: response.data.message };
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || "Failed to remove item from cart!"
+      console.error(
+        "Error on 'removeFromCart' [cart-slice] : ",
+        error.response?.data
       );
+      return rejectWithValue("Failed to remove item from cart!");
     }
   }
 );
@@ -142,7 +154,7 @@ const cartSlice = createSlice({
       })
       .addCase(updateCartItem.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload;
+        state.error = action.payload; // if erorr is not string type then take this meessage as error
       })
       .addCase(removeFromCart.pending, (state) => {
         state.status = "loading";
