@@ -49,6 +49,7 @@ export const updateCategorySchema = Joi.object({
     alt: Joi.string().trim(),
   }),
   level: Joi.number().valid(0, 1, 2),
+  isActive: Joi.boolean(),
 });
 
 export const deleteCategorySchema = Joi.object({

@@ -68,6 +68,7 @@ export const getProduct = async (req, res, next) => {
     {
       $match: {
         slug,
+        ...(role !== "admin" && { isActive: true }),
       },
     },
     {
@@ -110,6 +111,7 @@ export const getProduct = async (req, res, next) => {
         },
         ratings: 1,
         brand: 1,
+        ...(role === "admin" && { isActive: 1 }),
         variants: {
           attributes: 1,
           price: 1,
@@ -142,6 +144,8 @@ export const getProduct = async (req, res, next) => {
 };
 
 export const getProducts = async (req, res, next) => {
+  const { role } = req.user;
+
   const { error, value } = validateGetProducts(req.query);
 
   if (error) return next(error);
@@ -154,6 +158,7 @@ export const getProducts = async (req, res, next) => {
     sortOrder,
     minPrice,
     maxPrice,
+    isActive,
     page,
     limit,
   } = value;
@@ -174,9 +179,6 @@ export const getProducts = async (req, res, next) => {
             maxExpansions: 50,
           },
         },
-        count: {
-          type: "total",
-        },
       },
     });
   } else {
@@ -186,6 +188,13 @@ export const getProducts = async (req, res, next) => {
       },
     });
   }
+
+  pipeline.push({
+    $match: {
+      ...(isActive !== undefined && { isActive }),
+      ...(role !== "admin" && { isActive: true }),
+    },
+  });
 
   pipeline.push({
     $lookup: {
@@ -219,6 +228,7 @@ export const getProducts = async (req, res, next) => {
       name: 1,
       slug: 1,
       "description.short": 1,
+      ...(role === "admin" && { isActive: 1 }),
       category: {
         $arrayElemAt: [
           {
@@ -335,7 +345,7 @@ export const updateProduct = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { pid, name, description, category, brand } = value;
+  const { pid, name, description, category, brand, isActive } = value;
 
   try {
     const product = await Product.findByIdAndUpdate(
@@ -346,6 +356,7 @@ export const updateProduct = async (req, res, next) => {
           description,
           category,
           brand,
+          isActive,
         },
       },
       { new: true }

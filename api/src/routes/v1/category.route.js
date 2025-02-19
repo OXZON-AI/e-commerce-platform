@@ -7,11 +7,12 @@ import {
   getCategories,
   updateCategory,
 } from "../../controllers/category.controller.js";
+import { optionalAuth } from "../../middleware/optionalAuth.middleware.js";
 
 const route = express.Router();
 
 route.post("/", verifyToken, verifyAdmin, createCategory);
-route.get("/", getCategories);
+route.get("/", optionalAuth, getCategories);
 route.put("/:cid", verifyToken, verifyAdmin, updateCategory);
 route.delete("/:cid", verifyToken, verifyAdmin, deleteCategory);
 

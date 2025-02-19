@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Category } from "../models/category.model.js";
 import {
   buildCategoryTree,
@@ -10,6 +11,7 @@ import {
   validateDeleteCategory,
   validateUpdateCategory,
 } from "../utils/validator.util.js";
+import { Product } from "../models/product.model.js";
 
 export const createCategory = async (req, res, next) => {
   const { error, value } = validateCreateCategory(req.body);
@@ -42,12 +44,12 @@ export const createCategory = async (req, res, next) => {
 };
 
 export const getCategories = async (req, res, next) => {
-  try {
-    const categories = await Category.find()
-      .select("-createdAt -updatedAt -__v")
-      .lean();
+  const { role } = req.user;
 
-    const categoryTree = buildCategoryTree(categories);
+  try {
+    const categories = await Category.find().select("-__v").lean();
+
+    const categoryTree = buildCategoryTree(categories, role);
 
     logger.info(`Categories fetched successfully.`);
     return res.status(200).json({ categories: categoryTree });
@@ -65,10 +67,15 @@ export const updateCategory = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { cid, image, ...rest } = value;
+  const { cid, image, isActive, ...rest } = value;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     if (rest.parent) {
-      const exist = await Category.exists({ _id: rest.parent });
+      const exist = await Category.exists({ _id: rest.parent }).session(
+        session
+      );
 
       if (!exist) {
         const error = customError(404, "Parent category not found");
@@ -84,10 +91,11 @@ export const updateCategory = async (req, res, next) => {
         $set: {
           ...rest,
           ...(image && { "image.url": image.url, "image.alt": image.alt }),
+          isActive,
         },
       },
       { new: true }
-    );
+    ).session(session);
 
     if (!category) {
       const error = customError(404, "Category not found");
@@ -95,13 +103,23 @@ export const updateCategory = async (req, res, next) => {
       return next(error);
     }
 
+    await Product.updateMany({ category: cid }, { $set: { isActive } }).session(
+      session
+    );
+
+    await session.commitTransaction();
+
     logger.info(`Category with id ${cid} updated successfully`);
     return res
       .status(200)
       .json({ message: "Category updated successfully", category });
   } catch (error) {
+    await session.abortTransaction();
+
     logger.error(`Error updating category with id ${cid}: `, error);
     return next(error);
+  } finally {
+    await session.endSession();
   }
 };
 
@@ -112,12 +130,14 @@ export const deleteCategory = async (req, res, next) => {
 
   const { cid } = value;
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const ids = await getIdsForDelete(cid);
+    const ids = await getIdsForDelete(cid, session);
 
     const { deletedCount } = await Category.deleteMany({
       _id: { $in: ids },
-    });
+    }).session(session);
 
     if (!deletedCount) {
       const error = customError(404, "Category not found");
@@ -125,10 +145,21 @@ export const deleteCategory = async (req, res, next) => {
       return next(error);
     }
 
+    await Product.updateMany(
+      { category: { $in: ids } },
+      { $set: { category: null, isActive: false } }
+    ).session(session);
+
+    await session.commitTransaction();
+
     logger.info(`Category with id ${cid} deleted successfully`);
     return res.status(200).json({ message: "Category deleted successfully" });
   } catch (error) {
+    await session.abortTransaction();
+
     logger.error(`Error deleting category with id ${cid}: `, error);
     return next(error);
+  } finally {
+    await session.endSession();
   }
 };
