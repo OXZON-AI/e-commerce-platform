@@ -48,6 +48,11 @@ const LoginRegister = () => {
     };
   }, []);
 
+  // Clear errors
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch])
+
   // Helper function to validate email
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -139,50 +144,6 @@ const LoginRegister = () => {
   };
 
   // Register Form Handler
-  // const handleRegisterSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setErrors({}); // clear previous error state
-  //   clearError(null); // clear previous server error state
-
-  //   // Calling register form validation to check validations
-  //   if (!validateRegisterForm()) {
-  //     return;
-  //   }
-  //   try {
-  //     // Concatenating name
-  //     const fullName = `${firstName} ${lastName}`;
-
-  //     // ReCaptcha Token
-  //     const recaptchaToken = await executeReCaptcha(loginCaptchaRef);
-  //     if (!recaptchaToken) {
-  //       setErrors((prevErrors) => ({
-  //         ...prevErrors,
-  //         recaptcha: "ReCAPTCHA verification failed. Please try again.",
-  //       }));
-  //       return;
-  //     }
-
-  //     const userdata = {
-  //       email,
-  //       password,
-  //       name: fullName, //using concatenated value for name
-  //       phone,
-  //       token: recaptchaToken,
-  //     };
-  //     dispatch(registerUser(userdata)).unwrap();
-  //   } catch (err) {
-  //     console.error("Login Error:", err);
-  //     setErrors((prevErrors) => ({
-  //       ...prevErrors,
-  //       register:
-  //         err.response?.data?.message ||
-  //         err.message ||
-  //         "An unknown error occurred on login",
-  //     }));
-  //   }
-  // };
-
-  // Register Form Handler
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setErrors({}); // clear previous error state
@@ -230,44 +191,6 @@ const LoginRegister = () => {
     }
   };
 
-  // // Login Form Handler
-  // const handleLoginSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setErrors({});
-  //   clearError(null);
-
-  //   // Calling login form validation to check validations
-  //   if (!validateLoginForm()) {
-  //     return;
-  //   }
-
-  //   try {
-  //     // ReCaptcha Token
-  //     const recaptchaToken = await executeReCaptcha(registerCaptchaRef);
-  //     if (!recaptchaToken) {
-  //       setErrors((prevErrors) => ({
-  //         ...prevErrors,
-  //         recaptcha: "ReCAPTCHA verification failed. Please try again.",
-  //       }));
-  //       return;
-  //     }
-  //     await dispatch(loginUser({ email, password })).unwrap()
-  //     .then(() => {
-  //       toast.success("Login successful!");
-  //   })
-  //    .catch ((err) => {
-  //     console.error("Login Error:", err);
-  //     toast.error("Login failed. Please check your credentials.");  // Display error message
-  //     setErrors((prevErrors) => ({
-  //       ...prevErrors,
-  //       login:
-  //         err.response?.data?.message ||
-  //         err.message ||
-  //         "An unknown error occurred",
-  //     }));
-  //   });
-  // };
-
   // Login Form Handler
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -297,23 +220,7 @@ const LoginRegister = () => {
       toast.success("Login successful!");
     } catch (err) {
       console.error("Login Error:", err);
-      // setErrors((prevErrors) => ({
-      //   ...prevErrors,
-      //   login:
-      //     err.response?.data?.message ||
-      //     err.message ||
-      //     "An unknown error occurred",
-      // }));
-
       toast.error("Login failed. Please check your credentials."); // Display error message
-      // setErrors((prevErrors) => ({
-      //   ...prevErrors,
-      //   login:
-      //     err.response?.data?.message ||
-      //     err.message ||
-      //     "An unknown error occurred",
-      // }));
-
     }
   };
 
@@ -350,11 +257,6 @@ const LoginRegister = () => {
                           <div className="login-register-form">
                             {error && (
                               <p className="text-red-600 mb-3">{error}</p>
-                            )}
-                            {errors.login && (
-                              <p className="text-red-600 mb-3">
-                                {errors.login}
-                              </p>
                             )}
                             <form onSubmit={handleLoginSubmit}>
                               {errors.email && (
@@ -475,11 +377,6 @@ const LoginRegister = () => {
                           <div className="login-register-form">
                             {error && (
                               <p className="text-red-600 mb-3">{error}</p>
-                            )}
-                            {errors.register && (
-                              <p className="text-red-600 mb-3">
-                                {errors.register}
-                              </p>
                             )}
                             <form onSubmit={handleRegisterSubmit}>
                               {errors.firstName && (
