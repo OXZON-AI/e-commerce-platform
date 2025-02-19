@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Variant } from "../models/variant.model.js";
-import { findOrCreateCart } from "../services/cart.service.js";
+import { clearCart, findOrCreateCart } from "../services/cart.service.js";
 import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
 import {
@@ -215,6 +215,38 @@ export const updateCart = async (req, res, next) => {
     await session.abortTransaction();
 
     logger.error(`Error updating cart: `, error);
+    return next(error);
+  } finally {
+    await session.endSession();
+  }
+};
+
+export const emptyCart = async (req, res, next) => {
+  const { id, role } = req.user;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    let cart = await findOrCreateCart(id, role, session);
+
+    const bulkOperations = cart.items.map((item) => ({
+      updateOne: {
+        filter: { _id: item.variant },
+        update: { $inc: { stock: item.quantity } },
+      },
+    }));
+
+    await Variant.bulkWrite(bulkOperations, { session });
+
+    await clearCart(id, role, session);
+
+    await session.commitTransaction();
+
+    return res.status(200).json({ message: "Cart cleared successfully" });
+  } catch (error) {
+    await session.abortTransaction();
+
+    logger.error(`Error clearing cart: `, error);
     return next(error);
   } finally {
     await session.endSession();

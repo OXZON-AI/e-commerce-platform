@@ -43,7 +43,11 @@ const adminUserSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null; // Clear error state after update
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUsers.pending, (state) => {
@@ -72,4 +76,5 @@ const adminUserSlice = createSlice({
   },
 });
 
+export const { clearError } = adminUserSlice.actions;
 export default adminUserSlice.reducer;

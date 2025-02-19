@@ -13,7 +13,7 @@ const HeaderOne = ({
   borderStyle,
   headerPaddingClass,
   headerPositionClass,
-  headerBgClass
+  headerBgClass,
 }) => {
   const [scroll, setScroll] = useState(0);
   const [headerTop, setHeaderTop] = useState(0);
@@ -32,12 +32,19 @@ const HeaderOne = ({
   };
 
   return (
-    <header className={clsx("header-area clearfix", headerBgClass, headerPositionClass)}>
+    <header
+      className={clsx(
+        "header-area clearfix",
+        headerBgClass,
+        headerPositionClass
+      )}
+    >
       <div
         className={clsx(
-          "header-top-area", 
-          headerPaddingClass, top === "visible" ? "d-none d-lg-block" : "d-none", 
-          borderStyle === "fluid-border" && "border-none" 
+          "header-top-area",
+          headerPaddingClass,
+          top === "visible" ? "d-none d-lg-block" : "d-none",
+          borderStyle === "fluid-border" && "border-none"
         )}
       >
         <div className={layout === "container-fluid" ? layout : "container"}>
@@ -48,8 +55,8 @@ const HeaderOne = ({
 
       <div
         className={clsx(
-          headerPaddingClass, 
-          "sticky-bar header-res-padding clearfix", 
+          headerPaddingClass,
+          "sticky-bar header-res-padding clearfix",
           scroll > headerTop && "stick"
         )}
       >
@@ -63,7 +70,7 @@ const HeaderOne = ({
               {/* Nav menu */}
               <NavMenu />
             </div>
-            <div className="col-xl-2 col-lg-2 col-md-6 col-8">
+            <div className="col-xl-2 col-lg-2 col-md-6 col-8 ml-[-50px]">
               {/* Icon group */}
               <IconGroup />
             </div>
@@ -81,7 +88,7 @@ HeaderOne.propTypes = {
   headerPaddingClass: PropTypes.string,
   headerPositionClass: PropTypes.string,
   layout: PropTypes.string,
-  top: PropTypes.string
+  top: PropTypes.string,
 };
 
 export default HeaderOne;

@@ -9,6 +9,7 @@ import checkoutRouter from "./routes/v1/checkout.route.js";
 import reviewRouter from "./routes/v1/review.route.js";
 import orderRouter from "./routes/v1/order.route.js";
 import analyticsRouter from "./routes/v1/analytics.route.js";
+import contactRouter from "./routes/v1/contact.route.js";
 import helmet from "helmet";
 import { errorMiddleware } from "./middleware/error.middleware.js";
 import dotenv from "dotenv";
@@ -28,6 +29,9 @@ app.use(
     credentials: true,
   })
 );
+
+app.use("/v1/checkout/webhook", express.raw({ type: "application/json" }));
+
 app.use(express.json());
 app.use(
   helmet({
@@ -45,6 +49,7 @@ app.use("/v1/checkout", checkoutRouter);
 app.use("/v1/reviews", reviewRouter);
 app.use("/v1/orders", orderRouter);
 app.use("/v1/analytics", analyticsRouter);
+app.use("/v1/contact", contactRouter);
 
 app.use(errorMiddleware);
 

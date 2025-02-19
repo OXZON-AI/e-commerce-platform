@@ -7,6 +7,9 @@ import { validateCompleteCheckout } from "../utils/validator.util.js";
 import { Order } from "../models/order.model.js";
 import { customError } from "../utils/error.util.js";
 import mongoose from "mongoose";
+import "dotenv/config";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET);
 
 export const processCheckout = async (req, res, next) => {
   const { id, role } = req.user;
@@ -28,8 +31,6 @@ export const processCheckout = async (req, res, next) => {
       discount = getDiscount(user.loyaltyPoints, cart.total);
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET);
-
     const line_items = cart.items.map((item) => ({
       price_data: {
         currency: "mvr",
@@ -49,12 +50,15 @@ export const processCheckout = async (req, res, next) => {
       shipping_address_collection: {
         allowed_countries: ["MV"],
       },
-      discounts: discount.code ? [{ coupon: discount.code }] : [],
+      discounts: discount ? [{ coupon: discount.code }] : [],
       success_url: process.env.PAYMENT_SUCCESS_URL,
       cancel_url: process.env.PAYMENT_CANCEL_URL,
       metadata: {
         cartId: cart._id.toString(),
         usedPoints: discount && discount.usedPoints,
+        userId: id,
+        isGuest: role === "customer" ? false : true,
+        role,
       },
     });
 
@@ -69,96 +73,119 @@ export const processCheckout = async (req, res, next) => {
   }
 };
 
-export const completeCheckout = async (req, res, next) => {
-  const { id, role } = req.user;
-  const { error, value } = validateCompleteCheckout(req.body);
+export const handleWebhook = async (req, res, next) => {
+  const sig = req.headers["stripe-signature"];
 
-  if (error) return next(error);
+  let event;
 
-  const { session_id } = value;
-
-  const session = await mongoose.startSession();
-  session.startTransaction();
   try {
-    const stripe = new Stripe(process.env.STRIPE_SECRET);
-
-    const stripeSession = await stripe.checkout.sessions.retrieve(session_id, {
-      expand: ["payment_intent"],
-    });
-
-    const { billing_details, card } = await stripe.paymentMethods.retrieve(
-      stripeSession.payment_intent.payment_method
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
     );
-
-    if (stripeSession.payment_status !== "paid") {
-      const error = customError(400, "Payment not completed");
-      logger.error(`Payment not completed for session ${session_id}: `, error);
-      return next(error);
-    }
-
-    const cart = await findOrCreateCart(id, role, session);
-
-    const items = cart.items.map((item) => ({
-      variant: item.variant._id,
-      quantity: item.quantity,
-      subTotal: item.subTotal,
-    }));
-
-    const earnedPoints = convertToPoints(
-      stripeSession.payment_intent.amount_received
-    );
-
-    const order = new Order({
-      user: role === "customer" ? id : undefined,
-      isGuest: role === "customer" ? false : true,
-      email: stripeSession.customer_email,
-      items,
-      billing: { address: billing_details.address },
-      shipping: { address: stripeSession.shipping_details.address },
-      payment: {
-        transactionId: stripeSession.payment_intent.id,
-        amount: stripeSession.payment_intent.amount_received / 100,
-        brand: card.brand,
-        expMonth: card.exp_month,
-        expYear: card.exp_year,
-        last4: card.last4,
-        discount: stripeSession.total_details.amount_discount / 100,
-      },
-      earnedPoints,
-    });
-
-    await order.save({ session });
-    if (role === "customer") {
-      const updatedPoints = earnedPoints - stripeSession.metadata.usedPoints;
-      console.log(updatedPoints);
-
-      await User.findByIdAndUpdate(id, {
-        $inc: {
-          loyaltyPoints: updatedPoints,
-        },
-      }).session(session);
-    }
-    await clearCart(id, role, session);
-
-    await session.commitTransaction();
-
-    logger.info(`Checkout completed successfully for user ${id}.`);
-    return res.status(200).json({ message: "Checkout completed successfully" });
-  } catch (error) {
-    await session.abortTransaction();
-
-    if (error.code === 11000) {
-      const err = customError(400, "Checkout is already completed");
-      logger.error(
-        `Tried to save the order with payment id ${error.keyValue["payment.transactionId"]} again: `,
-        err
-      );
-      return next(err);
-    }
-
-    logger.error(`Error completing checkout for user ${id}: `, error);
-    return next(error);
-  } finally {
-    await session.endSession();
+  } catch (err) {
+    logger.error("Webhook signature verification failed: ", err.message);
+    return next(err);
   }
+
+  switch (event.type) {
+    case "checkout.session.completed": {
+      const session_id = event.data.object.id;
+
+      const session = await mongoose.startSession();
+      session.startTransaction();
+      try {
+        const stripeSession = await stripe.checkout.sessions.retrieve(
+          session_id,
+          {
+            expand: ["payment_intent"],
+          }
+        );
+
+        let { usedPoints, userId: id, isGuest, role } = stripeSession.metadata;
+
+        isGuest = isGuest === "true";
+
+        const { billing_details, card } = await stripe.paymentMethods.retrieve(
+          stripeSession.payment_intent.payment_method
+        );
+
+        if (stripeSession.payment_status !== "paid") {
+          const error = customError(400, "Payment not completed");
+          logger.error(
+            `Payment not completed for session ${session_id}: `,
+            error
+          );
+
+          await session.abortTransaction();
+
+          return next(error);
+        }
+
+        const cart = await findOrCreateCart(id, role, session);
+
+        const items = cart.items.map((item) => ({
+          variant: item.variant._id,
+          quantity: item.quantity,
+          subTotal: item.subTotal,
+        }));
+
+        const earnedPoints = convertToPoints(
+          stripeSession.payment_intent.amount_received
+        );
+
+        const order = new Order({
+          ...(!isGuest && { user: id }),
+          isGuest,
+          email: stripeSession.customer_details.email,
+          items,
+          billing: { address: billing_details.address },
+          shipping: { address: stripeSession.shipping_details.address },
+          payment: {
+            transactionId: stripeSession.payment_intent.id,
+            amount: stripeSession.payment_intent.amount_received / 100,
+            brand: card.brand,
+            expMonth: card.exp_month,
+            expYear: card.exp_year,
+            last4: card.last4,
+            discount: stripeSession.total_details.amount_discount / 100,
+          },
+          earnedPoints,
+        });
+
+        const { _id: oid } = await order.save({ session });
+
+        if (!isGuest) {
+          const updatedPoints = earnedPoints - usedPoints;
+
+          await User.findByIdAndUpdate(id, {
+            $inc: {
+              loyaltyPoints: updatedPoints,
+            },
+          }).session(session);
+        }
+
+        await clearCart(id, role, session);
+
+        await session.commitTransaction();
+
+        logger.info(
+          `Checkout completed successfully for user ${id} and order ${oid}.`
+        );
+      } catch (error) {
+        await session.abortTransaction();
+
+        logger.error(`Error completing checkout for user ${id}: `, error);
+        return next(error);
+      } finally {
+        await session.endSession();
+        break;
+      }
+    }
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  return res.status(200).json({ received: true });
 };

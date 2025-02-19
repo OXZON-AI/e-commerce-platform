@@ -3,12 +3,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
 import MenuCart from "./sub-components/MenuCart";
-import axios from "axios";
-import { clearUser } from "../../store/slices/user-slice";
+
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+import { clearUser, signoutUser } from "../../store/slices/user-slice";
 
 const IconGroup = ({ iconWhiteClass }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { userInfo, loading, success, error } = useSelector(
+    (state) => state.user
+  );
 
   const handleClick = (e) => {
     e.currentTarget.nextSibling.classList.toggle("active");
@@ -21,40 +27,28 @@ const IconGroup = ({ iconWhiteClass }) => {
     offcanvasMobileMenu.classList.add("active");
   };
 
-  const { cartItems } = useSelector((state) => state.cart);
+  const { items: cartItems } = useSelector((state) => state.cart);
 
-  const logoutHandler = async () => {
+  const logoutHandler = async (e) => {
+    e.preventDefault();
+
     try {
-      const response = await axios.get(
-        "http://localhost:3000/v1/auth/signout"
-      );
-      dispatch(clearUser()); // Clear the Redux user state
-      localStorage.removeItem('persist:frontend'); // Remove persisted Redux state
-      console.log(response.data.message);
-      alert('Signed out successfully!');
+      await dispatch(signoutUser()).unwrap();
+      dispatch(clearUser()); // Clear user data from Redux state
+      toast.success("Signed out successfully!"); // Success toast message
 
       navigate("/login-register"); // Redirect to login page
     } catch (error) {
-      console.error("Error logging out:", error.response?.data?.message || error.message);
-      alert('Failed to sign out. Please try again.');
+      console.error(
+        "Error logging out:",
+        error.response?.data?.message || error.message
+      );
+      toast.error("Failed to sign out. Please try again."); // Error toast message
     }
   };
 
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)}>
-      <div className="same-style header-search d-none d-lg-block">
-        <button className="search-active" onClick={(e) => handleClick(e)}>
-          <i className="pe-7s-search" />
-        </button>
-        <div className="search-content">
-          <form action="#">
-            <input type="text" placeholder="Search" />
-            <button className="button-search">
-              <i className="pe-7s-search" />
-            </button>
-          </form>
-        </div>
-      </div>
       <div className="same-style account-setting d-none d-lg-block">
         <button
           className="account-setting-active"
@@ -62,26 +56,33 @@ const IconGroup = ({ iconWhiteClass }) => {
         >
           <i className="pe-7s-user-female" />
         </button>
-        <div className="account-dropdown">
-          <ul>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/login-register"}>Login</Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/login-register"}>
-                Register
-              </Link>
-            </li>
-            <li>
-              <Link to={process.env.PUBLIC_URL + "/my-account"}>
-                my account
-              </Link>
-            </li>
 
-            <li>
-              <button onClick={logoutHandler}>Log out</button>
-            </li>
-          </ul>
+        <div className="account-dropdown">
+          {!userInfo ? (
+            <ul>
+              <li>
+                <Link to={process.env.PUBLIC_URL + "/login-register"}>
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link to={process.env.PUBLIC_URL + "/login-register"}>
+                  Register
+                </Link>
+              </li>
+            </ul>
+          ) : (
+            <ul>
+              <li>
+                <Link to={process.env.PUBLIC_URL + "/my-account"}>
+                  my account
+                </Link>
+              </li>
+              <Link to="#" onClick={logoutHandler}>
+                Log out
+              </Link>
+            </ul>
+          )}
         </div>
       </div>
 
