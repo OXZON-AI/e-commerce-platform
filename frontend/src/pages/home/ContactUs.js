@@ -1,20 +1,103 @@
-import { Fragment, React } from "react";
+import { Fragment, React, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  FaUsers,
-  FaFacebook,
-  FaTwitter,
-  FaInstagram,
-  FaMapMarkerAlt,
-  FaLinkedinIn,
-  FaPhoneAlt,
-  FaEnvelope,
-  FaClock,
-  FaQuestionCircle,
-} from "react-icons/fa";
+import { FaUsers, FaFacebook, FaTwitter, FaInstagram, FaMapMarkerAlt, FaLinkedinIn, FaPhoneAlt, FaEnvelope, FaClock, FaQuestionCircle } from "react-icons/fa";
 import LayoutOne from "../../layouts/LayoutOne";
 
+// Helper functions for validation
+const validateEmail = (email) => {
+  const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+  return regex.test(email);
+};
+
+const validateContactNumber = (contact) => {
+  const regex = /^\+960\d{7}$/; // For Maldives format: +960XXXXXXX
+  return regex.test(contact);
+};
+
+const validateSubject = (subject) => {
+  return subject.length >= 5;
+};
+
+const validateMessage = (message) => {
+  return message.length >= 20;
+};
+
 const ContactUs = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    contact: "",
+    subject: "",
+    message: "",
+  });
+
+  const [statusMessage, setStatusMessage] = useState("");
+  const [isSuccess, setIsSuccess] = useState(null);
+  
+  const [errors, setErrors] = useState({
+    email: "",
+    contact: "",
+    subject: "",
+    message: "",
+  });
+
+  // Handle form input changes and validate in real-time
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Update formData
+    setFormData({ ...formData, [name]: value });
+
+    // Real-time validation
+    let error = "";
+    if (name === "email" && !validateEmail(value)) {
+      error = "Valid email is required";
+    } else if (name === "contact" && !validateContactNumber(value)) {
+      error = "Valid contact number is required (+960XXXXXXX)";
+    } else if (name === "subject" && !validateSubject(value)) {
+      error = "Subject must be at least 5 characters long";
+    } else if (name === "message" && !validateMessage(value)) {
+      error = "Message must be at least 20 characters long";
+    }
+
+    // Update errors state for the specific field
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: error }));
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // If there are any validation errors, don't submit
+    if (Object.values(errors).some((error) => error)) {
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3000/v1/contact/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setIsSuccess(true);
+        setStatusMessage("Message sent successfully!");
+        setFormData({ name: "", email: "", contact: "", subject: "", message: "" });
+      } else {
+        setIsSuccess(false);
+        setStatusMessage(result.error || "Failed to send message.");
+      }
+    } catch (error) {
+      setIsSuccess(false);
+      setStatusMessage("An error occurred. Please try again.");
+    }
+  };
+
   return (
     <Fragment>
       <LayoutOne>
@@ -35,8 +118,7 @@ const ContactUs = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2 }}
             >
-              We are here to help you. Reach out to us and we will assist you
-              with your needs!
+              We are here to help you. Reach out to us and we will assist you with your needs!
             </motion.p>
           </section>
 
@@ -140,8 +222,8 @@ const ContactUs = () => {
               </div>
             </div>
 
+            {/* Google Maps */}
             <div className="w-full rounded-none overflow-hidden shadow-lg">
-              {/* <iframe className="w-full h-72" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3151.8354345097647!2d144.95373541531582!3d-37.81627977975139!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0xf577e8bfa5c98ab0!2sOrchid%20Magu%2C%20Thinadhoo!5e0!3m2!1sen!2smv!4v1696839243654!5m2!1sen!2smv" allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe> */}
               <iframe
                 title="Google Maps Location"
                 className="w-full h-72"
@@ -152,50 +234,105 @@ const ContactUs = () => {
               ></iframe>
             </div>
 
-            <form className="bg-white rounded-none shadow-md p-8 space-y-6 transition duration-300 hover:shadow-lg">
+            {/* Contact Form */}
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-lg shadow-md p-8 space-y-6 transition duration-300 hover:shadow-lg"
+            >
               <h2 className="text-4xl font-bold mb-4 text-gray-800 text-center">
                 Send Us a Message
               </h2>
 
               <div className="flex space-x-4">
-                <input
-                  type="text"
-                  placeholder="Your Name"
-                  className="w-1/2 p-4 border border-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                  required
-                />
-                <input
-                  type="email"
-                  placeholder="Your Email"
-                  className="w-1/2 p-4 border border-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                  required
-                />
+                <div className="w-full">
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Your Name"
+                    className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
+                    required
+                  />
+                </div>
+                <div className="w-full">
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Your Email"
+                    className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
+                    required
+                  />
+                  {errors.email && (
+                    <p className="text-red-600 text-sm mt-2">{errors.email}</p>
+                  )}
+                </div>
               </div>
 
               <div className="flex space-x-4">
-                <input
-                  type="text"
-                  placeholder="Your Contact Number"
-                  className="w-1/2 p-4 border border-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                  required
-                />
-                <input
-                  type="subject"
-                  placeholder="Subject"
-                  className="w-1/2 p-4 border border-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                  required
-                />
+                <div className="w-full">
+                  <input
+                    type="text"
+                    name="contact"
+                    value={formData.contact}
+                    onChange={handleChange}
+                    placeholder="Your Contact Number"
+                    className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
+                    required
+                  />
+                  {errors.contact && (
+                    <p className="text-red-600 text-sm mt-2">{errors.contact}</p>
+                  )}
+                </div>
+                <div className="w-full">
+                  <input
+                    type="text"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    placeholder="Subject"
+                    className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
+                    required
+                  />
+                  {errors.subject && (
+                    <p className="text-red-600 text-sm mt-2">{errors.subject}</p>
+                  )}
+                </div>
               </div>
 
-              <textarea
-                placeholder="Your Message"
-                className="w-full p-4 border border-gray-200 rounded-sm focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
-                rows="5"
-                required
-              ></textarea>
+              <div className="w-full">
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Your Message"
+                  className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
+                  rows="5"
+                  required
+                ></textarea>
+                {errors.message && (
+                  <p className="text-red-600 text-sm mt-2">{errors.message}</p>
+                )}
+              </div>
+
+              {/* Show status message */}
+              {statusMessage && (
+                <p
+                  className={`text-center text-lg font-semibold ${
+                    isSuccess ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {statusMessage}
+                </p>
+              )}
 
               <div className="flex justify-center">
-                <button className="bg-purple-600 text-white py-3 px-8 rounded-sm hover:bg-purple-700 hover:shadow-md transition duration-300">
+                <button
+                  type="submit"
+                  className="bg-purple-600 text-white py-3 px-8 rounded-lg hover:bg-purple-700 hover:shadow-md transition duration-300"
+                >
                   Submit
                 </button>
               </div>
