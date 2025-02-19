@@ -110,6 +110,7 @@ export const getProductsSchema = Joi.object({
     otherwise: Joi.number().min(1),
   }),
   maxPrice: Joi.number().min(1),
+  isActive: Joi.boolean(),
   page: Joi.number().min(1).default(1),
   limit: Joi.number().min(1).default(10),
 });
@@ -133,6 +134,7 @@ export const updateProductSchema = Joi.object({
       "string.pattern.base": "Category must be a valid ObjectId",
     }),
   brand: Joi.string().trim(),
+  isActive: Joi.boolean(),
 });
 
 export const deleteProductSchema = Joi.object({
