@@ -82,7 +82,49 @@ const MenuCart = () => {
                         className="img-fluid"
                       />
                     </div>
+
                     <div className="shopping-cart-title">
+                      <h4>{cartItem.variant?.product?.name}</h4>
+                      <h6 className="flex items-center gap-2">
+                        Qty:
+                        <div className="flex items-center">
+                          <button
+                            className="px-2 py-1 border rounded-md"
+                            onClick={() =>
+                              handleQuantityChange(
+                                cartItem.variant?._id,
+                                cartItem.quantity - 1
+                              )
+                            }
+                            disabled={cartItem.quantity === 1}
+                          >
+                            -
+                          </button>
+                          <span className="text-lg font-medium mx-2">
+                            {cartItem.quantity}
+                          </span>
+                          <button
+                            className="px-2 py-1 border rounded-md"
+                            onClick={() =>
+                              handleQuantityChange(
+                                cartItem.variant?._id,
+                                cartItem.quantity + 1
+                              )
+                            }
+                            disabled={
+                              cartItem.quantity >= cartItem.variant?.stock
+                            }
+                          >
+                            +
+                          </button>
+                        </div>
+                      </h6>
+                      <span>
+                        <span>{cartItem.subTotal.toFixed(2)} MVR</span>
+                      </span>
+                    </div>
+
+                    {/* <div className="shopping-cart-title">
                       <h4>{cartItem.variant?.product?.name}</h4>
                       <h6 className="flex items-center gap-2">
                         Qty:
@@ -102,7 +144,7 @@ const MenuCart = () => {
                       <span>
                         <span>{cartItem.subTotal.toFixed(2)} MVR</span>
                       </span>
-                    </div>
+                    </div> */}
                     <div className="shopping-cart-delete">
                       <button
                         onClick={() =>

@@ -2,6 +2,7 @@ import { Fragment, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import LayoutOne from "../../layouts/LayoutOne";
+import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import {
   clearCart,
@@ -37,6 +38,9 @@ const Cart = () => {
   const handleQuantityChange = (variantId, quantity) => {
     if (quantity < 1) return;
     dispatch(updateCartItem({ variantId, quantity }));
+    toast.success("Your shopping cart has been updated.", {
+    autoClose: 3000,  
+    });
   };
 
   const handleRemoveItem = (variantId) => {
@@ -136,19 +140,39 @@ const Cart = () => {
                         </td>
                         <td className="p-4 text-gray-700">
                           <div className="flex items-center justify-evenly">
-                            {/* Quantity input on the left side */}
-                            <input
-                              type="number"
-                              value={cartItem.quantity}
-                              min="1"
-                              onChange={(e) =>
-                                handleQuantityChange(
-                                  cartItem.variant?._id,
-                                  parseInt(e.target.value, 10)
-                                )
-                              }
-                              className="w-16 px-2 py-1 border rounded-md"
-                            />
+                            {/* Quantity Selector on the left side */}
+                            <div className="flex items-center">
+                              <button
+                                className="px-3 py-1 border rounded-md"
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    cartItem.variant?._id,
+                                    cartItem.quantity - 1
+                                  )
+                                }
+                                disabled={cartItem.quantity === 1}
+                              >
+                                -
+                              </button>
+                              <span className="text-lg font-medium mx-2">
+                                {cartItem.quantity}
+                              </span>
+                              <button
+                                className="px-3 py-1 border rounded-md"
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    cartItem.variant?._id,
+                                    cartItem.quantity + 1
+                                  )
+                                }
+                                disabled={
+                                  cartItem.quantity >= cartItem.variant?.stock
+                                }
+                              >
+                                +
+                              </button>
+                            </div>
+
                             {/* X mark icon on the right side */}
                             <button
                               onClick={() =>
