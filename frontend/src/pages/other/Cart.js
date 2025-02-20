@@ -4,6 +4,7 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import LayoutOne from "../../layouts/LayoutOne";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
+import { PuffLoader } from "react-spinners";
 import {
   clearCart,
   clearCartError,
@@ -23,6 +24,7 @@ const Cart = () => {
   const {
     items: cartItems,
     total,
+    status: cartStatus,
     error: cartError,
   } = useSelector((state) => state.cart);
   const { loading: checkoutLoading, error: checkoutError } = useSelector(
@@ -75,22 +77,6 @@ const Cart = () => {
 
     dispatch(processCheckout());
   };
-
-  // const handleQuantityChange = (id, quantity) => {
-  //   setCartItems((prevItems) =>
-  //     prevItems.map((item) =>
-  //       item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
-  //     )
-  //   );
-  // };
-
-  // const handleRemoveItem = (id) => {
-  //   setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  // };
-
-  // const clearCart = () => {
-  //   setCartItems([]);
-  // };
 
   return (
     <Fragment>
@@ -147,6 +133,9 @@ const Cart = () => {
                         <td className="p-4 text-gray-700">
                           <div className="flex items-center justify-evenly">
                             {/* Quantity Selector on the left side */}
+                            {cartStatus === "loading-update-cart" ? (
+                              <PuffLoader size={30} color="#9333ea"/>
+                            ) : null}
                             <div className="flex items-center">
                               <button
                                 className="px-3 py-1 border rounded-md"
@@ -156,7 +145,10 @@ const Cart = () => {
                                     cartItem.quantity - 1
                                   )
                                 }
-                                disabled={cartItem.quantity === 1}
+                                disabled={
+                                  cartItem.quantity === 1 ||
+                                  cartStatus === "loading-update-cart"
+                                }
                               >
                                 -
                               </button>
@@ -172,7 +164,9 @@ const Cart = () => {
                                   )
                                 }
                                 disabled={
-                                  cartItem.quantity >= cartItem.variant?.stock
+                                  cartItem.quantity >=
+                                    cartItem.variant?.stock ||
+                                  cartStatus === "loading-update-cart"
                                 }
                               >
                                 +
