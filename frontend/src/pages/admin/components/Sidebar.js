@@ -1,5 +1,11 @@
 import { Link } from "react-router-dom";
-import { HomeIcon, ArchiveBoxIcon, UserIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
+import {
+  HomeIcon,
+  ArchiveBoxIcon,
+  UserIcon,
+  ShoppingBagIcon,
+  Cog6ToothIcon,
+} from "@heroicons/react/24/outline";
 
 const Sidebar = () => {
   return (
@@ -7,25 +13,44 @@ const Sidebar = () => {
       <h2 className="text-2xl font-semibold text-gray-100 mb-6">Admin Panel</h2>
       <ul className="space-y-6">
         <li>
-          <Link to="/dashboard" className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out">
+          <Link
+            to="/dashboard"
+            className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
+          >
             <HomeIcon className="w-6 h-6 text-gray-400 hover:text-white" />
             <span className="font-medium">Dashboard</span>
           </Link>
         </li>
         <li>
-          <Link to="/admin-product" className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out">
+          <Link
+            to="/admin-product"
+            className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
+          >
             <ArchiveBoxIcon className="w-6 h-6 text-gray-400 hover:text-white" />
             <span className="font-medium">Product Management</span>
           </Link>
         </li>
-        <li>
+        {/* <li>
           <Link to="/manage-categories" className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out">
             <Cog6ToothIcon className="w-6 h-6 text-gray-400 hover:text-white" />
             <span className="font-medium">Category Management</span>
           </Link>
-        </li>
+        </li> */}
         <li>
-          <Link to="/registered-users" className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out">
+          <Link
+            to="/manage-orders"
+            className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
+          >
+            <ShoppingBagIcon className="w-6 h-6 text-gray-400 hover:text-white" />
+            <span className="font-medium">Order Management</span>
+          </Link>
+        </li>
+
+        <li>
+          <Link
+            to="/registered-users"
+            className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
+          >
             <UserIcon className="w-6 h-6 text-gray-400 hover:text-white" />
             <span className="font-medium">User Management</span>
           </Link>
