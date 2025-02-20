@@ -22,7 +22,7 @@ const ProductDetailPage = () => {
   );
   const [quantity, setQuantity] = useState(1);
   const [notification, setNotification] = useState(null);
-  const { status, error: cartError } = useSelector((state) => state.cart);
+  const { status: cartStatus, error: cartError } = useSelector((state) => state.cart);
 
   useEffect(() => {
     dispatch(fetchProductDetails(slug));
@@ -53,14 +53,14 @@ const ProductDetailPage = () => {
             quantity,
           })
         );
-        if (status === "succeeded") {
+        if (cartStatus === "succeeded-add-to-cart") {
           setNotification({
             type: "success",
             message: `${quantity} item(s) added to cart!`,
           });
 
           await dispatch(fetchCart()); // Wait for addToCart to complete, then fetch the latest cart
-        } else if (cartError && status === "failed") {
+        } else if (cartError && cartStatus === "failed-add-to-cart") {
           setNotification({ type: "error", message: `${cartError}` });
         }
       } catch (error) {
@@ -186,11 +186,11 @@ const ProductDetailPage = () => {
                     }`}
                     disabled={
                       productDetail.variants?.[0]?.stock === 0 ||
-                      status === "loading"
+                      cartStatus === "loading-add-to-cart"
                     }
                     onClick={addToCartHandler}
                   >
-                    {status === "loading" ? (
+                    {cartStatus === "loading-add-to-cart" ? (
                       <PuffLoader size={20} color="#fff" />
                     ) : productDetail.variants?.[0]?.stock > 0 ? (
                       `Add ${quantity} to Cart`
