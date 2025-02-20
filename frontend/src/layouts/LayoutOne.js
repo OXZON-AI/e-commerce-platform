@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 import { Fragment } from "react";
-import { ToastContainer } from "react-toastify";
+//import { ToastContainer } from "react-toastify";
 import HeaderOne from "../wrappers/header/HeaderOne";
 import FooterOne from "../wrappers/footer/FooterOne";
 import ScrollToTop from "../components/scroll-to-top";
@@ -14,7 +14,7 @@ const LayoutOne = ({
 }) => {
   return (
     <Fragment>
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
       <HeaderOne
         layout={headerContainerClass}
         top={headerTop}

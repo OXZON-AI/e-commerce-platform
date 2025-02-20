@@ -12,7 +12,6 @@ import MenuCart from "./components/header/sub-components/MenuCart";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const LoginRegister = lazy(() => import("./pages/other/LoginRegister"));
 const ForgotPassword = lazy(() => import("./pages/other/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/other/ResetPassword"));
@@ -194,7 +193,7 @@ const App = () => {
               element={<Unauthorized_Client_Page />}
             />
           </Routes>
-          <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+          <ToastContainer position="top-right" autoClose={3000} />
         </Suspense>
       </ScrollToTop>
     </Router>

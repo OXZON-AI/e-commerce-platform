@@ -51,7 +51,7 @@ const LoginRegister = () => {
   // Clear errors
   useEffect(() => {
     dispatch(clearError());
-  }, [dispatch])
+  }, [dispatch]);
 
   // Helper function to validate email
   const validateEmail = (email) => {
@@ -301,6 +301,7 @@ const LoginRegister = () => {
                                 >
                                   Password
                                 </label>
+
                                 <div className="relative">
                                   <input
                                     id="user-password"
@@ -311,7 +312,7 @@ const LoginRegister = () => {
                                     onChange={(e) =>
                                       setPassword(e.target.value)
                                     }
-                                    className={`w-full p-2 border rounded-md pr-10 ${
+                                    className={`w-full p-2 border rounded-md pr-12 ${
                                       errors.password
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -323,7 +324,7 @@ const LoginRegister = () => {
                                     onClick={() =>
                                       setShowPassword(!showPassword)
                                     }
-                                    className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+                                    className="absolute inset-y-1 right-4 flex justify-center p-2 text-gray-500"
                                   >
                                     {showPassword ? (
                                       <EyeOffIcon size={20} />
@@ -449,7 +450,7 @@ const LoginRegister = () => {
                                     onChange={(e) =>
                                       setPassword(e.target.value)
                                     }
-                                    className={`w-full p-2 border rounded-md pr-10 ${
+                                    className={`w-full p-2 border rounded-md pr-12 ${
                                       errors.password
                                         ? "border-red-500"
                                         : "border-gray-300"
@@ -461,7 +462,7 @@ const LoginRegister = () => {
                                     onClick={() =>
                                       setShowPassword(!showPassword)
                                     }
-                                    className="absolute inset-y-0 right-2 flex items-center text-gray-500"
+                                    className="absolute inset-y-1 right-3 flex  justify-center p-2 text-gray-500"
                                   >
                                     {showPassword ? (
                                       <EyeOffIcon size={20} />
