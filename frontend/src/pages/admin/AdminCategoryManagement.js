@@ -373,7 +373,15 @@ export default function AdminCategoryManagement() {
                       <td className="border p-3 text-sm text-gray-700">
                         {category.isActive ? "🟢 Active" : "🟡 Inactive"}
                       </td>
-                      <td className="border p-3 flex justify-center gap-4">
+                      <td className="border p-3 flex justify-center gap-4 items-center">
+                        {/* Toggle Switch */}
+                        <label className="inline-flex items-center cursor-pointer">
+                          <input type="checkbox" className="sr-only peer" />
+                          <div className="relative w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600">
+                            <div className="absolute top-[2px] start-[2px] bg-white border-gray-300 border rounded-full h-5 w-5 transition-all peer-checked:translate-x-full rtl:peer-checked:-translate-x-full peer-checked:border-white dark:border-gray-600"></div>
+                          </div>
+                        </label>
+
                         {editCategory === category._id ? (
                           <button
                             onClick={handleUpdateCategory}
