@@ -8,6 +8,7 @@ import {
   clearCart,
   clearCartError,
   fetchCart,
+  removeAllFromCart,
   removeFromCart,
   updateCartItem,
 } from "../../store/slices/cart-slice";
@@ -39,7 +40,7 @@ const Cart = () => {
     if (quantity < 1) return;
     dispatch(updateCartItem({ variantId, quantity }));
     toast.success("Your shopping cart has been updated.", {
-    autoClose: 3000,  
+      autoClose: 3000,
     });
   };
 
@@ -48,17 +49,22 @@ const Cart = () => {
   };
 
   const clearCartHandler = () => {
-    dispatch(clearCart()); // Dispatch Redux action to clear cart
+    // If cart is not empty trigger the API request for clear all items on cart
+    if (cartItems.length !== 0) {
+      dispatch(removeAllFromCart());
+    } else {
+      toast.info(
+        "Looks like your cart is on a diet—time to feed it some items! 🍕🛒",
+        {
+          autoClose: 5000,
+        }
+      );
+    }
   };
 
   // Checkout button handler - Payment Integration - Stripe Payment Gateway
   const checkoutHandler = async (e) => {
     if (e?.preventDefault) e.preventDefault(); // Prevent errors
-
-    // if (!userInfo) {
-    //   navigate("/login-register");
-    //   return;
-    // }
 
     if (checkoutLoading || checkoutError) {
       if (checkoutError) {
