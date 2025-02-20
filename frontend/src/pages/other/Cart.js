@@ -4,10 +4,12 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 import LayoutOne from "../../layouts/LayoutOne";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
+import { PuffLoader } from "react-spinners";
 import {
   clearCart,
   clearCartError,
   fetchCart,
+  removeAllFromCart,
   removeFromCart,
   updateCartItem,
 } from "../../store/slices/cart-slice";
@@ -22,6 +24,7 @@ const Cart = () => {
   const {
     items: cartItems,
     total,
+    status: cartStatus,
     error: cartError,
   } = useSelector((state) => state.cart);
   const { loading: checkoutLoading, error: checkoutError } = useSelector(
@@ -39,7 +42,7 @@ const Cart = () => {
     if (quantity < 1) return;
     dispatch(updateCartItem({ variantId, quantity }));
     toast.success("Your shopping cart has been updated.", {
-    autoClose: 3000,  
+      autoClose: 3000,
     });
   };
 
@@ -48,17 +51,22 @@ const Cart = () => {
   };
 
   const clearCartHandler = () => {
-    dispatch(clearCart()); // Dispatch Redux action to clear cart
+    // If cart is not empty trigger the API request for clear all items on cart
+    if (cartItems.length !== 0) {
+      dispatch(removeAllFromCart());
+    } else {
+      toast.info(
+        "Looks like your cart is on a diet—time to feed it some items! 🍕🛒",
+        {
+          autoClose: 5000,
+        }
+      );
+    }
   };
 
   // Checkout button handler - Payment Integration - Stripe Payment Gateway
   const checkoutHandler = async (e) => {
     if (e?.preventDefault) e.preventDefault(); // Prevent errors
-
-    // if (!userInfo) {
-    //   navigate("/login-register");
-    //   return;
-    // }
 
     if (checkoutLoading || checkoutError) {
       if (checkoutError) {
@@ -69,22 +77,6 @@ const Cart = () => {
 
     dispatch(processCheckout());
   };
-
-  // const handleQuantityChange = (id, quantity) => {
-  //   setCartItems((prevItems) =>
-  //     prevItems.map((item) =>
-  //       item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
-  //     )
-  //   );
-  // };
-
-  // const handleRemoveItem = (id) => {
-  //   setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  // };
-
-  // const clearCart = () => {
-  //   setCartItems([]);
-  // };
 
   return (
     <Fragment>
@@ -141,6 +133,9 @@ const Cart = () => {
                         <td className="p-4 text-gray-700">
                           <div className="flex items-center justify-evenly">
                             {/* Quantity Selector on the left side */}
+                            {cartStatus === "loading-update-cart" ? (
+                              <PuffLoader size={30} color="#9333ea"/>
+                            ) : null}
                             <div className="flex items-center">
                               <button
                                 className="px-3 py-1 border rounded-md"
@@ -150,7 +145,10 @@ const Cart = () => {
                                     cartItem.quantity - 1
                                   )
                                 }
-                                disabled={cartItem.quantity === 1}
+                                disabled={
+                                  cartItem.quantity === 1 ||
+                                  cartStatus === "loading-update-cart"
+                                }
                               >
                                 -
                               </button>
@@ -166,7 +164,9 @@ const Cart = () => {
                                   )
                                 }
                                 disabled={
-                                  cartItem.quantity >= cartItem.variant?.stock
+                                  cartItem.quantity >=
+                                    cartItem.variant?.stock ||
+                                  cartStatus === "loading-update-cart"
                                 }
                               >
                                 +

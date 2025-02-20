@@ -53,7 +53,9 @@ const AdminProductManagement = () => {
   const [serverError, setServerError] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
   const [deleteProductId, setDeleteProductId] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [imageLocalPreview, setImageLocalPreview] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -112,9 +114,12 @@ const AdminProductManagement = () => {
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
 
+    // set selected image to local state
+    setSelectedImage(file);
+
     // Show local preview before upload
     const previewUrl = URL.createObjectURL(file);
-    setImageUrl(previewUrl); // Temporarily show preview image
+    setImageLocalPreview(previewUrl); // Temporarily show preview image
 
     const imgFormData = new FormData();
     imgFormData.append("file", file);
@@ -231,6 +236,9 @@ const AdminProductManagement = () => {
 
     // clear server error
     setServerError("");
+    setSelectedImage(null);
+    setImageUrl("");
+    setImageLocalPreview("");
 
     // clear the form
     setFormData({
@@ -351,6 +359,9 @@ const AdminProductManagement = () => {
   const handleSave = async () => {
     console.log("handleSave called");
     console.log("Form Data:", formData);
+
+    // Clear local image preview state
+    setImageLocalPreview("");
 
     // update or not
     const isUpdating = !!productDetail;
@@ -539,6 +550,9 @@ const AdminProductManagement = () => {
       }
 
       const filterQuery = buildFilters(filters);
+      setSelectedImage(null);
+      setImageUrl("");
+      setImageLocalPreview("");
       await dispatch(fetchProducts(filterQuery));
       closeModal();
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -929,8 +943,10 @@ const AdminProductManagement = () => {
                 setFormData={setFormData}
                 addAttributeField={addAttributeField}
                 removeAttributeField={removeAttributeField}
-                imageUrl={imageUrl}
+                imageLocalPreview={imageLocalPreview}
                 handleImageUpload={handleImageUpload}
+                selectedImage={selectedImage}
+                imageUrl={imageUrl}
               />
             )}
 

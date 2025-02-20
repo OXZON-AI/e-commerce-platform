@@ -19,8 +19,10 @@ const ProductModal = ({
   setFormData,
   addAttributeField,
   removeAttributeField,
-  imageUrl,
+  imageLocalPreview,
   handleImageUpload,
+  selectedImage = { selectedImage },
+  imageUrl = { imageUrl },
 }) => {
   if (!isOpen) return null;
 
@@ -223,11 +225,11 @@ const ProductModal = ({
                 </label>
 
                 {/* Show preview near input */}
-                {imageUrl && (
+                {imageLocalPreview || formData.images[0].url && (
                   <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
                     <img
-                      src={imageUrl}
-                      alt="Selected"
+                      src={imageLocalPreview || formData.images[0].url}
+                      alt={"Selected" || formData.images[0].alt}
                       className="w-10 h-10 rounded-full border border-gray-400 object-cover"
                     />
                   </div>
@@ -312,16 +314,20 @@ const ProductModal = ({
               )}
 
               {/* Save button (appears above the loader) */}
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={loading}
-                className={`relative bg-purple-500 text-white px-5 py-3 rounded-lg hover:bg-purple-600 transition ${
-                  loading ? "opacity-50 cursor-not-allowed" : ""
-                } z-10`}
-              >
-                Save
-              </button>
+              {selectedImage && !imageUrl ? (
+                <PuffLoader size={30} color="#9333ea"/>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={loading}
+                  className={`relative bg-purple-500 text-white px-5 py-3 rounded-lg hover:bg-purple-600 transition ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  } z-10`}
+                >
+                  Save
+                </button>
+              )}
             </div>
           </div>
         </motion.div>
