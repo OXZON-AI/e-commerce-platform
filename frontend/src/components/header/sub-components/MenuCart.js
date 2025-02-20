@@ -5,28 +5,23 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   fetchCart,
   removeFromCart,
-  updateCartItem,
 } from "../../../store/slices/cart-slice";
 import {
   clearCheckoutError,
-  processCheckout,
 } from "../../../store/slices/checkout-slice";
 
 const MenuCart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // const currency = useSelector((state) => state.currency);
   const {
     items: cartItems,
     total,
+    status: cartStatus,
     error: cartError,
   } = useSelector((state) => state.cart);
-  const { loading: checkoutLoading, error: checkoutError } = useSelector(
-    (state) => state.checkout
-  );
-  const { userInfo } = useSelector((state) => state.user);
-
-  console.log("cartItems in cartmenu : ", cartItems);
+  // const { loading: checkoutLoading, error: checkoutError } = useSelector(
+  //   (state) => state.checkout
+  // );
 
   useEffect(() => {
     dispatch(clearCheckoutError()); // Clear Checkour errors on page mounting
@@ -34,9 +29,9 @@ const MenuCart = () => {
   }, [dispatch]);
 
   // quantity handler
-  const handleQuantityChange = (variantId, newQuantity) => {
-    dispatch(updateCartItem({ variantId, quantity: newQuantity }));
-  };
+  // const handleQuantityChange = (variantId, newQuantity) => {
+  //   dispatch(updateCartItem({ variantId, quantity: newQuantity }));
+  // };
 
   // cart item remove handler
   const cartItemDeleteHandler = (variantId) => {
@@ -44,23 +39,18 @@ const MenuCart = () => {
   };
 
   // Checkout button handler - Payment Integration - Stripe Payment Gateway
-  const checkoutHandler = async (e) => {
-    if (e?.preventDefault) e.preventDefault(); // Prevent errors
+  // const checkoutHandler = async (e) => {
+  //   if (e?.preventDefault) e.preventDefault(); // Prevent errors
 
-    // if (!userInfo) {
-    //   navigate("/login-register");
-    //   return;
-    // }
+  //   if (checkoutLoading || checkoutError) {
+  //     if (checkoutError) {
+  //       dispatch(processCheckout()); // Retry on error
+  //     }
+  //     return;
+  //   }
 
-    if (checkoutLoading || checkoutError) {
-      if (checkoutError) {
-        dispatch(processCheckout()); // Retry on error
-      }
-      return;
-    }
-
-    dispatch(processCheckout());
-  };
+  //   dispatch(processCheckout());
+  // };
 
   return (
     <div className="shopping-cart-content">
@@ -85,7 +75,7 @@ const MenuCart = () => {
 
                     <div className="shopping-cart-title">
                       <h4>{cartItem.variant?.product?.name}</h4>
-                      <h6 className="flex items-center gap-2">
+                      {/* <h6 className="flex items-center gap-2">
                         Qty:
                         <div className="flex items-center">
                           <button
@@ -118,33 +108,12 @@ const MenuCart = () => {
                             +
                           </button>
                         </div>
-                      </h6>
+                      </h6> */}
                       <span>
                         <span>{cartItem.subTotal.toFixed(2)} MVR</span>
                       </span>
                     </div>
 
-                    {/* <div className="shopping-cart-title">
-                      <h4>{cartItem.variant?.product?.name}</h4>
-                      <h6 className="flex items-center gap-2">
-                        Qty:
-                        <input
-                          type="number"
-                          min="1"
-                          value={cartItem.quantity}
-                          onChange={(e) =>
-                            handleQuantityChange(
-                              cartItem.variant?._id,
-                              parseInt(e.target.value)
-                            )
-                          }
-                          className="w-12 h-8 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        />
-                      </h6>
-                      <span>
-                        <span>{cartItem.subTotal.toFixed(2)} MVR</span>
-                      </span>
-                    </div> */}
                     <div className="shopping-cart-delete">
                       <button
                         onClick={() =>
@@ -170,7 +139,7 @@ const MenuCart = () => {
                 >
                   view cart
                 </Link>
-                <Link
+                {/* <Link
                   to={"#"}
                   onClick={checkoutHandler}
                   className="default-btn"
@@ -181,7 +150,7 @@ const MenuCart = () => {
                     : checkoutError
                     ? "Checkout Failed! [Try Again]"
                     : "Checkout"}
-                </Link>
+                </Link> */}
               </div>
             </Fragment>
           ) : (

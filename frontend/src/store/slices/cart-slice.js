@@ -7,7 +7,6 @@ export const fetchCart = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/v1/carts/");
-      console.log("Cart Items slice: ", response.data);
 
       return response.data;
     } catch (error) {
@@ -29,7 +28,6 @@ export const addToCart = createAsyncThunk(
         variant: variantId,
         quantity,
       });
-      console.log("add to cart in slice: ", response.data);
 
       return { variantId, quantity, message: response.data.message };
     } catch (error) {
