@@ -277,7 +277,7 @@ const ProductModal = ({
                   + Add Attribute
                 </button>
               </div>
-              <div className="flex items-center space-x-2 mt-4">
+              {/* <div className="flex items-center space-x-2 mt-4">
                 <input
                   type="checkbox"
                   name="isDefault"
@@ -290,7 +290,7 @@ const ProductModal = ({
                 <label className="text-sm font-medium text-gray-700">
                   Default Variant
                 </label>
-              </div>
+              </div> */}
             </div>
           </form>
 

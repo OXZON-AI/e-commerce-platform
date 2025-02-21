@@ -9,7 +9,7 @@ import {
 
 const Sidebar = () => {
   return (
-    <div className="w-64 h-screen bg-gray-800 text-white flex flex-col p-6 shadow-lg transition-all duration-300 ease-in-out">
+    <div className="w-64 h-full bg-gray-800 text-white flex flex-col p-6 shadow-lg transition-all duration-300 ease-in-out">
       <h2 className="text-2xl font-semibold text-gray-100 mb-6">Admin Panel</h2>
       <ul className="space-y-6">
         <li>
