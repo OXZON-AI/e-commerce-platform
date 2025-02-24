@@ -54,7 +54,7 @@ export default function AdminCategoryManagement() {
   // effect hook for asign error in state to servererror local state
   useEffect(() => {
     setServerError(errorCategory);
-  });
+  }, [errorCategory]);
 
   // setup cloudinary configuration
   const cld = new Cloudinary({
@@ -95,14 +95,6 @@ export default function AdminCategoryManagement() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCategoryData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // handler for set image url inside categoryData object
-  const handleImageChange = (e) => {
-    setCategoryData((prev) => ({
-      ...prev,
-      image: { ...prev.image, url: e.target.value },
-    }));
   };
 
   // Helper function to validate category create form

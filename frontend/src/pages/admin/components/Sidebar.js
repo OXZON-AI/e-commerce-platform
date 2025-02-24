@@ -4,7 +4,7 @@ import {
   ArchiveBoxIcon,
   UserIcon,
   ShoppingBagIcon,
-  Cog6ToothIcon,
+  // Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 
 const Sidebar = () => {

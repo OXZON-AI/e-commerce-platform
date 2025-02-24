@@ -7,9 +7,6 @@ import AdminNavbar from "./components/AdminNavbar";
 
 // imports for cloudinary image upload
 import { Cloudinary } from "@cloudinary/url-gen";
-import { auto } from "@cloudinary/url-gen/actions/resize";
-import { autoGravity } from "@cloudinary/url-gen/qualifiers/gravity";
-import { AdvancedImage } from "@cloudinary/react";
 
 // import { FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -143,7 +140,7 @@ const AdminProductManagement = () => {
   // effect hook for asign error in state to servererror local state
   useEffect(() => {
     setServerError(error);
-  });
+  }, [error]);
 
   useEffect(() => {
     const filterQuery = buildFilters(filters);
