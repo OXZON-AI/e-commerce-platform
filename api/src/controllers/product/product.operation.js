@@ -10,6 +10,7 @@ import {
   validateUpdateProduct,
 } from "../../utils/validator.util.js";
 import { customError } from "../../utils/error.util.js";
+import { cartCleanup } from "../../services/cart.service.js";
 
 export const createProduct = async (req, res, next) => {
   const { error, value } = validateCreateProduct(req.body);

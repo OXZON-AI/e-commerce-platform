@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { Variant } from "../models/variant.model.js";
-import { clearCart, findOrCreateCart } from "../services/cart.service.js";
+import {
+  clearCart,
+  findOrCreateCart,
+  removeItem,
+} from "../services/cart.service.js";
 import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
 import {
@@ -32,13 +36,40 @@ export const addToCart = async (req, res, next) => {
 
   const { variant: vid, quantity } = value;
 
+  const pipeline = [
+    [
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(`${vid}`),
+        },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "product",
+          foreignField: "_id",
+          as: "product",
+        },
+      },
+      {
+        $addFields: {
+          isActive: {
+            $ifNull: [{ $first: "$product.isActive" }, false],
+          },
+        },
+      },
+      {
+        $match: {
+          isActive: true,
+        },
+      },
+    ],
+  ];
+
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const variant = await Variant.findById(vid)
-      .select("price stock")
-      .lean()
-      .session(session);
+    const [variant] = await Variant.aggregate(pipeline).session(session);
 
     if (!variant) {
       const error = customError(404, "Variant not found");
@@ -109,28 +140,9 @@ export const removeFromCart = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    let cart = await findOrCreateCart(id, role, session);
+    const cart = await findOrCreateCart(id, role, session);
 
-    const item = cart.items.find((item) => item.variant._id == vid);
-
-    if (!item) {
-      const error = customError(404, "Item not found in cart");
-      logger.error(
-        `Item with variant id ${vid} not found in cart with id ${cart._id}: `,
-        error
-      );
-      return next(error);
-    }
-
-    cart.total -= item.subTotal;
-
-    await Variant.findByIdAndUpdate(vid, {
-      $inc: { stock: item.quantity },
-    }).session(session);
-
-    cart.items = cart.items.filter((item) => item.variant._id != vid);
-
-    await cart.save({ session });
+    await removeItem(cart, vid, session);
 
     await session.commitTransaction();
 
