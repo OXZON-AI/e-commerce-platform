@@ -38,6 +38,7 @@ export default function AdminCategoryManagement() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [imageLocalPreview, setImageLocalPreview] = useState("");
+  const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
@@ -91,6 +92,30 @@ export default function AdminCategoryManagement() {
       ...prev,
       image: { ...prev.image, url: e.target.value },
     }));
+  };
+
+  // Helper function to validate category name
+  const validateCategoryForm = () => {
+    const newErrors = {};
+
+    if (!categoryData.name) {
+      newErrors.name = "Name Required!";
+    }
+
+    if (!categoryData.description) {
+      newErrors.description = "Description Required!";
+    }
+
+    if (!categoryData.image) {
+      newErrors.image = "Image Required!";
+    }
+
+    if (!imageUrl) {
+      newErrors.image = "Image Required!";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; //If newErrors has no keys (i.e., it's an empty object {}), it returns true. If newErrors has at least one key (i.e., it contains errors), it returns false.
   };
 
   // handler for creating new category
