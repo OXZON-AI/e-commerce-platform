@@ -15,6 +15,7 @@ import Sidebar from "./components/Sidebar";
 import AdminNavbar from "./components/AdminNavbar";
 import { Cloudinary } from "@cloudinary/url-gen/index";
 import axios from "axios";
+import DeleteModal from "./Modals/DeleteModal";
 
 export default function AdminCategoryManagement() {
   const navigate = useNavigate();
@@ -41,11 +42,19 @@ export default function AdminCategoryManagement() {
   const [imageLocalPreview, setImageLocalPreview] = useState("");
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteCategoryId, setDeleteCategoryId] = useState(null);
+  const [serverError, setServerError] = useState("");
 
   useEffect(() => {
     setErrors({}); // clear error state on component mounting
     dispatch(fetchCategories());
   }, [dispatch]);
+
+  // effect hook for asign error in state to servererror local state
+  useEffect(() => {
+    setServerError(errorCategory);
+  });
 
   // setup cloudinary configuration
   const cld = new Cloudinary({
@@ -189,19 +198,6 @@ export default function AdminCategoryManagement() {
       });
   };
 
-  // handler for delete a category
-  const handleDeleteCategory = (id) => {
-    dispatch(deleteCategory(id))
-      .unwrap()
-      .then(() => {
-        setSuccessMessage("Category deleted successfully!");
-        setTimeout(() => setSuccessMessage(""), 3000);
-      })
-      .catch((error) => {
-        console.error("Error deleting category:", error);
-      });
-  };
-
   // handler for set category id to editCategory
   const handleEditCategory = (category) => {
     setEditCategory(category._id);
@@ -264,6 +260,33 @@ export default function AdminCategoryManagement() {
     }
 
     console.log("Toggled category active status : ", editIsActive);
+  };
+
+  // handler for open delete modal
+  const openDeleteModal = (categoryId) => {
+    setDeleteCategoryId(categoryId);
+    setDeleteModalOpen(true);
+  };
+
+  // handler for close delete modal
+  const closeDeleteModal = () => {
+    setServerError(""); // clear server errors when modal close
+    setDeleteModalOpen(false);
+  };
+
+  // handler for delete a category
+  const handleDeleteCategory = (id) => {
+    dispatch(deleteCategory(id))
+      .unwrap()
+      .then(() => {
+        setDeleteCategoryId(null);
+        setDeleteModalOpen(false);
+        setSuccessMessage("Category deleted successfully!");
+        setTimeout(() => setSuccessMessage(""), 3000);
+      })
+      .catch((error) => {
+        console.error("Error deleting category:", error);
+      });
   };
 
   return (
@@ -539,7 +562,7 @@ export default function AdminCategoryManagement() {
                           </button>
                         )}
                         <button
-                          onClick={() => handleDeleteCategory(category._id)}
+                          onClick={() => openDeleteModal(category._id)}
                           className="bg-red-500 text-white p-3 rounded-lg hover:bg-red-600 transition"
                         >
                           <Trash2 size={18} />
@@ -550,6 +573,17 @@ export default function AdminCategoryManagement() {
                 </tbody>
               </table>
             </div>
+
+            {deleteModalOpen && (
+              <DeleteModal
+                loading={loadingCategories}
+                deleteModalOpen={deleteModalOpen}
+                closeDeleteModal={closeDeleteModal}
+                handleDelete={handleDeleteCategory}
+                categoryId={deleteCategoryId} // add category id
+                serverError={serverError}
+              />
+            )}
           </div>
         </div>
       </div>

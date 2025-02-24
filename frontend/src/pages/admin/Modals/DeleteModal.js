@@ -8,6 +8,7 @@ const DeleteModal = ({
   closeDeleteModal,
   handleDelete,
   productId,
+  categoryId,
   serverError,
 }) => {
   if (!deleteModalOpen) return null;
@@ -26,8 +27,8 @@ const DeleteModal = ({
             <p className="text-sm font-medium text-red-700">{serverError}</p>
           </div>
         )}
-        <h3 className="text-xl font-semibold mb-4">Delete Product</h3>
-        <p className="mb-4">Are you sure you want to delete this product?</p>
+        <h3 className="text-xl font-semibold mb-4">{productId ? "Delete Product" : categoryId ? "delete category" : "No Action"}</h3>
+        <p className="mb-4">{productId ? "Are you sure you want to delete this product?" : categoryId ? "Are you sure you want to delete this category?" : "This delete popup not deleteing anything!"}</p>
         <div className="flex justify-between">
           <button
             type="button"
@@ -45,13 +46,13 @@ const DeleteModal = ({
 
             <button
               type="button"
-              onClick={() => handleDelete(productId)}
+              onClick={() => handleDelete(productId ?? categoryId)} // The ?? (Nullish Coalescing Operator) ensures that false or 0 values are not mistakenly used.
               disabled={loading}
               className={`relative bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               } z-10`}
             >
-              Save
+              Delete
             </button>
           </div>
         </div>
