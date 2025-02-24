@@ -42,6 +42,7 @@ export default function AdminCategoryManagement() {
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
+    setErrors({}); // clear error state on component mounting
     dispatch(fetchCategories());
   }, [dispatch]);
 
@@ -94,8 +95,8 @@ export default function AdminCategoryManagement() {
     }));
   };
 
-  // Helper function to validate category name
-  const validateCategoryForm = () => {
+  // Helper function to validate category create form
+  const validateCategoryCreateForm = () => {
     const newErrors = {};
 
     if (!categoryData.name) {
@@ -118,8 +119,32 @@ export default function AdminCategoryManagement() {
     return Object.keys(newErrors).length === 0; //If newErrors has no keys (i.e., it's an empty object {}), it returns true. If newErrors has at least one key (i.e., it contains errors), it returns false.
   };
 
+  // Helper function to validate category update form
+  const validateCategoryUpdateForm = () => {
+    const newErrors = {};
+
+    if (!editName) {
+      newErrors.updateName = "Name Required!";
+    }
+
+    if (!editDescription) {
+      newErrors.updateDescription = "Description Required!";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; //If newErrors has no keys (i.e., it's an empty object {}), it returns true. If newErrors has at least one key (i.e., it contains errors), it returns false.
+  };
+
   // handler for creating new category
   const handleSubmit = () => {
+    // clear previous error state
+    setErrors({});
+
+    // calling form validation handler
+    if (!validateCategoryCreateForm()) {
+      return;
+    }
+
     // format new category object with relavant data
     const formattedCategoryData = {
       name: categoryData.name,
@@ -185,6 +210,14 @@ export default function AdminCategoryManagement() {
 
   // handler for update a category
   const handleUpdateCategory = () => {
+    // clear previous error state
+    setErrors({});
+
+    // calling form validation handler
+    if (!validateCategoryUpdateForm()) {
+      return;
+    }
+
     dispatch(
       updateCategory({
         cid: editCategory,
@@ -211,6 +244,11 @@ export default function AdminCategoryManagement() {
       .catch((error) => {
         console.error("Error updating category:", error);
       });
+  };
+
+  // Cancel update form
+  const closeUpdateForm = () => {
+    setEditCategory(null);
   };
 
   return (
@@ -241,6 +279,9 @@ export default function AdminCategoryManagement() {
                 </div>
               )}
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                {errors.name && (
+                  <p className="text-red-500 text-sm">{errors.name}</p>
+                )}
                 <input
                   type="text"
                   name="name"
@@ -249,6 +290,9 @@ export default function AdminCategoryManagement() {
                   onChange={handleChange}
                   className="border p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
                 />
+                {errors.description && (
+                  <p className="text-red-500 text-sm">{errors.description}</p>
+                )}
                 <input
                   type="text"
                   name="description"
@@ -270,7 +314,9 @@ export default function AdminCategoryManagement() {
               </option>
             ))}
           </select> */}
-
+                {errors.image && (
+                  <p className="text-red-500 text-sm">{errors.image}</p>
+                )}
                 {/* Image upload button */}
                 <div className="relative w-full">
                   {/* Hidden File Input */}
@@ -387,24 +433,40 @@ export default function AdminCategoryManagement() {
                       </td>
                       <td className="border p-3 text-sm text-gray-700">
                         {editCategory === category._id ? (
-                          <input
-                            type="text"
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
-                          />
+                          <>
+                            {errors.updateName && (
+                              <p className="text-red-500 text-sm">
+                                {errors.updateName}
+                              </p>
+                            )}
+                            <input
+                              type="text"
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                              className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
+                            />
+                          </>
                         ) : (
                           category.name
                         )}
                       </td>
                       <td className="border p-3 text-sm text-gray-700">
                         {editCategory === category._id ? (
-                          <input
-                            type="text"
-                            value={editDescription}
-                            onChange={(e) => setEditDescription(e.target.value)}
-                            className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
-                          />
+                          <>
+                            {errors.updateDescription && (
+                              <p className="text-red-500 text-sm">
+                                {errors.updateDescription}
+                              </p>
+                            )}
+                            <input
+                              type="text"
+                              value={editDescription}
+                              onChange={(e) =>
+                                setEditDescription(e.target.value)
+                              }
+                              className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
+                            />
+                          </>
                         ) : (
                           category.description
                         )}
@@ -425,12 +487,20 @@ export default function AdminCategoryManagement() {
                           selectedImage && !imageUrl ? ( // If image selected and still imageUrl not recieved from cloudinary then show waiting spinner. otherwise show add category button
                             <PuffLoader size={30} color="#9333ea" />
                           ) : (
-                            <button
-                              onClick={handleUpdateCategory}
-                              className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition"
-                            >
-                              Save
-                            </button>
+                            <>
+                              <button
+                                onClick={handleUpdateCategory}
+                                className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={closeUpdateForm}
+                                className="bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-600 transition"
+                              >
+                                Cancel
+                              </button>
+                            </>
                           )
                         ) : (
                           <button
