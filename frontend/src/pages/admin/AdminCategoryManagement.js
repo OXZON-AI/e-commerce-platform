@@ -35,12 +35,15 @@ export default function AdminCategoryManagement() {
   const [editCategory, setEditCategory] = useState(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [editIsActive, setEditIsActive] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [imageLocalPreview, setImageLocalPreview] = useState("");
+  const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
+    setErrors({}); // clear error state on component mounting
     dispatch(fetchCategories());
   }, [dispatch]);
 
@@ -93,8 +96,56 @@ export default function AdminCategoryManagement() {
     }));
   };
 
+  // Helper function to validate category create form
+  const validateCategoryCreateForm = () => {
+    const newErrors = {};
+
+    if (!categoryData.name) {
+      newErrors.name = "Name Required!";
+    }
+
+    if (!categoryData.description) {
+      newErrors.description = "Description Required!";
+    }
+
+    if (!categoryData.image) {
+      newErrors.image = "Image Required!";
+    }
+
+    if (!imageUrl) {
+      newErrors.image = "Image Required!";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; //If newErrors has no keys (i.e., it's an empty object {}), it returns true. If newErrors has at least one key (i.e., it contains errors), it returns false.
+  };
+
+  // Helper function to validate category update form
+  const validateCategoryUpdateForm = () => {
+    const newErrors = {};
+
+    if (!editName) {
+      newErrors.updateName = "Name Required!";
+    }
+
+    if (!editDescription) {
+      newErrors.updateDescription = "Description Required!";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; //If newErrors has no keys (i.e., it's an empty object {}), it returns true. If newErrors has at least one key (i.e., it contains errors), it returns false.
+  };
+
   // handler for creating new category
   const handleSubmit = () => {
+    // clear previous error state
+    setErrors({});
+
+    // calling form validation handler
+    if (!validateCategoryCreateForm()) {
+      return;
+    }
+
     // format new category object with relavant data
     const formattedCategoryData = {
       name: categoryData.name,
@@ -156,10 +207,19 @@ export default function AdminCategoryManagement() {
     setEditCategory(category._id);
     setEditName(category.name);
     setEditDescription(category.description);
+    setEditIsActive(category.isActive);
   };
 
   // handler for update a category
   const handleUpdateCategory = () => {
+    // clear previous error state
+    setErrors({});
+
+    // calling form validation handler
+    if (!validateCategoryUpdateForm()) {
+      return;
+    }
+
     dispatch(
       updateCategory({
         cid: editCategory,
@@ -169,6 +229,7 @@ export default function AdminCategoryManagement() {
           url: imageUrl ? imageUrl : undefined,
           alt: "category image",
         },
+        isActive: editIsActive,
       })
     )
       .unwrap()
@@ -179,6 +240,7 @@ export default function AdminCategoryManagement() {
         setEditCategory(null);
         setEditName("");
         setEditDescription("");
+        setEditIsActive(false);
         setSuccessMessage("Category updated successfully!");
         setTimeout(() => setSuccessMessage(""), 3000);
         dispatch(fetchCategories());
@@ -186,6 +248,22 @@ export default function AdminCategoryManagement() {
       .catch((error) => {
         console.error("Error updating category:", error);
       });
+  };
+
+  // Cancel update form
+  const closeUpdateForm = () => {
+    setEditCategory(null);
+  };
+
+  // Handler for category active status toggle button
+  const handleToggle = (categoryStatus) => {
+    if (categoryStatus === false) {
+      setEditIsActive(true);
+    } else {
+      setEditIsActive(false);
+    }
+
+    console.log("Toggled category active status : ", editIsActive);
   };
 
   return (
@@ -216,6 +294,9 @@ export default function AdminCategoryManagement() {
                 </div>
               )}
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
+                {errors.name && (
+                  <p className="text-red-500 text-sm">{errors.name}</p>
+                )}
                 <input
                   type="text"
                   name="name"
@@ -224,6 +305,9 @@ export default function AdminCategoryManagement() {
                   onChange={handleChange}
                   className="border p-3 rounded-lg w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
                 />
+                {errors.description && (
+                  <p className="text-red-500 text-sm">{errors.description}</p>
+                )}
                 <input
                   type="text"
                   name="description"
@@ -245,7 +329,9 @@ export default function AdminCategoryManagement() {
               </option>
             ))}
           </select> */}
-
+                {errors.image && (
+                  <p className="text-red-500 text-sm">{errors.image}</p>
+                )}
                 {/* Image upload button */}
                 <div className="relative w-full">
                   {/* Hidden File Input */}
@@ -362,50 +448,87 @@ export default function AdminCategoryManagement() {
                       </td>
                       <td className="border p-3 text-sm text-gray-700">
                         {editCategory === category._id ? (
-                          <input
-                            type="text"
-                            value={editName}
-                            onChange={(e) => setEditName(e.target.value)}
-                            className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
-                          />
+                          <>
+                            {errors.updateName && (
+                              <p className="text-red-500 text-sm">
+                                {errors.updateName}
+                              </p>
+                            )}
+                            <input
+                              type="text"
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                              className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
+                            />
+                          </>
                         ) : (
                           category.name
                         )}
                       </td>
                       <td className="border p-3 text-sm text-gray-700">
                         {editCategory === category._id ? (
-                          <input
-                            type="text"
-                            value={editDescription}
-                            onChange={(e) => setEditDescription(e.target.value)}
-                            className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
-                          />
+                          <>
+                            {errors.updateDescription && (
+                              <p className="text-red-500 text-sm">
+                                {errors.updateDescription}
+                              </p>
+                            )}
+                            <input
+                              type="text"
+                              value={editDescription}
+                              onChange={(e) =>
+                                setEditDescription(e.target.value)
+                              }
+                              className="border p-2 rounded w-full focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
+                            />
+                          </>
                         ) : (
                           category.description
                         )}
                       </td>
                       <td className="border p-3 text-sm text-gray-700">
-                        {category.isActive ? "🟢 Active" : "🟡 Inactive"}
+                        {editCategory === category._id ? (
+                          <>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={editIsActive}
+                                onChange={() => handleToggle(editIsActive)}
+                                className="sr-only peer"
+                              />
+                              <div
+                                className={`w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer
+                                  peer-checked:bg-green-500 peer-checked:after:translate-x-5
+                                  after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white
+                                  after:border after:rounded-full after:h-4 after:w-4 after:transition-all`}
+                              ></div>
+                            </label>
+                          </>
+                        ) : category.isActive ? (
+                          "🟢 Active"
+                        ) : (
+                          "🟡 Inactive"
+                        )}
                       </td>
                       <td className="border p-3 flex justify-center gap-4 items-center">
-                        {/* Toggle Switch */}
-                        <label className="inline-flex items-center cursor-pointer">
-                          <input type="checkbox" className="sr-only peer" />
-                          <div className="relative w-11 h-6 bg-gray-200 peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600">
-                            <div className="absolute top-[2px] start-[2px] bg-white border-gray-300 border rounded-full h-5 w-5 transition-all peer-checked:translate-x-full rtl:peer-checked:-translate-x-full peer-checked:border-white dark:border-gray-600"></div>
-                          </div>
-                        </label>
-
                         {editCategory === category._id ? ( // If the editCategory has id then show save button otherwise edit button
                           selectedImage && !imageUrl ? ( // If image selected and still imageUrl not recieved from cloudinary then show waiting spinner. otherwise show add category button
                             <PuffLoader size={30} color="#9333ea" />
                           ) : (
-                            <button
-                              onClick={handleUpdateCategory}
-                              className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition"
-                            >
-                              Save
-                            </button>
+                            <>
+                              <button
+                                onClick={handleUpdateCategory}
+                                className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={closeUpdateForm}
+                                className="bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-600 transition"
+                              >
+                                Cancel
+                              </button>
+                            </>
                           )
                         ) : (
                           <button
