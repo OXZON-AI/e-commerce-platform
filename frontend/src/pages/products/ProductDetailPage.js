@@ -22,7 +22,9 @@ const ProductDetailPage = () => {
   );
   const [quantity, setQuantity] = useState(1);
   const [notification, setNotification] = useState(null);
-  const { status: cartStatus, error: cartError } = useSelector((state) => state.cart);
+  const { status: cartStatus, error: cartError } = useSelector(
+    (state) => state.cart
+  );
 
   useEffect(() => {
     dispatch(fetchProductDetails(slug));
@@ -52,17 +54,14 @@ const ProductDetailPage = () => {
             variantId: productDetail.variants[0]._id,
             quantity,
           })
-        );
-        if (cartStatus === "succeeded-add-to-cart") {
-          setNotification({
-            type: "success",
-            message: `${quantity} item(s) added to cart!`,
-          });
+        ).unwrap(); // Ensures we get the resolved response of the async thunk
 
-          await dispatch(fetchCart()); // Wait for addToCart to complete, then fetch the latest cart
-        } else if (cartError && cartStatus === "failed-add-to-cart") {
-          setNotification({ type: "error", message: `${cartError}` });
-        }
+        setNotification({
+          type: "success",
+          message: `${quantity} item(s) added to cart!`,
+        });
+
+        await dispatch(fetchCart()); // Wait for addToCart to complete, then fetch the latest cart
       } catch (error) {
         setNotification({ type: "error", message: "Something went wrong!" });
       }
