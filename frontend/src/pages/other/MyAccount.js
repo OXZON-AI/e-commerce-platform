@@ -9,6 +9,9 @@ import {
 import Accordion from "react-bootstrap/Accordion";
 import LayoutOne from "../../layouts/LayoutOne";
 
+import { toast } from "react-toastify"; // Importing Toastify
+import "react-toastify/dist/ReactToastify.css"; // Import Toastify styles
+
 const MyAccount = () => {
   const dispatch = useDispatch();
   const { userInfo, loading, error, success } = useSelector(
@@ -29,7 +32,20 @@ const MyAccount = () => {
       dispatch(clearSuccess());
       setPassword("");
       setConfirmPassword("");
+
+      // Show success toast notification when password is updated
+      toast.success("Password updated successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     }
+    
   }, [success, error, dispatch]);
 
   useEffect(() => {
@@ -114,7 +130,7 @@ const MyAccount = () => {
     if (error) {
       dispatch(clearError());
     }
-    setSuccessMessage("");
+    // setSuccessMessage("");
 
     // Check validation
     if (!validatePasswordForm()) return;
@@ -124,7 +140,7 @@ const MyAccount = () => {
     };
 
     dispatch(updateUser({ userId: userInfo._id, userData: updatedData }));
-    setSuccessMessage("Password updated successfully!");
+    // setSuccessMessage("Password updated successfully!");
 
     // Clear form1 errors when success is achieved in form2
     setForm1Errors({});
@@ -137,7 +153,7 @@ const MyAccount = () => {
           <div className="container mx-auto px-4">
             <div className="flex justify-center">
               <div className="w-full lg:w-2/3 xl:w-1/2">
-                <div className="bg-white shadow-lg rounded-xl p-8">
+                <div className="bg-white shadow-lg rounded-sm p-8">
                   <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
                     My Account
                   </h2>
@@ -159,7 +175,7 @@ const MyAccount = () => {
                     {/* Edit Account Information */}
                     <Accordion.Item
                       eventKey="0"
-                      className="rounded-lg overflow-hidden shadow-md"
+                      className="rounded-sm overflow-hidden shadow-md"
                     >
                       <Accordion.Header className="bg-gray-100 hover:bg-gray-200 transition p-4">
                         <span className="mr-2 text-gray-500 font-medium">
@@ -281,7 +297,7 @@ const MyAccount = () => {
                     {/* Change Password */}
                     <Accordion.Item
                       eventKey="1"
-                      className="rounded-lg overflow-hidden shadow-md"
+                      className="rounded-sm overflow-hidden shadow-md"
                     >
                       <Accordion.Header className="bg-gray-100 hover:bg-gray-200 transition p-4">
                         <span className="mr-2 text-gray-500 font-medium">
@@ -362,7 +378,7 @@ const MyAccount = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>       
       </LayoutOne>
     </Fragment>
   );

@@ -142,6 +142,7 @@ const App = () => {
               path={process.env.PUBLIC_URL + "/my-account"}
               element={
                 <ProtectedRoute>
+                  <ToastContainer position="bottom-right" autoClose={3000} />
                   <MyAccount />
                 </ProtectedRoute>
               }
