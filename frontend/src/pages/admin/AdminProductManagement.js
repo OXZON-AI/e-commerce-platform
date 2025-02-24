@@ -830,6 +830,9 @@ const AdminProductManagement = () => {
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
                         Brand
                       </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        Active Status
+                      </th>
                       <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
                         Actions
                       </th>
@@ -880,6 +883,13 @@ const AdminProductManagement = () => {
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
                           {product.brand || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {product.isActive === true
+                            ? "🟢 Active"
+                            : product.isActive === false
+                            ? "🟡 Inactive"
+                            : "N/A"}
                         </td>
                         <td className="px-6 py-4 text-sm text-right space-x-2">
                           <button

@@ -519,10 +519,12 @@ export default function AdminCategoryManagement() {
                               ></div>
                             </label>
                           </>
-                        ) : category.isActive ? (
+                        ) : category.isActive === true ? (
                           "🟢 Active"
-                        ) : (
+                        ) : category.isActive === false ? (
                           "🟡 Inactive"
+                        ) : (
+                          "N/A"
                         )}
                       </td>
                       <td className="border p-3 flex justify-center gap-4 items-center">
