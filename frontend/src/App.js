@@ -8,6 +8,7 @@ import UnauthorizedPage from "./pages/admin/Unauthorized_Page";
 import Unauthorized_Client_Page from "./pages/admin/Unauthorized_Client_Page";
 import ClientRouteProtector from "./components/router-protector/ClientRouteProtector";
 import MenuCart from "./components/header/sub-components/MenuCart";
+import OrderManagement from "./pages/admin/AdminOrderManagement";
 // import SampleProductDetail from "./pages/other/SampleProductDetail";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -177,6 +178,18 @@ const App = () => {
                 </AdminRouteProtector>
               }
             />
+
+              {/* Admin Order Management */}
+              <Route path="/manage-orders" element={<OrderManagement />} />
+              <Route
+              path={process.env.PUBLIC_URL + "/manage-orders"}
+              element={
+                <AdminRouteProtector>
+                  <OrderManagement />
+                </AdminRouteProtector>
+              }
+            />
+
 
             {/* Admin Category Management */}
             <Route
