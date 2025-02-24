@@ -9,8 +9,7 @@ import checkoutRouter from "./routes/v1/checkout.route.js";
 import reviewRouter from "./routes/v1/review.route.js";
 import orderRouter from "./routes/v1/order.route.js";
 import analyticsRouter from "./routes/v1/analytics.route.js";
-
-import contactRouter from "./routes/v1/contactus.routes.js"; // ✅ Added contact route
+import contactRouter from "./routes/v1/contact.route.js";
 import helmet from "helmet";
 import { errorMiddleware } from "./middleware/error.middleware.js";
 import dotenv from "dotenv";
@@ -41,8 +40,6 @@ app.use(
 );
 app.use(cookieParser());
 
-// ✅ Register the new contact route
-app.use("/v1/contact", contactRouter);
 app.use("/v1/auth", authRouter);
 app.use("/v1/users", userRouter);
 app.use("/v1/products", productRouter);
