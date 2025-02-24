@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Trash2, Edit, ArrowLeft, Upload } from "lucide-react";
+import { PuffLoader } from "react-spinners";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -34,7 +35,9 @@ export default function AdminCategoryManagement() {
   const [editCategory, setEditCategory] = useState(null);
   const [editName, setEditName] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [selectedImage, setSelectedImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
+  const [imageLocalPreview, setImageLocalPreview] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
@@ -50,9 +53,12 @@ export default function AdminCategoryManagement() {
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
 
+    // set selected image to local state
+    setSelectedImage(file);
+
     // Show local preview before upload
     const previewUrl = URL.createObjectURL(file);
-    setImageUrl(previewUrl); // For temporarily preview image
+    setImageLocalPreview(previewUrl); // For temporarily preview image
 
     const imgFormData = new FormData();
     imgFormData.append("file", file);
@@ -120,6 +126,8 @@ export default function AdminCategoryManagement() {
         });
 
         setImageUrl("");
+        setSelectedImage(null);
+        setImageLocalPreview("");
         setSuccessMessage("Category added successfully!");
         setTimeout(() => setSuccessMessage(""), 3000);
 
@@ -166,6 +174,8 @@ export default function AdminCategoryManagement() {
       .unwrap()
       .then(() => {
         setImageUrl("");
+        setSelectedImage(null);
+        setImageLocalPreview("");
         setEditCategory(null);
         setEditName("");
         setEditDescription("");
@@ -256,10 +266,10 @@ export default function AdminCategoryManagement() {
                   </label>
 
                   {/* Show preview near input */}
-                  {imageUrl && (
+                  {imageLocalPreview && (
                     <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
                       <img
-                        src={imageUrl}
+                        src={imageLocalPreview}
                         alt="Selected"
                         className="w-10 h-10 rounded-full border border-gray-400 object-cover"
                       />
@@ -267,12 +277,16 @@ export default function AdminCategoryManagement() {
                   )}
                 </div>
 
-                <button
-                  onClick={handleSubmit}
-                  className="bg-purple-500 text-white p-3 rounded-lg hover:bg-purple-600 transition w-full sm:w-auto"
-                >
-                  <Plus size={18} />
-                </button>
+                {selectedImage && !imageUrl ? (
+                  <PuffLoader size={30} color="#9333ea" />
+                ) : (
+                  <button
+                    onClick={handleSubmit}
+                    className="bg-purple-500 text-white p-3 rounded-lg hover:bg-purple-600 transition w-full sm:w-auto"
+                  >
+                    <Plus size={18} />
+                  </button>
+                )}
               </div>
 
               <table className="min-w-full border-collapse table-auto">
@@ -325,10 +339,10 @@ export default function AdminCategoryManagement() {
                             </label>
 
                             {/* Show preview near input */}
-                            {imageUrl && (
+                            {imageLocalPreview && (
                               <div className="absolute top-1/2 justify-center transform -translate-y-1/2">
                                 <img
-                                  src={imageUrl}
+                                  src={imageLocalPreview}
                                   alt="Selected"
                                   className="w-10 h-10 border rounded-2 m-auto border-gray-400 object-cover"
                                 />
@@ -382,13 +396,17 @@ export default function AdminCategoryManagement() {
                           </div>
                         </label>
 
-                        {editCategory === category._id ? (
-                          <button
-                            onClick={handleUpdateCategory}
-                            className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition"
-                          >
-                            Save
-                          </button>
+                        {editCategory === category._id ? ( // If the editCategory has id then show save button otherwise edit button
+                          selectedImage && !imageUrl ? ( // If image selected and still imageUrl not recieved from cloudinary then show waiting spinner. otherwise show add category button
+                            <PuffLoader size={30} color="#9333ea" />
+                          ) : (
+                            <button
+                              onClick={handleUpdateCategory}
+                              className="bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition"
+                            >
+                              Save
+                            </button>
+                          )
                         ) : (
                           <button
                             onClick={() => handleEditCategory(category)}
