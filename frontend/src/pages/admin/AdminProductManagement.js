@@ -336,6 +336,11 @@ const AdminProductManagement = () => {
       return false;
     }
 
+    if (!imageUrl) {
+      alert("Product Image Required!");
+      return false;
+    }
+
     return true;
   };
 
