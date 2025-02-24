@@ -9,26 +9,26 @@ const validateEmail = (email) => {
   return regex.test(email);
 };
 
-const validateContactNumber = (contact) => {
+const validateContactNumber = (phone) => {
   const regex = /^\+960\d{7}$/; // For Maldives format: +960XXXXXXX
-  return regex.test(contact);
+  return regex.test(phone);
 };
 
 const validateSubject = (subject) => {
   return subject.length >= 5;
 };
 
-const validateMessage = (message) => {
-  return message.length >= 20;
+const validateMessage = (inquiry) => {
+  return inquiry.length >= 20;
 };
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    contact: "",
+    phone: "",
     subject: "",
-    message: "",
+    inquiry: "",
   });
 
   const [statusMessage, setStatusMessage] = useState("");
@@ -36,9 +36,9 @@ const ContactUs = () => {
   
   const [errors, setErrors] = useState({
     email: "",
-    contact: "",
+    phone: "",
     subject: "",
-    message: "",
+    inquiry: "",
   });
 
   // Handle form input changes and validate in real-time
@@ -52,11 +52,11 @@ const ContactUs = () => {
     let error = "";
     if (name === "email" && !validateEmail(value)) {
       error = "Valid email is required";
-    } else if (name === "contact" && !validateContactNumber(value)) {
+    } else if (name === "phone" && !validateContactNumber(value)) {
       error = "Valid contact number is required (+960XXXXXXX)";
     } else if (name === "subject" && !validateSubject(value)) {
       error = "Subject must be at least 5 characters long";
-    } else if (name === "message" && !validateMessage(value)) {
+    } else if (name === "inquiry" && !validateMessage(value)) {
       error = "Message must be at least 20 characters long";
     }
 
@@ -87,7 +87,7 @@ const ContactUs = () => {
       if (response.ok) {
         setIsSuccess(true);
         setStatusMessage("Message sent successfully!");
-        setFormData({ name: "", email: "", contact: "", subject: "", message: "" });
+        setFormData({ name: "", email: "", phone: "", subject: "", inquiry: "" });
       } else {
         setIsSuccess(false);
         setStatusMessage(result.error || "Failed to send message.");
@@ -275,15 +275,15 @@ const ContactUs = () => {
                 <div className="w-full">
                   <input
                     type="text"
-                    name="contact"
-                    value={formData.contact}
+                    name="phone"
+                    value={formData.phone}
                     onChange={handleChange}
                     placeholder="Your Contact Number"
                     className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
                     required
                   />
-                  {errors.contact && (
-                    <p className="text-red-600 text-sm mt-2">{errors.contact}</p>
+                  {errors.phone && (
+                    <p className="text-red-600 text-sm mt-2">{errors.phone}</p>
                   )}
                 </div>
                 <div className="w-full">
@@ -304,16 +304,16 @@ const ContactUs = () => {
 
               <div className="w-full">
                 <textarea
-                  name="message"
-                  value={formData.message}
+                  name="inquiry"
+                  value={formData.inquiry}
                   onChange={handleChange}
                   placeholder="Your Message"
                   className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
                   rows="5"
                   required
                 ></textarea>
-                {errors.message && (
-                  <p className="text-red-600 text-sm mt-2">{errors.message}</p>
+                {errors.inquiry && (
+                  <p className="text-red-600 text-sm mt-2">{errors.inquiry}</p>
                 )}
               </div>
 

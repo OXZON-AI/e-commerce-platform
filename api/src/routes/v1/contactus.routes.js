@@ -11,9 +11,9 @@ const isValidMaldivianPhone = (phone) => {
 };
 router.post("/send-email", async (req, res) => {
   try {
-    const { name, email, contact, subject, message } = req.body;
+    const { name, email, phone, subject, inquiry } = req.body;
     // 1. Validate required fields
-    if (!name || !email || !contact || !subject || !message) {
+    if (!name || !email || !phone || !subject || !inquiry) {
       return res.status(400).json({ error: "All fields are required" });
     }
     // 2. Validate email format
@@ -21,11 +21,11 @@ router.post("/send-email", async (req, res) => {
       return res.status(400).json({ error: "Invalid email format" });
     }
     // 3. Validate Maldivian phone number
-    if (!isValidMaldivianPhone(contact)) {
+    if (!isValidMaldivianPhone(phone)) {
       return res.status(400).json({ error: "Invalid phone number. Please use a valid Maldivian phone number." });
     }
     // 4. Validate message length
-    if (!validator.isLength(message, { min: 20 })) {
+    if (!validator.isLength(inquiry, { min: 20 })) {
       return res.status(400).json({ error: "Message must be at least 20 characters long" });
     }
     // 5. Validate subject length
@@ -52,12 +52,12 @@ router.post("/send-email", async (req, res) => {
       from: `"${name}" <${email}>`, // Properly formatted sender info
       to: process.env.MAILER_EMAIL,
       subject: `New Contact Form Submission: ${subject}`,
-      text: `Name: ${name}\nEmail: ${email}\nContact: ${contact}\n\nMessage:\n${message}`,
+      text: `Name: ${name}\nEmail: ${email}\nContact: ${phone}\n\nMessage:\n${inquiry}`,
     };
     // Send email
     const info = await transporter.sendMail(mailOptions);
     console.log("Email sent:", info.response);
-    res.status(200).json({ message: "Email sent successfully!" });
+    res.status(200).json({ inquiry: "Email sent successfully!" });
   } catch (error) {
     console.error("Error sending email:", error);
     res.status(500).json({ error: "Failed to send email" });
