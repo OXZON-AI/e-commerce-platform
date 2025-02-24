@@ -89,15 +89,39 @@ const HomeElectronics = () => {
     pauseOnHover: true,
   };
 
+  const offers = [
+    {
+      id: 1,
+      title: "Limited-Time Offer",
+      description: "Get up to 50% off on select items!",
+      image: "https://dummyimage.com/400x250/FF9D8B/fff",
+      link: "/shop-now",
+    },
+    {
+      id: 2,
+      title: "Buy 1 Get 1 Free",
+      description: "Exclusive BOGO offer on selected products!",
+      image: "https://dummyimage.com/400x250/64B1EF/fff",
+      link: "/bogo-deals",
+    },
+    {
+      id: 3,
+      title: "Flash Sale!",
+      description: "Limited stocks available, hurry up!",
+      image: "https://dummyimage.com/400x250/65F565/fff",
+      link: "/flash-sale",
+    },
+  ];
+
   return (
     <Fragment>
       <LayoutOne>
         <div className="bg-gray-100">
           {/* Hero Section with Swiping Images */}
 
-          <div className="relative w-full h-[600px] overflow-hidden">
-            {/* Image Slider */}
-            <Slider {...sliderSettings}>
+          {/* <div className="relative w-full h-[600px] overflow-hidden"> */}
+          {/* Image Slider */}
+          {/* <Slider {...sliderSettings}>
               <div className="w-full h-full">
                 <img
                   src="https://dummyimage.com/1920x600/ff6347/fff"
@@ -133,15 +157,42 @@ const HomeElectronics = () => {
                   className="w-full h-full object-cover object-center transition-transform transform hover:scale-110 duration-700"
                 />
               </div>
-            </Slider>
+            </Slider> */}
 
-            {/* Animated Text Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center text-white text-center bg-gradient-to-b from-purple-800 to-transparent p-6">
+          {/* Animated Text Overlay */}
+          {/* <div className="absolute inset-0 flex items-center justify-center text-white text-center bg-gradient-to-b from-purple-800 to-transparent p-6">
               <div className="space-y-4 animate-fade-down">
                 <h1 className="text-5xl font-extrabold animate-slide-down">
                   Discover the Future of Electronics
                 </h1>
                 <p className="text-lg animate-slide-down-delay">
+                  Exclusive gadgets & unbeatable deals.
+                </p>
+                <button className="mt-6 px-8 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
+                  Shop Now
+                </button>
+              </div>
+            </div>
+          </div> */}
+
+          {/* Hero Section with Swiping Images */}
+          <div className="relative w-full h-[500px] sm:h-[600px] lg:h-[700px] overflow-hidden">
+            {/* Static Images */}
+            <div className="w-full h-full">
+              <img
+                src="https://dummyimage.com/1920x600/ff6347/fff"
+                alt="Hero 1"
+                className="w-full h-full object-cover object-center transition-transform transform hover:scale-110 duration-700"
+              />
+            </div>
+
+            {/* Text Overlay */}
+            <div className="absolute inset-0 flex items-center justify-center text-white text-center bg-gradient-to-b from-purple-800 to-transparent p-6">
+              <div className="space-y-4 animate-fade-down">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold animate-slide-down">
+                  Discover the Future of Electronics
+                </h1>
+                <p className="text-lg sm:text-xl lg:text-2xl animate-slide-down-delay">
                   Exclusive gadgets & unbeatable deals.
                 </p>
                 <button className="mt-6 px-8 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
@@ -235,7 +286,7 @@ const HomeElectronics = () => {
           </div>
 
           {/* Promotional Banner */}
-          <div
+          {/* <div
             className="relative w-full h-[300px] bg-cover bg-center flex items-center justify-center text-white text-center transition-all duration-300 hover:bg-opacity-70"
             style={{
               backgroundImage:
@@ -249,61 +300,32 @@ const HomeElectronics = () => {
                 Shop Now
               </button>
             </div>
-          </div>
+          </div> */}
 
-          {/* Testimonials with Auto Swiping Effect */}
-          <div className="container mx-auto py-12">
+          <div className="container mx-auto px-4 py-8">
             <h2 className="text-3xl font-bold text-center mb-6">
-              Customer Reviews
+              Ongoing Offers
             </h2>
-            <Slider
-              {...{
-                autoplay: true, // Enables auto sliding
-                autoplaySpeed: 3000, // Time between slides (in milliseconds)
-                infinite: true, // Loops the slides infinitely
-                slidesToShow: 1, // Number of slides to show at a time
-                slidesToScroll: 1, // Number of slides to scroll at a time
-                arrows: true, // Display arrows for navigation
-                dots: true, // Show navigation dots below the slider
-                speed: 500, // Speed of transition between slides
-                pauseOnHover: true, // Pauses the sliding when the user hovers over the slider
-              }}
-            >
-              {[
-                { text: "Great product! Highly recommend.", rating: 5 },
-                { text: "Amazing quality, will buy again!", rating: 4 },
-                {
-                  text: "Satisfactory experience, good value for money.",
-                  rating: 4,
-                },
-                {
-                  text: "Excellent customer service and fast delivery.",
-                  rating: 5,
-                },
-                {
-                  text: "It exceeded my expectations, totally worth it!",
-                  rating: 5,
-                },
-                { text: "Good product but needs some improvement.", rating: 3 },
-              ].map((review, index) => (
+            <div className="grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-8">
+              {offers.map((offer) => (
                 <div
-                  key={index}
-                  className=" p-6 rounded-none shadow-none hover:shadow-xl transition-transform transform hover:scale-110 duration-300 ease-in-out flex flex-col items-center"
+                  key={offer.id}
+                  className="relative bg-cover bg-center rounded-sm overflow-hidden shadow-lg transition-transform transform hover:scale-105 h-[400px]"
+                  style={{ backgroundImage: `url(${offer.image})` }}
                 >
-                  <p className="text-gray-700 italic text-center text-xl md:text-2xl">
-                    “{review.text}”
-                  </p>
-                  <div className="flex mt-3 items-center justify-center">
-                    {Array.from({ length: review.rating }).map((_, i) => (
-                      <Star key={i} className="text-yellow-500" />
-                    ))}
-                    {Array.from({ length: 5 - review.rating }).map((_, i) => (
-                      <Star key={i} className="text-gray-300" />
-                    ))}
+                  <div className="bg-black bg-opacity-50 p-8 h-full flex flex-col justify-center items-center text-white text-center">
+                    <h3 className="text-2xl font-semibold">{offer.title}</h3>
+                    <p className="text-lg mt-2">{offer.description}</p>
+                    <a
+                      href={offer.link}
+                      className="mt-4 px-6 py-2 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition duration-300 ease-in-out"
+                    >
+                      Shop Now
+                    </a>
                   </div>
                 </div>
               ))}
-            </Slider>
+            </div>
           </div>
 
           {/* Brand Logos */}
