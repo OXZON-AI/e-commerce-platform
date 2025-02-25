@@ -7,9 +7,6 @@ import AdminNavbar from "./components/AdminNavbar";
 
 // imports for cloudinary image upload
 import { Cloudinary } from "@cloudinary/url-gen";
-import { auto } from "@cloudinary/url-gen/actions/resize";
-import { autoGravity } from "@cloudinary/url-gen/qualifiers/gravity";
-import { AdvancedImage } from "@cloudinary/react";
 
 // import { FiUpload } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
@@ -143,7 +140,7 @@ const AdminProductManagement = () => {
   // effect hook for asign error in state to servererror local state
   useEffect(() => {
     setServerError(error);
-  });
+  }, [error]);
 
   useEffect(() => {
     const filterQuery = buildFilters(filters);
@@ -333,6 +330,11 @@ const AdminProductManagement = () => {
 
     if (!formData.images) {
       alert("Each product must have at least one image!");
+      return false;
+    }
+
+    if (!imageUrl) {
+      alert("Product Image Required!");
       return false;
     }
 
@@ -828,6 +830,9 @@ const AdminProductManagement = () => {
                       <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
                         Brand
                       </th>
+                      <th className="px-6 py-4 text-left text-sm font-medium text-gray-600">
+                        Active Status
+                      </th>
                       <th className="px-6 py-4 text-right text-sm font-medium text-gray-600">
                         Actions
                       </th>
@@ -878,6 +883,13 @@ const AdminProductManagement = () => {
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
                           {product.brand || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {product.isActive === true
+                            ? "🟢 Active"
+                            : product.isActive === false
+                            ? "🟡 Inactive"
+                            : "N/A"}
                         </td>
                         <td className="px-6 py-4 text-sm text-right space-x-2">
                           <button

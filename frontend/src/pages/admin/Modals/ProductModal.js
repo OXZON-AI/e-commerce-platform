@@ -21,8 +21,8 @@ const ProductModal = ({
   removeAttributeField,
   imageLocalPreview,
   handleImageUpload,
-  selectedImage = { selectedImage },
-  imageUrl = { imageUrl },
+  selectedImage,
+  imageUrl,
 }) => {
   if (!isOpen) return null;
 
@@ -225,7 +225,7 @@ const ProductModal = ({
                 </label>
 
                 {/* Show preview near input */}
-                {imageLocalPreview || formData.images[0].url && (
+                {(imageLocalPreview || formData.images[0].url) && (
                   <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
                     <img
                       src={imageLocalPreview || formData.images[0].url}
@@ -315,7 +315,7 @@ const ProductModal = ({
 
               {/* Save button (appears above the loader) */}
               {selectedImage && !imageUrl ? (
-                <PuffLoader size={30} color="#9333ea"/>
+                <PuffLoader size={30} color="#9333ea" />
               ) : (
                 <button
                   type="button"
