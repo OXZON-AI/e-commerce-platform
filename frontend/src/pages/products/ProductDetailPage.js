@@ -34,18 +34,6 @@ const ProductDetailPage = () => {
     };
   }, [slug, dispatch]);
 
-  const increaseQuantity = () => {
-    if (quantity < productDetail.variants[0]?.stock) {
-      setQuantity(quantity + 1);
-    }
-  };
-
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
-
   const addToCartHandler = async () => {
     if (productDetail.variants[0]?.stock > 0) {
       try {
@@ -160,43 +148,30 @@ const ProductDetailPage = () => {
                 ) : (
                   <p className="text-red-500 font-medium mb-4">Out of Stock</p>
                 )}
-                <div className="flex items-center gap-4 mb-4">
-                  <button
-                    className="px-3 py-1 border rounded-md"
-                    onClick={decreaseQuantity}
-                    disabled={quantity === 1}
-                  >
-                    -
-                  </button>
-                  <span className="text-lg font-medium">{quantity}</span>
-                  <button
-                    className="px-3 py-1 border rounded-md"
-                    onClick={increaseQuantity}
-                    disabled={quantity >= productDetail.variants?.[0]?.stock}
-                  >
-                    +
-                  </button>
 
-                  <button
-                    className={`px-4 py-2 rounded-none text-white font-medium ${
-                      productDetail.variants?.[0]?.stock > 0
-                        ? "bg-purple-600 hover:bg-purple-700"
-                        : "bg-gray-400 cursor-not-allowed"
-                    }`}
-                    disabled={
-                      productDetail.variants?.[0]?.stock === 0 ||
-                      cartStatus === "loading-add-to-cart"
-                    }
-                    onClick={addToCartHandler}
-                  >
-                    {cartStatus === "loading-add-to-cart" ? (
-                      <PuffLoader size={20} color="#fff" />
-                    ) : productDetail.variants?.[0]?.stock > 0 ? (
-                      `Add ${quantity} to Cart`
-                    ) : (
-                      "Unavailable"
-                    )}
-                  </button>
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="ml-auto">
+                    <button
+                      className={`px-4 py-2 rounded-none text-white font-medium ${
+                        productDetail.variants?.[0]?.stock > 0
+                          ? "bg-purple-600 hover:bg-purple-700"
+                          : "bg-gray-400 cursor-not-allowed"
+                      }`}
+                      disabled={
+                        productDetail.variants?.[0]?.stock === 0 ||
+                        cartStatus === "loading-add-to-cart"
+                      }
+                      onClick={addToCartHandler}
+                    >
+                      {cartStatus === "loading-add-to-cart" ? (
+                        <PuffLoader size={20} color="#fff" />
+                      ) : productDetail.variants?.[0]?.stock > 0 ? (
+                        "Add to Cart"
+                      ) : (
+                        "Unavailable"
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

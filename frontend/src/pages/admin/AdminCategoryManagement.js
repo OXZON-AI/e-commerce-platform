@@ -46,6 +46,13 @@ export default function AdminCategoryManagement() {
   const [deleteCategoryId, setDeleteCategoryId] = useState(null);
   const [serverError, setServerError] = useState("");
 
+
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleToggle = () => {
+    setIsChecked((prev) => !prev);
+  };
+
   useEffect(() => {
     setErrors({}); // clear error state on component mounting
     dispatch(fetchCategories());

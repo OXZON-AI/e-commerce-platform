@@ -10,7 +10,6 @@ import {
   FaPhoneAlt,
   FaEnvelope,
   FaClock,
-  FaQuestionCircle,
 } from "react-icons/fa";
 import LayoutOne from "../../layouts/LayoutOne";
 
@@ -201,7 +200,7 @@ const ContactUs = () => {
               </div>
             </form>
 
-            <div className="mt-6 flex space-x-4 justify-start">
+            {/* <div className="mt-6 flex space-x-4 justify-start">
               <a
                 href="http://localhost:5000/faqs"
                 className="text-blue-600 font-bold text-xl flex items-center gap-2 hover:text-blue-800 transition-all duration-300"
@@ -209,7 +208,7 @@ const ContactUs = () => {
                 <FaQuestionCircle className="text-2xl" />
                 FAQs
               </a>
-            </div>
+            </div> */}
           </section>
         </div>
       </LayoutOne>
