@@ -897,7 +897,15 @@ const AdminProductManagement = () => {
                           {product.defaultVariant?.price || "N/A"} MVR
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
-                          {product.defaultVariant?.stock || "N/A"}
+                          {product.defaultVariant?.stock ? (
+                            <div className="border-1 border-blue-500 bg-blue-100 text-blue-600 px-2 py-1 rounded">
+                              {product.defaultVariant.stock}
+                            </div>
+                          ) : (
+                            <div className="border-1 border-red-500 bg-red-100 text-red-600 px-2 py-1 rounded">
+                              Out of Stock!
+                            </div>
+                          )}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
                           {product.category?.name || "N/A"}
