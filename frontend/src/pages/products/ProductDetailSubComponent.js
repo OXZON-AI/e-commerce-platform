@@ -53,20 +53,24 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         {activeTab === "specs" && (
           <div>
             <p>
-              <strong>Brand:</strong> {prodDetails.brand}
+              <strong>Brand</strong> &nbsp;&nbsp; : &nbsp;&nbsp; {prodDetails.brand}
             </p>
             <p>
-              <strong>Category:</strong> {prodDetails.category?.name}
+              <strong>Category</strong> &nbsp;&nbsp; : &nbsp;&nbsp; {prodDetails.category?.name}
             </p>
 
             {prodDetails &&
-              prodDetails.variants?.[0]?.attributes.map((attr) => (
-                <p>
-                  <strong>{attr.name} :</strong> {attr.value}
-                </p>
-              ))}
-          </div>
-        )}
+      prodDetails.variants?.[0]?.attributes.map((attr) => (
+        <p key={attr.name}>
+          <strong>
+            {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
+          </strong> 
+          &nbsp;&nbsp; : &nbsp;&nbsp; 
+          {attr.value}
+        </p>
+      ))}
+  </div>
+)}
         {activeTab === "description" && (
           <p>{prodDetails.description.detailed}</p>
         )}
