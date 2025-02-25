@@ -23,6 +23,7 @@ import {
 } from "./validationSchemas/category.schema.js";
 import { completeCheckoutSchema } from "./validationSchemas/checkout.schema.js";
 import { contactSchema } from "./validationSchemas/contact.schema.js";
+import { subscribeSchema } from "./validationSchemas/news.schema.js";
 import {
   cancelOrderSchema,
   getOrdersSchema,
@@ -81,3 +82,4 @@ export const validateRelatedProducts = validate(relatedProductsSchema);
 export const validateSalesSummary = validate(salesSummarySchema);
 export const validateSalesPerformance = validate(salesPerformanceSchema);
 export const validateContact = validate(contactSchema);
+export const validateSubscribe = validate(subscribeSchema);
