@@ -27,7 +27,7 @@ const FooterOne = ({
       )}
     >
       <div className={`${containerClass ? containerClass : "container"}`}>
-        <div className="row">
+        <div className="row justify-content-center">
           <div
             className={`${
               sideMenu ? "col-xl-2 col-sm-4" : "col-lg-2 col-sm-4"
@@ -46,34 +46,6 @@ const FooterOne = ({
               sideMenu ? "col-xl-2 col-sm-4" : "col-lg-2 col-sm-4"
             }`}
           >
-            <div className="footer-widget mb-30 ml-30">
-              <div className="footer-title">
-                <h3>ABOUT US</h3>
-              </div>
-              <div className="footer-list">
-                <ul>
-                  <li>
-                    <Link to={process.env.PUBLIC_URL + "/about"}>About us</Link>
-                  </li>
-                  <li>
-                    <Link to={process.env.PUBLIC_URL + "#/"}>
-                      Store location
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={process.env.PUBLIC_URL + "/contact"}>
-                      Contact
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div
-            className={`${
-              sideMenu ? "col-xl-2 col-sm-4" : "col-lg-2 col-sm-4"
-            }`}
-          >
             <div
               className={`${
                 sideMenu
@@ -86,15 +58,15 @@ const FooterOne = ({
               </div>
               <div className="footer-list">
                 <ul>
-                  <li>
-                    <Link to={process.env.PUBLIC_URL + "#/"}>Returns</Link>
+
+                <li>
+                    <Link to={process.env.PUBLIC_URL + "/about"}>About us</Link>
                   </li>
                   <li>
-                    <Link to={process.env.PUBLIC_URL + "#/"}>
-                      Support Policy
+                    <Link to={process.env.PUBLIC_URL + "/contact"}>
+                      Contact
                     </Link>
                   </li>
-
                   <li>
                     <Link to={process.env.PUBLIC_URL + "/faqs"}>FAQs</Link>
                   </li>
