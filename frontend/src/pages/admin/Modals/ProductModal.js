@@ -284,25 +284,29 @@ const ProductModal = ({
                   + Add Attribute
                 </button>
               </div>
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-gray-700 ">
-                  Active Status
-                </label>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.isActive}
-                    onChange={() => handleToggle(formData.isActive)}
-                    className="sr-only peer"
-                  />
-                  <div
-                    className={`w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer
+              {/* if update form load show active status otherwise  dont show */}
+              {formData.name ? (
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700 ">
+                    Active Status
+                  </label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.isActive}
+                      onChange={() => handleToggle(formData.isActive)}
+                      className="sr-only peer"
+                    />
+                    <div
+                      className={`w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer
                                   peer-checked:bg-green-500 peer-checked:after:translate-x-5
                                   after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white
                                   after:border after:rounded-full after:h-4 after:w-4 after:transition-all`}
-                  ></div>
-                </label>
-              </div>
+                    ></div>
+                  </label>
+                </div>
+              ) : null}
+
               {/* <div className="flex items-center space-x-2 mt-4">
                 <input
                   type="checkbox"
