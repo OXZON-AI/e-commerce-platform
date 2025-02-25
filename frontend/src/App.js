@@ -22,6 +22,7 @@ const ProductListPage = lazy(() => import("./pages/products/ProductListPage"));
 const ProductDetailPage = lazy(() =>
   import("./pages/products/ProductDetailPage")
 );
+const OrderHistory = lazy(() => import("./pages/products/OrderHistory"));
 
 //success_fail
 const PaymentSuccess = lazy(() => import("./pages/other/PaymentSuccess"));
@@ -93,6 +94,11 @@ const App = () => {
             <Route
               path={process.env.PUBLIC_URL + "/"}
               element={<HomeElectronics />}
+            />
+
+            <Route
+              path={process.env.PUBLIC_URL + "/order-history"}
+              element={<OrderHistory />}
             />
 
             <Route
