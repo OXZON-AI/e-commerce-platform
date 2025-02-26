@@ -18,6 +18,23 @@ export const fetchOrders = createAsyncThunk(
   }
 );
 
+// Async thunk to update order status
+export const updateOrderStatus = createAsyncThunk(
+  "orders/updateOrderStatus",
+  async ({ oid, status }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.patch(`/v1/orders/${oid}`, {
+        status,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Something went wrong!"
+      );
+    }
+  }
+);
+
 const initialState = {
   orders: [],
   status: "idle",
@@ -31,14 +48,27 @@ const orderSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchOrders.pending, (state) => {
-        state.status = "loading";
+        state.status = "fetch-loading";
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = "fetch-succeeded";
         state.orders = action.payload;
       })
       .addCase(fetchOrders.rejected, (state, action) => {
-        state.status = "failed";
+        state.status = "fetch-failed";
+        state.error = action.payload;
+      })
+      .addCase(updateOrderStatus.pending, (state) => {
+        state.status = "update-loading";
+      })
+      .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        state.status = "update-succeeded";
+        state.orders = state.orders.map((order) =>
+          order._id === action.payload._id ? action.payload : order
+        );
+      })
+      .addCase(updateOrderStatus.rejected, (state, action) => {
+        state.status = "update-failed";
         state.error = action.payload;
       });
   },
