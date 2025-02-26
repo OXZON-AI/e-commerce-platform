@@ -2,12 +2,12 @@ import React, { Fragment, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LayoutOne from "../../layouts/LayoutOne";
-import { fetchOrders } from "../../store/slices/order-slice";
+import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
 import { useDispatch, useSelector } from "react-redux";
 
 const OrderHistory = () => {
   const dispatch = useDispatch();
-  const { orders } = useSelector((state) => state.orders);
+  const { orders, status, error } = useSelector((state) => state.orders);
 
   // Efect hook for fetch orders
   useEffect(() => {
@@ -16,26 +16,59 @@ const OrderHistory = () => {
 
   // Handler for cancel order
   const handleCancelOrder = (oid) => {
-    toast.info("order cancel success!");
+    dispatch(cancelOrder(oid))
+      .unwrap()
+      .then(() => {
+        toast.success("Order cancelled successfully.");
+      })
+      .catch(() => {
+        toast.error("Failed to cancel order.");
+      });
   };
 
   // Handler for reorder
   const handleReorder = (productName) => {
-    toast.info("reorder success!");
+    toast.info("reorder succeess!");
+  };
+
+  // function for change distinct colors for diffrent order status
+  const getStatusBadge = (status) => {
+    const statusStyles = {
+      pending: "border-amber-500 bg-amber-50 text-amber-600",
+      cancelled: "border-red-500 bg-red-100 text-red-600",
+      shipped: "border-blue-500 bg-blue-100 text-blue-600",
+      delivered: "border-green-500 bg-green-100 text-green-600",
+      processing: "border-purple-500 bg-purple-100 text-purple-600",
+    };
+
+    return (
+      <div
+        className={`border-1 px-2 py-1 rounded font-normal ${
+          statusStyles[status] || "border-gray-500 bg-gray-100 text-gray-600"
+        }`}
+      >
+        {status}
+      </div>
+    );
   };
 
   return (
     <Fragment>
       <LayoutOne>
-        <div className="min-h-full bg-purple-100 flex items-center justify-center p-6">
+        <div className="min-h-full bg-gray-100 flex items-center justify-center p-6">
           <div className="w-full lg:w-3/4 xl:w-2/3 bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Your Order History
             </h2>
+            {status === "fetch-loading" && <p>Loading orders...</p>}
+            {status === "fetch-failed" && (
+              <p className="text-red-500">{error}</p>
+            )}
             <div className="overflow-x-auto">
               <table className="w-full border-collapse rounded-lg overflow-hidden">
                 <thead>
                   <tr className="bg-gray-700 text-white">
+                    <th className="p-3 text-left">Index</th>
                     <th className="p-3 text-left">Item</th>
                     <th className="p-3 text-left">Quantity</th>
                     <th className="p-3 text-left">Date</th>
@@ -47,41 +80,58 @@ const OrderHistory = () => {
                 </thead>
                 <tbody>
                   {orders &&
-                    orders.map((order) =>
-                      order.items.map((item, index) => (
+                    orders.map((order, orderIndex) => (
+                      <>
                         <tr
-                          key={`${order._id}-${index}`}
-                          className="border-b hover:bg-gray-200 transition"
+                          key={order._id}
+                          className="bg-gray-200 font-medium"
                         >
-                          <td className="p-3">{item.variant.product.name}</td>
-                          <td className="p-3">{item.quantity}</td>
-                          <td className="p-3">
+                          <td className="p-3" colSpan="6">
+                            Order #{orderIndex + 1} -{" "}
                             {new Date(order.createdAt).toLocaleDateString()}
                           </td>
-                          <td className="p-3 font-semibold">
-                            {item.subTotal} MVR
-                          </td>
-                          <td className="p-3">{order.status}</td>
-                          <td className="p-3">{item.points}</td>
-                          <td className="p-3 flex items-center gap-2">
-                            <button
-                              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
-                              onClick={() => handleReorder(item.name)}
-                            >
-                              Reorder
-                            </button>
-                            {order.status === "pending" && (
-                              <button
-                                className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
-                                onClick={() => handleCancelOrder(order._id)}
-                              >
-                                Cancel
-                              </button>
-                            )}
+                          <td className="p-3 text-left" colSpan="2">
+                            Order ID: {order._id}
                           </td>
                         </tr>
-                      ))
-                    )}
+                        {order.items.map((item, index) => (
+                          <tr
+                            key={`${order._id}-${index}`}
+                            className="border-b hover:bg-purple-100 transition"
+                          >
+                            <td className="p-3">{index + 1}</td>
+                            <td className="p-3">{item.variant.product.name}</td>
+                            <td className="p-3">{item.quantity}</td>
+                            <td className="p-3">
+                              {new Date(order.createdAt).toLocaleDateString()}
+                            </td>
+                            <td className="p-3 font-semibold">
+                              {item.subTotal} MVR
+                            </td>
+                            <td className="p-3">
+                              {getStatusBadge(order.status)}
+                            </td>
+                            <td className="p-3">{item.points}</td>
+                            <td className="p-3 flex items-center gap-2">
+                              <button
+                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                                onClick={() => handleReorder(item.name)}
+                              >
+                                Reorder
+                              </button>
+                              {order.status === "pending" && (
+                                <button
+                                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+                                  onClick={() => handleCancelOrder(order._id)}
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </>
+                    ))}
                 </tbody>
               </table>
             </div>
