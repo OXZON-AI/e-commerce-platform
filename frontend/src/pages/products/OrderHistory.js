@@ -2,7 +2,7 @@ import React, { Fragment, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LayoutOne from "../../layouts/LayoutOne";
-import { fetchOrders } from "../../store/slices/order-slice";
+import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
 import { useDispatch, useSelector } from "react-redux";
 
 const OrderHistory = () => {
@@ -16,12 +16,19 @@ const OrderHistory = () => {
 
   // Handler for cancel order
   const handleCancelOrder = (oid) => {
-    toast.info("order cancel success!");
+    dispatch(cancelOrder(oid))
+      .unwrap()
+      .then(() => {
+        toast.success("Order cancelled successfully.");
+      })
+      .catch(() => {
+        toast.error("Failed to cancel order.");
+      });
   };
 
   // Handler for reorder
   const handleReorder = (productName) => {
-    toast.info("reorder success!");
+    toast.info("reorder succeess!");
   };
 
   return (
@@ -36,6 +43,7 @@ const OrderHistory = () => {
               <table className="w-full border-collapse rounded-lg overflow-hidden">
                 <thead>
                   <tr className="bg-gray-700 text-white">
+                    <th className="p-3 text-left">Index</th>
                     <th className="p-3 text-left">Item</th>
                     <th className="p-3 text-left">Quantity</th>
                     <th className="p-3 text-left">Date</th>
@@ -53,6 +61,7 @@ const OrderHistory = () => {
                           key={`${order._id}-${index}`}
                           className="border-b hover:bg-gray-200 transition"
                         >
+                          <td className="p-3">{index+1}</td>
                           <td className="p-3">{item.variant.product.name}</td>
                           <td className="p-3">{item.quantity}</td>
                           <td className="p-3">
