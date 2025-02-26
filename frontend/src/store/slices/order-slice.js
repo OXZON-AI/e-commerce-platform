@@ -12,7 +12,7 @@ export const fetchOrders = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Something went wrong!"
+        error.response?.data?.message || "Failed to get orders"
       );
     }
   }
@@ -29,8 +29,24 @@ export const updateOrderStatus = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Something went wrong!"
+        error.response?.data?.message || "Failed to update order status"
       );
+    }
+  }
+);
+
+// Async thunk to cancel order
+export const cancelOrder = createAsyncThunk(
+  "orders/cancelOrder",
+  async (oid, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.patch(
+        `/v1/orders/${oid}/cancel`,
+        {},
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to cancel order");
     }
   }
 );
@@ -69,6 +85,19 @@ const orderSlice = createSlice({
       })
       .addCase(updateOrderStatus.rejected, (state, action) => {
         state.status = "update-failed";
+        state.error = action.payload;
+      })
+      .addCase(cancelOrder.pending, (state) => {
+        state.status = "cancelOrder-loading";
+      })
+      .addCase(cancelOrder.fulfilled, (state, action) => {
+        state.status = "cancelOrder-succeeded";
+        state.orders = state.orders.map((order) =>
+          order._id === action.payload._id ? action.payload : order
+        );
+      })
+      .addCase(cancelOrder.rejected, (state, action) => {
+        state.status = "cancelOrder-failed";
         state.error = action.payload;
       });
   },
