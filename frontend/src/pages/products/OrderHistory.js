@@ -6,6 +6,7 @@ import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCart } from "../../store/slices/cart-slice";
 import { fetchProductDetails } from "../../store/slices/product-slice";
+import HashLoader from "react-spinners/HashLoader";
 
 const OrderHistory = () => {
   const dispatch = useDispatch();
@@ -35,7 +36,7 @@ const OrderHistory = () => {
   // Handler for reorder
   const handleReorder = (productSlug, productQuantity) => {
     // fetch product details to check product stock for product availability.
-    dispatch(fetchProductDetails(productSlug)) 
+    dispatch(fetchProductDetails(productSlug))
       .unwrap()
       .then((product) => {
         if (
@@ -101,83 +102,98 @@ const OrderHistory = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Your Order History
             </h2>
-            {orderStatus === "fetch-loading" && <p>Loading orders...</p>}
-            {orderStatus === "fetch-failed" && (
-              <p className="text-red-500">{orderError}</p>
-            )}
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse rounded-lg overflow-hidden">
-                <thead>
-                  <tr className="bg-gray-700 text-white">
-                    <th className="p-3 text-left">Index</th>
-                    <th className="p-3 text-left">Item</th>
-                    <th className="p-3 text-left">Quantity</th>
-                    <th className="p-3 text-left">Date</th>
-                    <th className="p-3 text-left">Total price</th>
-                    <th className="p-3 text-left">Order Status</th>
-                    <th className="p-3 text-left">Loyalty Points</th>
-                    <th className="p-3 text-left">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders &&
-                    orders.map((order, orderIndex) => (
-                      <>
-                        <tr key={order._id} className="bg-gray-200 font-medium">
-                          <td className="p-3" colSpan="6">
-                            Order #{orderIndex + 1} -{" "}
-                            {new Date(order.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="p-3 text-left" colSpan="2">
-                            Order ID: {order._id}
-                          </td>
-                        </tr>
-                        {order.items.map((item, index) => (
+            {orderStatus === "fetch-loading" ? (
+              // Show Loading State with Centered HashLoader
+              <div className="flex flex-col justify-center items-center py-[50px] mx-auto text-gray-700 font-semibold">
+                <HashLoader color="#a855f7" size={50} />
+                <span className="mt-3">Loading Orders...</span>
+              </div>
+            ) : orderStatus === "fetch-failed" ? (
+              // Show Error Message Instead of Table
+              <div className="my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
+                <span className="mt-3">{orderError}</span>
+              </div>
+            ) : (
+              // Show Table Only If There’s No Loading/Error -----------------------------------------------------------------
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse rounded-lg overflow-hidden">
+                  <thead>
+                    <tr className="bg-gray-700 text-white">
+                      <th className="p-3 text-left">Index</th>
+                      <th className="p-3 text-left">Item</th>
+                      <th className="p-3 text-left">Quantity</th>
+                      <th className="p-3 text-left">Date</th>
+                      <th className="p-3 text-left">Total price</th>
+                      <th className="p-3 text-left">Order Status</th>
+                      <th className="p-3 text-left">Loyalty Points</th>
+                      <th className="p-3 text-left">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders &&
+                      orders.map((order, orderIndex) => (
+                        <>
                           <tr
-                            key={`${order._id}-${index}`}
-                            className="border-b hover:bg-purple-100 transition"
+                            key={order._id}
+                            className="bg-gray-200 font-medium"
                           >
-                            <td className="p-3">{index + 1}</td>
-                            <td className="p-3">{item.variant.product.name}</td>
-                            <td className="p-3">{item.quantity}</td>
-                            <td className="p-3">
+                            <td className="p-3" colSpan="6">
+                              Order #{orderIndex + 1} -{" "}
                               {new Date(order.createdAt).toLocaleDateString()}
                             </td>
-                            <td className="p-3 font-semibold">
-                              {item.subTotal} MVR
-                            </td>
-                            <td className="p-3">
-                              {getStatusBadge(order.status)}
-                            </td>
-                            <td className="p-3">{item.points}</td>
-                            <td className="p-3 flex items-center gap-2">
-                              <button
-                                className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
-                                onClick={() =>
-                                  handleReorder(
-                                    item.variant.product.slug,
-                                    item.quantity
-                                  )
-                                }
-                              >
-                                Reorder
-                              </button>
-                              {order.status === "pending" && (
-                                <button
-                                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
-                                  onClick={() => handleCancelOrder(order._id)}
-                                >
-                                  Cancel
-                                </button>
-                              )}
+                            <td className="p-3 text-left" colSpan="2">
+                              Order ID: {order._id}
                             </td>
                           </tr>
-                        ))}
-                      </>
-                    ))}
-                </tbody>
-              </table>
-            </div>
+                          {order.items.map((item, index) => (
+                            <tr
+                              key={`${order._id}-${index}`}
+                              className="border-b hover:bg-purple-100 transition"
+                            >
+                              <td className="p-3">{index + 1}</td>
+                              <td className="p-3">
+                                {item.variant.product.name}
+                              </td>
+                              <td className="p-3">{item.quantity}</td>
+                              <td className="p-3">
+                                {new Date(order.createdAt).toLocaleDateString()}
+                              </td>
+                              <td className="p-3 font-semibold">
+                                {item.subTotal} MVR
+                              </td>
+                              <td className="p-3">
+                                {getStatusBadge(order.status)}
+                              </td>
+                              <td className="p-3">{item.points}</td>
+                              <td className="p-3 flex items-center gap-2">
+                                <button
+                                  className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                                  onClick={() =>
+                                    handleReorder(
+                                      item.variant.product.slug,
+                                      item.quantity
+                                    )
+                                  }
+                                >
+                                  Reorder
+                                </button>
+                                {order.status === "pending" && (
+                                  <button
+                                    className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+                                    onClick={() => handleCancelOrder(order._id)}
+                                  >
+                                    Cancel
+                                  </button>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </LayoutOne>
