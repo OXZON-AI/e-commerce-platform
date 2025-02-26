@@ -4,10 +4,16 @@ import "react-toastify/dist/ReactToastify.css";
 import LayoutOne from "../../layouts/LayoutOne";
 import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
 import { useDispatch, useSelector } from "react-redux";
+import { addToCart, fetchCart } from "../../store/slices/cart-slice";
+import { fetchProductDetails } from "../../store/slices/product-slice";
 
 const OrderHistory = () => {
   const dispatch = useDispatch();
-  const { orders, status, error } = useSelector((state) => state.orders);
+  const {
+    orders,
+    status: orderStatus,
+    error: orderError,
+  } = useSelector((state) => state.orders);
 
   // Efect hook for fetch orders
   useEffect(() => {
@@ -27,8 +33,43 @@ const OrderHistory = () => {
   };
 
   // Handler for reorder
-  const handleReorder = (productName) => {
-    toast.info("reorder succeess!");
+  const handleReorder = (productSlug, productQuantity) => {
+    // fetch product details to check product stock for product availability.
+    dispatch(fetchProductDetails(productSlug)) 
+      .unwrap()
+      .then((product) => {
+        if (
+          !product.variants ||
+          product.variants.length === 0 ||
+          product.variants[0].stock <= 0
+        ) {
+          toast.warning("Out of Stock!");
+          return;
+        }
+        if (product.variants[0].stock < productQuantity) {
+          toast.warning(`${product.variants[0].stock} items left!`);
+          return;
+        }
+        // dispatch addToCart request for add product to cart.
+        dispatch(
+          addToCart({
+            variantId: product.variants[0]._id,
+            quantity: productQuantity,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            // dispatch fetchCart request for imediatly update cart!
+            dispatch(fetchCart());
+            toast.success("Product Added to cart.");
+          })
+          .catch(() => {
+            toast.error("Failed to add to cart.");
+          });
+      })
+      .catch(() => {
+        toast.error("Failed to check stock!");
+      });
   };
 
   // function for change distinct colors for diffrent order status
@@ -60,9 +101,9 @@ const OrderHistory = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Your Order History
             </h2>
-            {status === "fetch-loading" && <p>Loading orders...</p>}
-            {status === "fetch-failed" && (
-              <p className="text-red-500">{error}</p>
+            {orderStatus === "fetch-loading" && <p>Loading orders...</p>}
+            {orderStatus === "fetch-failed" && (
+              <p className="text-red-500">{orderError}</p>
             )}
             <div className="overflow-x-auto">
               <table className="w-full border-collapse rounded-lg overflow-hidden">
@@ -82,10 +123,7 @@ const OrderHistory = () => {
                   {orders &&
                     orders.map((order, orderIndex) => (
                       <>
-                        <tr
-                          key={order._id}
-                          className="bg-gray-200 font-medium"
-                        >
+                        <tr key={order._id} className="bg-gray-200 font-medium">
                           <td className="p-3" colSpan="6">
                             Order #{orderIndex + 1} -{" "}
                             {new Date(order.createdAt).toLocaleDateString()}
@@ -115,7 +153,12 @@ const OrderHistory = () => {
                             <td className="p-3 flex items-center gap-2">
                               <button
                                 className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
-                                onClick={() => handleReorder(item.name)}
+                                onClick={() =>
+                                  handleReorder(
+                                    item.variant.product.slug,
+                                    item.quantity
+                                  )
+                                }
                               >
                                 Reorder
                               </button>
