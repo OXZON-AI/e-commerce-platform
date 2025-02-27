@@ -10,7 +10,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const [activeTab, setActiveTab] = useState("specs");
   const [filters, setFilters] = useState({
     cid: prodDetails.category._id,
-    limit: 4,
+    limit: 5,
   });
   const [relatedProducts, setRelatedProducts] = useState([]);
 
@@ -48,7 +48,8 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     dispatch(fetchRelatedProducts(filters))
       .unwrap()
       .then((products) => {
-        setRelatedProducts(products); // set related products to local state.
+        const filteredProducts = products.filter(product => product._id !== prodDetails._id);
+        setRelatedProducts(filteredProducts); // Set related products excluding the current product.
         console.log("related products - ", relatedProducts);
       })
       .catch(() => {
