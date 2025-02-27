@@ -100,7 +100,7 @@ const OrderHistory = () => {
         <div className="min-h-full bg-gray-100 flex items-center justify-center p-6">
           <div className="w-full lg:w-3/4 xl:w-2/3 bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Your Order History
+              My Orders
             </h2>
             {orderStatus === "fetch-loading" ? (
               // Show Loading State with Centered HashLoader
@@ -137,12 +137,19 @@ const OrderHistory = () => {
                             key={order._id}
                             className="bg-gray-200 font-medium"
                           >
-                            <td className="p-3" colSpan="6">
-                              Order #{orderIndex + 1} -{" "}
+                            <td className="p-3" colSpan="7">
+                              Order ID: {order._id} -{" "}
                               {new Date(order.createdAt).toLocaleDateString()}
                             </td>
-                            <td className="p-3 text-left" colSpan="2">
-                              Order ID: {order._id}
+                            <td className="p-3 text-left" colSpan="1">
+                              {order.status === "pending" && (
+                                <button
+                                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+                                  onClick={() => handleCancelOrder(order._id)}
+                                >
+                                  Cancel
+                                </button>
+                              )}
                             </td>
                           </tr>
                           {order.items.map((item, index) => (
@@ -177,14 +184,6 @@ const OrderHistory = () => {
                                 >
                                   Reorder
                                 </button>
-                                {order.status === "pending" && (
-                                  <button
-                                    className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
-                                    onClick={() => handleCancelOrder(order._id)}
-                                  >
-                                    Cancel
-                                  </button>
-                                )}
                               </td>
                             </tr>
                           ))}
