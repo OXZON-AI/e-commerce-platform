@@ -1,44 +1,11 @@
 import { useEffect, useState } from "react";
-//import { getOrders, updateOrderStatus, cancelOrder } from "../../services/orderService";
 import { Link } from "react-router-dom";
 import AdminNavbar from "./components/AdminNavbar";
 import Sidebar from "./components/Sidebar";
+
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // useEffect(() => {
-  //   fetchOrders();
-  // }, []);
-
-  // const fetchOrders = async () => {
-  //   try {
-  //     const data = await getOrders();
-  //     setOrders(data);
-  //   } catch (error) {
-  //     console.error("Error fetching orders:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const handleStatusUpdate = async (orderId, newStatus) => {
-  //   try {
-  //     await updateOrderStatus(orderId, newStatus);
-  //     fetchOrders(); // Refresh orders after update
-  //   } catch (error) {
-  //     console.error("Failed to update status:", error);
-  //   }
-  // };
-
-  // const handleCancelOrder = async (orderId) => {
-  //   try {
-  //     await cancelOrder(orderId);
-  //     fetchOrders(); // Refresh orders after cancel
-  //   } catch (error) {
-  //     console.error("Failed to cancel order:", error);
-  //   }
-  // };
 
   return (
     <div className="flex flex-col h-screen">
@@ -54,14 +21,20 @@ const OrderManagement = () => {
           <div className="p-0 sm:p-8 md:p-10 lg:p-12 w-full mx-auto">
             <div className="bg-white shadow-xl rounded-none p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-semibold text-gray-800">Order Management</h2>
+                <h2 className="text-3xl font-semibold text-gray-800">
+                  Order Management
+                </h2>
               </div>
 
               {/* Loading & Empty State */}
               {loading ? (
-                <div className="text-center text-gray-500 py-10">Loading orders...</div>
+                <div className="text-center text-gray-500 py-10">
+                  Loading orders...
+                </div>
               ) : orders.length === 0 ? (
-                <div className="text-center text-gray-500 py-10">No orders found.</div>
+                <div className="text-center text-gray-500 py-10">
+                  No orders found.
+                </div>
               ) : (
                 // Table Structure
                 <div className="overflow-x-auto">
@@ -77,10 +50,19 @@ const OrderManagement = () => {
                     </thead>
                     <tbody>
                       {orders.map((order) => (
-                        <tr key={order._id} className="border-b border-gray-200 hover:bg-gray-100">
-                          <td className="py-4 px-6 text-gray-800">{order._id}</td>
-                          <td className="py-4 px-6 text-gray-800">{order.email}</td>
-                          <td className="py-4 px-6 text-gray-800">${order.totalAmount.toFixed(2)}</td>
+                        <tr
+                          key={order._id}
+                          className="border-b border-gray-200 hover:bg-gray-100"
+                        >
+                          <td className="py-4 px-6 text-gray-800">
+                            {order._id}
+                          </td>
+                          <td className="py-4 px-6 text-gray-800">
+                            {order.email}
+                          </td>
+                          <td className="py-4 px-6 text-gray-800">
+                            ${order.totalAmount.toFixed(2)}
+                          </td>
                           <td className="py-4 px-6">
                             <span
                               className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -128,7 +110,6 @@ const OrderManagement = () => {
       </div>
     </div>
   );
-  
 };
 
 export default OrderManagement;
