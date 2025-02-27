@@ -171,7 +171,7 @@ const OrderHistory = () => {
                               <td className="p-3">
                                 {getStatusBadge(order.status)}
                               </td>
-                              <td className="p-3">{item.points}</td>
+                              <td className="p-3">{order.earnedPoints || "N/A"}</td>
                               <td className="p-3 flex items-center gap-2">
                                 <button
                                   className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
