@@ -76,6 +76,8 @@ export const getOrders = async (req, res, next) => {
         billing: 1,
         shipping: 1,
         status: 1,
+        createdAt: 1,
+        earnedPoints: 1,
         items: {
           $map: {
             input: "$items",
