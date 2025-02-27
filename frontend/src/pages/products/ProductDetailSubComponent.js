@@ -44,17 +44,12 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
 
   // efect hook for fetch related products by category
   useEffect(() => {
+    setRelatedProducts([]);
     dispatch(fetchRelatedProducts(filters))
       .unwrap()
       .then((products) => {
-        if (Array.isArray(products)) {
-          setRelatedProducts(products); // set related products to local state.
-          toast.info("Releated Product fetch success!");
-          console.log("related products - ", relatedProducts);
-        } else {
-          toast.error("products is not a array!");
-          console.log("Related Products : ", products);
-        }
+        setRelatedProducts(products); // set related products to local state.
+        console.log("related products - ", relatedProducts);
       })
       .catch(() => {
         toast.error("Faield to fetch related products!");
