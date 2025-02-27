@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchRelatedProducts } from "../../store/slices/product-slice";
 import { toast } from "react-toastify";
 import placeholderImage from "../../assets/images/placeholder_image.png";
+import { Link } from "react-router-dom";
 
 const ProductDetailSubComponent = ({ prodDetails }) => {
   const dispatch = useDispatch();
@@ -204,38 +205,37 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {relatedProducts &&
             relatedProducts.map((product) => (
-              <div
-                key={product._id}
-                className="relative bg-white shadow-md rounded-2xl overflow-hidden p-5 transition-transform transform hover:scale-100 hover:shadow-2xl"
-              >
-                <div className="w-full h-44 flex items-center justify-center rounded-lg">
-                  <img
-                    src={product.defaultVariant.image.url || placeholderImage}
-                    alt={product.defaultVariant.image.alt || "product Image"}
-                    className="w-full"
-                  />
-                </div>
-                {/* {product.discount && (
+              <Link key={product._id} to={`/product/${product.slug}`}>
+                <div className="relative bg-white shadow-md rounded-2xl overflow-hidden p-5 transition-transform transform hover:scale-100 hover:shadow-2xl">
+                  <div className="w-full h-44 flex items-center justify-center rounded-lg">
+                    <img
+                      src={product.defaultVariant.image.url || placeholderImage}
+                      alt={product.defaultVariant.image.alt || "product Image"}
+                      className="w-full"
+                    />
+                  </div>
+                  {/* {product.discount && (
                 <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
                   {product.discount}
                 </span>
               )} */}
-                {/* {product.newTag && (
+                  {/* {product.newTag && (
                 <span className="absolute top-3 right-3 bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
                   New
                 </span>
               )} */}
-                <p className="mt-4 text-lg font-semibold text-gray-700">
-                  {product.name}
-                </p>
-                <p className="mt-4 text-lg font-semibold text-gray-700">
-                  {product.defaultVariant.price} MVR
-                </p>
-                <div className="flex justify-center mt-2 text-yellow-500">
-                  {"★".repeat(Math.floor(product.ratings.average))}
-                  {"☆".repeat(5 - Math.floor(product.ratings.average))}
+                  <p className="mt-4 text-lg font-semibold text-gray-700">
+                    {product.name}
+                  </p>
+                  <p className="mt-4 text-lg font-semibold text-gray-700">
+                    {product.defaultVariant.price} MVR
+                  </p>
+                  <div className="flex justify-center mt-2 text-yellow-500">
+                    {"★".repeat(Math.floor(product.ratings.average))}
+                    {"☆".repeat(5 - Math.floor(product.ratings.average))}
+                  </div>
                 </div>
-              </div>
+              </Link>
             ))}
         </div>
       </div>
