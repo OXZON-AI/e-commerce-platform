@@ -205,8 +205,8 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                 <div className="relative bg-white shadow-md rounded-2xl overflow-hidden p-5 transition-transform transform hover:scale-100 hover:shadow-2xl">
                   <div className="w-full h-44 flex items-center justify-center rounded-lg">
                     <img
-                      src={product.defaultVariant.image.url || placeholderImage}
-                      alt={product.defaultVariant.image.alt || "product Image"}
+                      src={product?.defaultVariant?.image?.url || placeholderImage}
+                      alt={product?.defaultVariant?.image?.alt || "product Image"}
                       className="w-full"
                     />
                   </div>
@@ -224,7 +224,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                     {product.name}
                   </p>
                   <p className="mt-4 text-lg font-semibold text-gray-700">
-                    {product.defaultVariant.price} MVR
+                    {product?.defaultVariant?.price || "N/A"} MVR
                   </p>
                   <div className="flex justify-center mt-2 text-yellow-500">
                     {"★".repeat(Math.floor(product.ratings.average))}
