@@ -84,10 +84,29 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
+// Async thunk to get related product
+export const fetchRelatedProducts = createAsyncThunk(
+  "product/relatedProduct",
+  async (filters = {}, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/v1/products/related/", {
+        params: filters,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Failed Retrive Related Product Details!"
+      );
+    }
+  }
+);
+
 const productSlice = createSlice({
   name: "product",
   initialState: {
     items: [],
+    relatedProducts: [],
     pagination: { page: 1, totalPages: 1 },
     brands: [],
     productDetail: null,
@@ -187,6 +206,18 @@ const productSlice = createSlice({
         state.items = state.items.filter((item) => item._id !== action.payload);
       })
       .addCase(deleteProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchRelatedProducts.pending, (state, action) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(fetchRelatedProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.relatedProducts = action.payload;
+      })
+      .addCase(fetchRelatedProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

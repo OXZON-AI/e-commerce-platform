@@ -58,13 +58,12 @@ const ProductDetailPage = () => {
     }
     setTimeout(() => setNotification(null), 3000);
   };
-
   const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
+    dots: true, // Show dots for navigation
+    infinite: true, // Infinite scrolling
+    speed: 500, // Transition speed
+    slidesToShow: 3, // Number of images visible at a time
+    slidesToScroll: 1, // Number of images to scroll per click
   };
 
   const calculateOverallRating = (reviews) => {

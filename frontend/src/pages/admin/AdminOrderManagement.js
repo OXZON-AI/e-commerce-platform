@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getOrders, updateOrderStatus, cancelOrder } from "../../services/orderService";
+//import { getOrders, updateOrderStatus, cancelOrder } from "../../services/orderService";
 import { Link } from "react-router-dom";
 import AdminNavbar from "./components/AdminNavbar";
 import Sidebar from "./components/Sidebar";
@@ -7,38 +7,38 @@ const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  // useEffect(() => {
+  //   fetchOrders();
+  // }, []);
 
-  const fetchOrders = async () => {
-    try {
-      const data = await getOrders();
-      setOrders(data);
-    } catch (error) {
-      console.error("Error fetching orders:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const fetchOrders = async () => {
+  //   try {
+  //     const data = await getOrders();
+  //     setOrders(data);
+  //   } catch (error) {
+  //     console.error("Error fetching orders:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  const handleStatusUpdate = async (orderId, newStatus) => {
-    try {
-      await updateOrderStatus(orderId, newStatus);
-      fetchOrders(); // Refresh orders after update
-    } catch (error) {
-      console.error("Failed to update status:", error);
-    }
-  };
+  // const handleStatusUpdate = async (orderId, newStatus) => {
+  //   try {
+  //     await updateOrderStatus(orderId, newStatus);
+  //     fetchOrders(); // Refresh orders after update
+  //   } catch (error) {
+  //     console.error("Failed to update status:", error);
+  //   }
+  // };
 
-  const handleCancelOrder = async (orderId) => {
-    try {
-      await cancelOrder(orderId);
-      fetchOrders(); // Refresh orders after cancel
-    } catch (error) {
-      console.error("Failed to cancel order:", error);
-    }
-  };
+  // const handleCancelOrder = async (orderId) => {
+  //   try {
+  //     await cancelOrder(orderId);
+  //     fetchOrders(); // Refresh orders after cancel
+  //   } catch (error) {
+  //     console.error("Failed to cancel order:", error);
+  //   }
+  // };
 
   return (
     <div className="flex flex-col h-screen">
@@ -98,13 +98,13 @@ const OrderManagement = () => {
                           </td>
                           <td className="py-4 px-6 flex space-x-2 justify-center">
                             <button
-                              onClick={() => handleStatusUpdate(order._id, "shipped")}
+                              //onClick={() => handleStatusUpdate(order._id, "shipped")}
                               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
                             >
                               Mark as Shipped
                             </button>
                             <button
-                              onClick={() => handleCancelOrder(order._id)}
+                              //onClick={() => handleCancelOrder(order._id)}
                               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
                             >
                               Cancel

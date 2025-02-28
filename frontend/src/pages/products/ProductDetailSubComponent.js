@@ -1,7 +1,18 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRelatedProducts } from "../../store/slices/product-slice";
+import { toast } from "react-toastify";
+import placeholderImage from "../../assets/images/placeholder_image.png";
+import { Link } from "react-router-dom";
 
 const ProductDetailSubComponent = ({ prodDetails }) => {
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("specs");
+  const [filters, setFilters] = useState({
+    cid: prodDetails.category._id,
+    limit: 5,
+  });
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   const [submitted, setSubmitted] = useState(false);
   const handleSubmit = (e) => {
@@ -18,18 +29,33 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     { id: "reviews", label: `Reviews (5)` },
   ];
 
-  const relatedProducts = [
-    { id: 1, name: "Gaming Laptop XYZ", discount: "-10%", rating: 4 },
-    { id: 2, name: "Smartphone Pro Max", discount: "-15%", rating: 5 },
-    {
-      id: 3,
-      name: "Wireless Headphones",
-      discount: "-20%",
-      newTag: true,
-      rating: 4.5,
-    },
-    { id: 4, name: "4K Smart TV 55-inch", newTag: true, rating: 4 },
-  ];
+  // const relatedProducts = [
+  //   { id: 1, name: "Gaming Laptop XYZ", discount: "-10%", rating: 4 },
+  //   { id: 2, name: "Smartphone Pro Max", discount: "-15%", rating: 5 },
+  //   {
+  //     id: 3,
+  //     name: "Wireless Headphones",
+  //     discount: "-20%",
+  //     newTag: true,
+  //     rating: 4.5,
+  //   },
+  //   { id: 4, name: "4K Smart TV 55-inch", newTag: true, rating: 4 },
+  // ];
+
+  // efect hook for fetch related products by category
+  useEffect(() => {
+    setRelatedProducts([]);
+    dispatch(fetchRelatedProducts(filters))
+      .unwrap()
+      .then((products) => {
+        const filteredProducts = products.filter(product => product._id !== prodDetails._id);
+        setRelatedProducts(filteredProducts); // Set related products excluding the current product.
+        console.log("related products - ", relatedProducts);
+      })
+      .catch(() => {
+        toast.error("Faield to fetch related products!");
+      }); // fetch products only realted category for productDetail page
+  }, [dispatch]);
 
   return (
     <div className="container mx-auto p-6">
@@ -53,24 +79,26 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         {activeTab === "specs" && (
           <div>
             <p>
-              <strong>Brand</strong> &nbsp;&nbsp; : &nbsp;&nbsp; {prodDetails.brand}
+              <strong>Brand</strong> &nbsp;&nbsp; : &nbsp;&nbsp;{" "}
+              {prodDetails.brand}
             </p>
             <p>
-              <strong>Category</strong> &nbsp;&nbsp; : &nbsp;&nbsp; {prodDetails.category?.name}
+              <strong>Category</strong> &nbsp;&nbsp; : &nbsp;&nbsp;{" "}
+              {prodDetails.category?.name}
             </p>
 
             {prodDetails &&
-      prodDetails.variants?.[0]?.attributes.map((attr) => (
-        <p key={attr.name}>
-          <strong>
-            {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
-          </strong> 
-          &nbsp;&nbsp; : &nbsp;&nbsp; 
-          {attr.value}
-        </p>
-      ))}
-  </div>
-)}
+              prodDetails.variants?.[0]?.attributes.map((attr) => (
+                <p key={attr.name}>
+                  <strong>
+                    {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
+                  </strong>
+                  &nbsp;&nbsp; : &nbsp;&nbsp;
+                  {attr.value}
+                </p>
+              ))}
+          </div>
+        )}
         {activeTab === "description" && (
           <p>{prodDetails.description.detailed}</p>
         )}
@@ -171,35 +199,40 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
           Related Products
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {relatedProducts.map((product) => (
-            <div
-              key={product.id}
-              className="relative bg-white shadow-md rounded-2xl overflow-hidden p-5 transition-transform transform hover:scale-100 hover:shadow-2xl"
-            >
-              <div className="bg-gray-200 w-full h-44 flex items-center justify-center rounded-lg">
-                <span className="text-gray-500 text-lg font-semibold">
-                  600x800
-                </span>
-              </div>
-              {product.discount && (
+          {relatedProducts &&
+            relatedProducts.map((product) => (
+              <Link key={product._id} to={`/product/${product.slug}`}>
+                <div className="relative bg-white shadow-md rounded-2xl overflow-hidden p-5 transition-transform transform hover:scale-100 hover:shadow-2xl">
+                  <div className="w-full h-44 flex items-center justify-center rounded-lg">
+                    <img
+                      src={product?.defaultVariant?.image?.url || placeholderImage}
+                      alt={product?.defaultVariant?.image?.alt || "product Image"}
+                      className="w-full"
+                    />
+                  </div>
+                  {/* {product.discount && (
                 <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
                   {product.discount}
                 </span>
-              )}
-              {product.newTag && (
+              )} */}
+                  {/* {product.newTag && (
                 <span className="absolute top-3 right-3 bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
                   New
                 </span>
-              )}
-              <p className="mt-4 text-lg font-semibold text-gray-700">
-                {product.name}
-              </p>
-              <div className="flex justify-center mt-2 text-yellow-500">
-                {"★".repeat(Math.floor(product.rating))}
-                {"☆".repeat(5 - Math.floor(product.rating))}
-              </div>
-            </div>
-          ))}
+              )} */}
+                  <p className="mt-4 text-lg font-semibold text-gray-700">
+                    {product.name}
+                  </p>
+                  <p className="mt-4 text-lg font-semibold text-gray-700">
+                    {product?.defaultVariant?.price || "N/A"} MVR
+                  </p>
+                  <div className="flex justify-center mt-2 text-yellow-500">
+                    {"★".repeat(Math.floor(product.ratings.average))}
+                    {"☆".repeat(5 - Math.floor(product.ratings.average))}
+                  </div>
+                </div>
+              </Link>
+            ))}
         </div>
       </div>
     </div>

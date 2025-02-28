@@ -1,107 +1,198 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LayoutOne from "../../layouts/LayoutOne";
-
-const orders = [
-  {
-    id: 1,
-    products: [
-      { name: "Samsung 4K Smart TV", price: "£599.99", points: 50 },
-    ],
-    quantity: 1,
-    date: "15/02/2024",
-    status: "shipped",
-  },
-  {
-    id: 2,
-    products: [
-      { name: "Apple MacBook Pro 14-inch", price: "£1,499.00", points: 120 },
-      { name: "Logitech Wireless Mouse", price: "£29.99", points: 10 },
-    ],
-    quantity: 2,
-    date: "10/02/2024",
-    status: "processing",
-  },
-  {
-    id: 3,
-    products: [
-      { name: "Sony WH-1000XM4 Headphones", price: "£279.99", points: 30 },
-    ],
-    quantity: 1,
-    date: "05/02/2024",
-    status: "delivered",
-  },
-  {
-    id: 4,
-    products: [
-      { name: "Samsung Galaxy S24 Ultra", price: "£1,099.00", points: 90 },
-      { name: "Anker 20W Fast Charger", price: "£19.99", points: 5 },
-      { name: "Wireless Earbuds", price: "£49.99", points: 15 },
-    ],
-    quantity: 3,
-    date: "01/02/2024",
-    status: "cancelled",
-  },
-];
-
-const handleReorder = (productName) => {
-  toast.success(`${productName} has been reordered successfully!`, {
-    position: "top-right",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    style: { top: '80px' }
-  });
-};
+import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart, fetchCart } from "../../store/slices/cart-slice";
+import { fetchProductDetails } from "../../store/slices/product-slice";
+import HashLoader from "react-spinners/HashLoader";
 
 const OrderHistory = () => {
+  const dispatch = useDispatch();
+  const {
+    orders,
+    status: orderStatus,
+    error: orderError,
+  } = useSelector((state) => state.orders);
+
+  // Efect hook for fetch orders
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, [dispatch]);
+
+  // Handler for cancel order
+  const handleCancelOrder = (oid) => {
+    dispatch(cancelOrder(oid))
+      .unwrap()
+      .then(() => {
+        toast.success("Order cancelled successfully.");
+      })
+      .catch(() => {
+        toast.error("Failed to cancel order.");
+      });
+  };
+
+  // Handler for reorder
+  const handleReorder = (productSlug, productQuantity) => {
+    // fetch product details to check product stock for product availability.
+    dispatch(fetchProductDetails(productSlug))
+      .unwrap()
+      .then((product) => {
+        if (
+          !product.variants ||
+          product.variants.length === 0 ||
+          product.variants[0].stock <= 0
+        ) {
+          toast.warning("Out of Stock!");
+          return;
+        }
+        if (product.variants[0].stock < productQuantity) {
+          toast.warning(`${product.variants[0].stock} items left!`);
+          return;
+        }
+        // dispatch addToCart request for add product to cart.
+        dispatch(
+          addToCart({
+            variantId: product.variants[0]._id,
+            quantity: productQuantity,
+          })
+        )
+          .unwrap()
+          .then(() => {
+            // dispatch fetchCart request for imediatly update cart!
+            dispatch(fetchCart());
+            toast.success("Product Added to cart.");
+          })
+          .catch(() => {
+            toast.error("Failed to add to cart.");
+          });
+      })
+      .catch(() => {
+        toast.error("Failed to check stock!");
+      });
+  };
+
+  // function for change distinct colors for diffrent order status
+  const getStatusBadge = (status) => {
+    const statusStyles = {
+      pending: "border-amber-500 bg-amber-50 text-amber-600",
+      cancelled: "border-red-500 bg-red-100 text-red-600",
+      shipped: "border-blue-500 bg-blue-100 text-blue-600",
+      delivered: "border-green-500 bg-green-100 text-green-600",
+      processing: "border-purple-500 bg-purple-100 text-purple-600",
+    };
+
+    return (
+      <div
+        className={`border-1 px-2 py-1 rounded font-normal ${
+          statusStyles[status] || "border-gray-500 bg-gray-100 text-gray-600"
+        }`}
+      >
+        {status}
+      </div>
+    );
+  };
+
   return (
     <Fragment>
       <LayoutOne>
-        <div className="min-h-full bg-purple-100 flex items-center justify-center p-6">
+        <div className="min-h-full bg-gray-100 flex items-center justify-center p-6">
           <div className="w-full lg:w-3/4 xl:w-2/3 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Order History</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse rounded-lg overflow-hidden">
-                <thead>
-                  <tr className="bg-gray-700 text-white">
-                    <th className="p-3 text-left">Item</th>
-                    <th className="p-3 text-left">Quantity</th>
-                    <th className="p-3 text-left">Date</th>
-                    <th className="p-3 text-left">Price</th>
-                    <th className="p-3 text-left">Order Status</th>
-                    <th className="p-3 text-left">Loyalty Points</th>
-                    <th className="p-3 text-left">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((order) =>
-                    order.products.map((product, index) => (
-                      <tr key={`${order.id}-${index}`} className="border-b hover:bg-gray-200 transition">
-                        <td className="p-3">{product.name}</td>
-                        <td className="p-3">1</td>
-                        <td className="p-3">{order.date}</td>
-                        <td className="p-3 font-semibold">{product.price}</td>
-                        <td className="p-3">{order.status}</td>
-                        <td className="p-3">{product.points}</td>
-                        <td className="p-3">
-                          <button 
-                            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
-                            onClick={() => handleReorder(product.name)}
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              My Orders
+            </h2>
+            {orderStatus === "fetch-loading" ? (
+              // Show Loading State with Centered HashLoader
+              <div className="flex flex-col justify-center items-center py-[50px] mx-auto text-gray-700 font-semibold">
+                <HashLoader color="#a855f7" size={50} />
+                <span className="mt-3">Loading Orders...</span>
+              </div>
+            ) : orderStatus === "fetch-failed" ? (
+              // Show Error Message Instead of Table
+              <div className="my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
+                <span className="mt-3">{orderError}</span>
+              </div>
+            ) : (
+              // Show Table Only If There’s No Loading/Error -----------------------------------------------------------------
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse rounded-lg overflow-hidden">
+                  <thead>
+                    <tr className="bg-gray-700 text-white">
+                      <th className="p-3 text-left">Index</th>
+                      <th className="p-3 text-left">Item</th>
+                      <th className="p-3 text-left">Quantity</th>
+                      <th className="p-3 text-left">Date</th>
+                      <th className="p-3 text-left">Total price</th>
+                      <th className="p-3 text-left">Order Status</th>
+                      <th className="p-3 text-left">Loyalty Points</th>
+                      <th className="p-3 text-left">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders &&
+                      orders.map((order, orderIndex) => (
+                        <>
+                          <tr
+                            key={order._id}
+                            className="bg-gray-200 font-medium"
                           >
-                            Reorder
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                            <td className="p-3" colSpan="7">
+                              Order ID: {order._id} -{" "}
+                              {new Date(order.createdAt).toLocaleDateString()}
+                            </td>
+                            <td className="p-3 text-left" colSpan="1">
+                              {order.status === "pending" && (
+                                <button
+                                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+                                  onClick={() => handleCancelOrder(order._id)}
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                          {order.items.map((item, index) => (
+                            <tr
+                              key={`${order._id}-${index}`}
+                              className="border-b hover:bg-purple-100 transition"
+                            >
+                              <td className="p-3">{index + 1}</td>
+                              <td className="p-3">
+                                {item.variant.product.name}
+                              </td>
+                              <td className="p-3">{item.quantity}</td>
+                              <td className="p-3">
+                                {new Date(order.createdAt).toLocaleDateString()}
+                              </td>
+                              <td className="p-3 font-semibold">
+                                {item.subTotal} MVR
+                              </td>
+                              <td className="p-3">
+                                {getStatusBadge(order.status)}
+                              </td>
+                              <td className="p-3">{order.earnedPoints || "N/A"}</td>
+                              <td className="p-3 flex items-center gap-2">
+                                <button
+                                  className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                                  onClick={() =>
+                                    handleReorder(
+                                      item.variant.product.slug,
+                                      item.quantity
+                                    )
+                                  }
+                                >
+                                  Reorder
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </LayoutOne>
