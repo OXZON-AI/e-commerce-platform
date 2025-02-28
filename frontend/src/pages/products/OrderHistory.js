@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LayoutOne from "../../layouts/LayoutOne";
@@ -16,10 +16,18 @@ const OrderHistory = () => {
     error: orderError,
   } = useSelector((state) => state.orders);
 
+  const [filters, setFilters] = useState({
+    status: undefined,
+    sortBy: "date",
+    sortOrder: "desc",
+    page: 1,
+    limit: 10,
+  });
+
   // Efect hook for fetch orders
   useEffect(() => {
-    dispatch(fetchOrders());
-  }, [dispatch]);
+    dispatch(fetchOrders(filters));
+  }, [dispatch, filters]);
 
   // Handler for cancel order
   const handleCancelOrder = (oid) => {
@@ -27,6 +35,11 @@ const OrderHistory = () => {
       .unwrap()
       .then(() => {
         toast.success("Order cancelled successfully.");
+        dispatch(fetchOrders())
+          .unwrap()
+          .then(() => {
+            console.log("🔰 Orders are re-fetched!");
+          });
       })
       .catch(() => {
         toast.error("Failed to cancel order.");
@@ -48,7 +61,7 @@ const OrderHistory = () => {
           return;
         }
         if (product.variants[0].stock < productQuantity) {
-          toast.warning(`${product.variants[0].stock} items left!`);
+          toast.warning(`Only ${product.variants[0].stock} items left!`);
           return;
         }
         // dispatch addToCart request for add product to cart.
@@ -71,6 +84,23 @@ const OrderHistory = () => {
       .catch(() => {
         toast.error("Failed to check stock!");
       });
+  };
+
+  // handler for filterChange
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value || undefined, // undefine use when value is empty, then mark as undefine
+      page: 1,
+    });
+  };
+
+  // handler for pagination
+  const handlePagination = (direction) => {
+    setFilters((prev) => ({
+      ...prev,
+      page: direction === "next" ? prev.page + 1 : Math.max(prev.page - 1, 1),
+    }));
   };
 
   // function for change distinct colors for diffrent order status
@@ -99,9 +129,34 @@ const OrderHistory = () => {
       <LayoutOne>
         <div className="min-h-full bg-gray-100 flex items-center justify-center p-6">
           <div className="w-full lg:w-3/4 xl:w-2/3 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              My Orders
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">My Orders</h2>
+
+            <div className="flex gap-4 mb-4">
+              <select
+                name="status"
+                value={filters.status}
+                onChange={handleFilterChange}
+                className="p-2 border rounded"
+              >
+                <option value="">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+
+              <select
+                name="sortOrder"
+                value={filters.sortOrder}
+                onChange={handleFilterChange}
+                className="p-2 border rounded"
+              >
+                <option value="desc">Newest First</option>
+                <option value="asc">Oldest First</option>
+              </select>
+            </div>
+
             {orderStatus === "fetch-loading" ? (
               // Show Loading State with Centered HashLoader
               <div className="flex flex-col justify-center items-center py-[50px] mx-auto text-gray-700 font-semibold">
@@ -125,7 +180,7 @@ const OrderHistory = () => {
                       <th className="p-3 text-left">Date</th>
                       <th className="p-3 text-left">Total price</th>
                       <th className="p-3 text-left">Order Status</th>
-                      <th className="p-3 text-left">Loyalty Points</th>
+                      {/* <th className="p-3 text-left">Loyalty Points</th> */}
                       <th className="p-3 text-left">Action</th>
                     </tr>
                   </thead>
@@ -137,19 +192,33 @@ const OrderHistory = () => {
                             key={order._id}
                             className="bg-gray-200 font-medium"
                           >
-                            <td className="p-3" colSpan="7">
+                            <td className="p-3" colSpan="5">
                               Order ID: {order._id} -{" "}
                               {new Date(order.createdAt).toLocaleDateString()}
                             </td>
+                            <td className="p-3" colSpan="1">
+                              {order.earnedPoints}
+                            </td>
                             <td className="p-3 text-left" colSpan="1">
-                              {order.status === "pending" && (
-                                <button
-                                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
-                                  onClick={() => handleCancelOrder(order._id)}
-                                >
-                                  Cancel
-                                </button>
-                              )}
+                              {order.status === "pending" ? (
+                                <>
+                                  {orderStatus === "cancelOrder-loading" ? (
+                                    <>
+                                      <HashLoader color="#a855f7" size={20} />
+                                      <p>Canceling Order...</p>
+                                    </>
+                                  ) : (
+                                    <button
+                                      className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition"
+                                      onClick={() =>
+                                        handleCancelOrder(order._id)
+                                      }
+                                    >
+                                      Cancel
+                                    </button>
+                                  )}
+                                </>
+                              ) : null}
                             </td>
                           </tr>
                           {order.items.map((item, index) => (
@@ -171,7 +240,6 @@ const OrderHistory = () => {
                               <td className="p-3">
                                 {getStatusBadge(order.status)}
                               </td>
-                              <td className="p-3">{order.earnedPoints || "N/A"}</td>
                               <td className="p-3 flex items-center gap-2">
                                 <button
                                   className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
@@ -191,6 +259,25 @@ const OrderHistory = () => {
                       ))}
                   </tbody>
                 </table>
+
+                {/* ------------Pagination--------------- */}
+                <div className="flex justify-between mt-4">
+                  <button
+                    className="px-4 py-2 bg-gray-500 text-white rounded disabled:opacity-50"
+                    disabled={filters.page === 1}
+                    onClick={() => handlePagination("prev")}
+                  >
+                    Previous
+                  </button>
+                  <span className="px-4 py-2">Page {filters.page}</span>
+                  <button
+                    className="px-4 py-2 bg-gray-500 text-white rounded disabled:opacity-50"
+                    disabled={orders.length < 10}
+                    onClick={() => handlePagination("next")}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             )}
           </div>
