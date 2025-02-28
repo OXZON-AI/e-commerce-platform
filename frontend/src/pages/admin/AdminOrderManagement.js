@@ -2,10 +2,36 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import AdminNavbar from "./components/AdminNavbar";
 import Sidebar from "./components/Sidebar";
+import { useDispatch, useSelector } from "react-redux";
+import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
+import { toast } from "react-toastify";
 
 const OrderManagement = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const {
+    orders,
+    status: orderStatus,
+    error: orderError,
+  } = useSelector((state) => state.orders);
+
+  // Efect hook for fetch orders
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, [dispatch]);
+
+  // Handler for cancel order
+  const handleCancelOrder = (oid) => {
+    console.log("order-id : ", oid);
+    
+    dispatch(cancelOrder(oid))
+      .unwrap()
+      .then(() => {
+        toast.success("Order cancelled successfully.");
+      })
+      .catch(() => {
+        toast.error("Failed to cancel order.");
+      });
+  };
 
   return (
     <div className="flex flex-col h-screen">
@@ -26,8 +52,8 @@ const OrderManagement = () => {
                 </h2>
               </div>
 
-              {/* Loading & Empty State */}
-              {loading ? (
+              {/* orderStatus === "fetch-loading" & Empty State */}
+              {orderStatus === "fetch-loading" ? (
                 <div className="text-center text-gray-500 py-10">
                   Loading orders...
                 </div>
@@ -41,6 +67,7 @@ const OrderManagement = () => {
                   <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
                     <thead className="bg-gray-200 text-gray-700">
                       <tr>
+                        <th className="py-3 px-6 text-left">Index</th>
                         <th className="py-3 px-6 text-left">Order ID</th>
                         <th className="py-3 px-6 text-left">Customer</th>
                         <th className="py-3 px-6 text-left">Total</th>
@@ -49,11 +76,14 @@ const OrderManagement = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {orders.map((order) => (
+                      {orders.map((order, index) => (
                         <tr
                           key={order._id}
                           className="border-b border-gray-200 hover:bg-gray-100"
                         >
+                          <td className="py-4 px-6 text-gray-800">
+                            #{index+1}
+                          </td>
                           <td className="py-4 px-6 text-gray-800">
                             {order._id}
                           </td>
@@ -61,13 +91,15 @@ const OrderManagement = () => {
                             {order.email}
                           </td>
                           <td className="py-4 px-6 text-gray-800">
-                            ${order.totalAmount.toFixed(2)}
+                            ${order.payment.amount.toFixed(2)}
                           </td>
                           <td className="py-4 px-6">
                             <span
                               className={`px-3 py-1 rounded-full text-sm font-semibold ${
                                 order.status === "pending"
                                   ? "bg-yellow-500 text-gray-900"
+                                  : order.status === "processing"
+                                  ? "bg-slate-500 text-white"
                                   : order.status === "shipped"
                                   ? "bg-blue-500 text-white"
                                   : order.status === "delivered"
@@ -86,7 +118,7 @@ const OrderManagement = () => {
                               Mark as Shipped
                             </button>
                             <button
-                              //onClick={() => handleCancelOrder(order._id)}
+                              onClick={() => handleCancelOrder(order._id)}
                               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
                             >
                               Cancel
