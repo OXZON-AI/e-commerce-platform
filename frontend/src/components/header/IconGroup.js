@@ -73,6 +73,11 @@ const IconGroup = ({ iconWhiteClass }) => {
                   my account
                 </Link>
               </li>
+              <li>
+                <Link to={process.env.PUBLIC_URL + "/order-history"}>
+                  My Orders
+                </Link>
+              </li>
               <Link to="#" onClick={logoutHandler}>
                 Log out
               </Link>
