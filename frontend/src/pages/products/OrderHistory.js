@@ -10,6 +10,7 @@ import HashLoader from "react-spinners/HashLoader";
 import { useNavigate } from "react-router-dom";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
 import dropArrowIcon from "../../assets/icons/dropArrow.svg";
+import PuffLoader from "react-spinners/PuffLoader";
 
 const OrderHistory = () => {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ const OrderHistory = () => {
     status: orderStatus,
     error: orderError,
   } = useSelector((state) => state.orders);
+  const { status: cartStatus } = useSelector((state) => state.cart);
 
   const [filters, setFilters] = useState({
     status: undefined,
@@ -287,17 +289,29 @@ const OrderHistory = () => {
                               </td>
                               <td className="p-3">{}</td>
                               <td className="p-3 flex items-center gap-2">
-                                <button
-                                  className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
-                                  onClick={() =>
-                                    handleReorder(
-                                      item.variant.product.slug,
-                                      item.quantity
-                                    )
-                                  }
-                                >
-                                  Reorder
-                                </button>
+                                {cartStatus === "loading-add-to-cart" ? (
+                                  <button
+                                    className="px-4 py-2 bg-purple-300 text-white rounded"
+                                    disabled={true}
+                                  >
+                                    <PuffLoader color="#7e22ce" size={20} />
+                                  </button>
+                                ) : (
+                                  <button
+                                    className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                                    disabled={
+                                      cartStatus === "loading-add-to-cart"
+                                    }
+                                    onClick={() =>
+                                      handleReorder(
+                                        item.variant.product.slug,
+                                        item.quantity
+                                      )
+                                    }
+                                  >
+                                    Reorder
+                                  </button>
+                                )}
                               </td>
                             </tr>
                           ))}
