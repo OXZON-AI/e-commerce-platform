@@ -134,7 +134,7 @@ const Cart = () => {
                           <div className="flex items-center justify-evenly">
                             {/* Quantity Selector on the left side */}
                             {cartStatus === "loading-update-cart" ? (
-                              <PuffLoader size={30} color="#9333ea"/>
+                              <PuffLoader size={30} color="#9333ea" />
                             ) : null}
                             <div className="flex items-center">
                               <button
@@ -270,6 +270,14 @@ const Cart = () => {
                   ? "Try Again"
                   : "Proceed to Checkout"}
               </Link>
+
+              {checkoutError && (
+                <div className="mt-4 w-full bg-red-100 border-1 border-red-500 text-red-700 p-4 rounded-md mb-4">
+                  <p className="text-sm font-medium text-red-700">
+                    {checkoutError}
+                  </p>
+                </div>
+              )}
               {/* <Link
                 to={process.env.PUBLIC_URL + "/checkout"}
                 className="mt-5 block text-center bg-purple-500 text-white font-medium px-6 py-2 rounded-md hover:bg-purple-600 transition"
