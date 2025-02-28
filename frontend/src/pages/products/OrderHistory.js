@@ -8,6 +8,8 @@ import { addToCart, fetchCart } from "../../store/slices/cart-slice";
 import { fetchProductDetails } from "../../store/slices/product-slice";
 import HashLoader from "react-spinners/HashLoader";
 import { useNavigate } from "react-router-dom";
+import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
+import dropArrowIcon from "../../assets/icons/dropArrow.svg";
 
 const OrderHistory = () => {
   const dispatch = useDispatch();
@@ -134,29 +136,47 @@ const OrderHistory = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">My Orders</h2>
 
             <div className="flex gap-4 mb-4">
-              <select
-                name="status"
-                value={filters.status}
-                onChange={handleFilterChange}
-                className="p-2 border rounded"
-              >
-                <option value="">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="delivered">Delivered</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+              <div className="relative">
+                <select
+                  name="status"
+                  value={filters.status || ""}
+                  onChange={handleFilterChange}
+                  className="p-2 border rounded w-[150px] appearance-none pr-8"
+                >
+                  <option value="">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+                <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                  <img
+                    src={dropArrowIcon}
+                    alt="dropdown arrow"
+                    className="w-4"
+                  />
+                </div>
+              </div>
 
-              <select
-                name="sortOrder"
-                value={filters.sortOrder}
-                onChange={handleFilterChange}
-                className="p-2 border rounded"
-              >
-                <option value="desc">Newest First</option>
-                <option value="asc">Oldest First</option>
-              </select>
+              <div className="relative">
+                <select
+                  name="sortOrder"
+                  value={filters.sortOrder}
+                  onChange={handleFilterChange}
+                  className="p-2 border rounded w-[150px] appearance-none pr-8"
+                >
+                  <option value="desc">Newest First</option>
+                  <option value="asc">Oldest First</option>
+                </select>
+                <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                  <img
+                    src={dropArrowIcon}
+                    alt="dropdown arrow"
+                    className="w-4"
+                  />
+                </div>
+              </div>
             </div>
 
             {orderStatus === "fetch-loading" ? (
@@ -173,6 +193,11 @@ const OrderHistory = () => {
             ) : orders.length === 0 ? (
               // Show no orders available
               <div className="flex flex-col items-center text-center py-6">
+                <img
+                  src={emptyOrdersImg}
+                  alt="empty order image"
+                  className="w-25"
+                />
                 <p className="text-center text-gray-700 font-semibold py-6">
                   No{" "}
                   <span className="text-purple-600">
