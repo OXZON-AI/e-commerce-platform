@@ -7,10 +7,23 @@ import {
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaCartPlus } from "react-icons/fa";
-import { Fragment, React } from "react";
+import { Fragment, React, useEffect } from "react";
 import Slider from "react-slick";
 import LayoutOne from "../../layouts/LayoutOne";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories } from "../../store/slices/category-slice";
+
 const HomeElectronics = () => {
+  const dispatch = useDispatch();
+  const { categories, loadingCategories, errorCategory } = useSelector(
+    (state) => state.categories
+  );
+
+  // effect hook for fetch categories
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
   // Slick slider settings for the product carousel
   const productSliderSettings = {
     dots: true,
@@ -208,23 +221,22 @@ const HomeElectronics = () => {
               Shop by Category
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {["Laptops", "Smartphones", "Accessories", "Gaming"].map(
-                (category, index) => (
+              {categories &&
+                categories.map((category, index) => (
                   <div
                     key={index}
                     className="bg-white p-4 transition-all transform hover:scale-105 hover:shadow-xl duration-300 ease-in-out"
                   >
                     <img
-                      src={`https://dummyimage.com/300x350/000/fff`}
-                      alt={category}
-                      className=" mx-auto"
+                      src={category.image.url}
+                      alt={category.image.alt}
+                      className="h-[200px] mx-auto"
                     />
                     <h3 className="text-xl font-semibold text-center mt-3">
-                      {category}
+                      {category.name}
                     </h3>
                   </div>
-                )
-              )}
+                ))}
             </div>
           </div>
 
