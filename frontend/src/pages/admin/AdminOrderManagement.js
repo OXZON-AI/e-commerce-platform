@@ -17,7 +17,7 @@ const AdminOrderManagement = () => {
     status: orderStatus,
     error: orderError,
   } = useSelector((state) => state.orders);
-  
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateSort, setDateSort] = useState("newest");
@@ -34,10 +34,12 @@ const AdminOrderManagement = () => {
   useEffect(() => {
     dispatch(fetchOrders(filters));
   }, [dispatch, filters]);
-  
+
   // Filtering orders based on search input
   const filteredOrders = orders.filter((order) =>
-    order.customerName.toLowerCase().includes(search.toLowerCase())
+    order.items[0].variant.product.name
+      .toLowerCase()
+      .includes(search.toLowerCase())
   );
 
   // Handler for cancel order
@@ -189,6 +191,32 @@ const AdminOrderManagement = () => {
                   ))}
                 </tbody>
               </table>
+
+              {/* ------------Pagination--------------- */}
+              <div className="flex justify-end items-center mt-4 space-x-4">
+                {/* Previous Button */}
+                <button
+                  onClick={() => handlePagination("prev")}
+                  disabled={filters.page === 1}
+                  className={
+                    "px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                  }
+                >
+                  Previous
+                </button>
+
+                {/* Page Indicator */}
+                <span className="text-gray-700">Page {filters.page}</span>
+
+                {/* Next Button */}
+                <button
+                  onClick={() => handlePagination("next")}
+                  disabled={orders.length < 10}
+                  className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
         </div>
