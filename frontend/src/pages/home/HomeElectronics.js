@@ -12,10 +12,12 @@ import Slider from "react-slick";
 import LayoutOne from "../../layouts/LayoutOne";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../store/slices/category-slice";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import bannerImg from "../../assets/images/bannerv2.png";
 
 const HomeElectronics = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { categories, loadingCategories, errorCategory } = useSelector(
     (state) => state.categories
   );
@@ -194,22 +196,25 @@ const HomeElectronics = () => {
             {/* Static Images */}
             <div className="w-full h-full">
               <img
-                src="https://dummyimage.com/1920x600/ff6347/fff"
+                src={bannerImg}
                 alt="Hero 1"
                 className="w-full h-full object-cover object-center transition-transform transform hover:scale-110 duration-700"
               />
             </div>
 
             {/* Text Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center text-white text-center bg-gradient-to-b from-purple-800 to-transparent p-6">
+            <div className="absolute inset-0 flex items-center justify-center text-white text-center bg-[linear-gradient(to_bottom,_transparent,_#000000)] p-6">
               <div className="space-y-4 animate-fade-down">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold animate-slide-down">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white text-shadow-md font-extrabold animate-slide-down">
                   Discover the Future of Electronics
                 </h1>
-                <p className="text-lg sm:text-xl lg:text-2xl animate-slide-down-delay">
+                <p className="text-lg sm:text-xl lg:text-2xl text-gray-100 text-shadow-md animate-slide-down-delay">
                   Exclusive gadgets & unbeatable deals.
                 </p>
-                <button className="mt-6 px-8 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
+                <button
+                  className="mt-6 px-8 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105"
+                  onClick={() => navigate("/product-catalogue")}
+                >
                   Shop Now
                 </button>
               </div>
