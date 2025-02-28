@@ -149,7 +149,7 @@ const ProductDetailPage = () => {
                 )}
 
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="ml-auto">
+                  <div style={{ marginLeft: "200px" }}>
                     <button
                       className={`px-4 py-2 rounded-none text-white font-medium ${
                         productDetail.variants?.[0]?.stock > 0

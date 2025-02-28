@@ -7,8 +7,9 @@ import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
 import { toast } from "react-toastify";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
 import dropArrowIcon from "../../assets/icons/dropArrow.svg";
+import { FaSearch, FaDownload, FaEye, FaEdit } from "react-icons/fa";
 
-const OrderManagement = () => {
+const AdminOrderManagement = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const {
@@ -16,6 +17,10 @@ const OrderManagement = () => {
     status: orderStatus,
     error: orderError,
   } = useSelector((state) => state.orders);
+  
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateSort, setDateSort] = useState("newest");
 
   const [filters, setFilters] = useState({
     status: undefined,
@@ -29,6 +34,11 @@ const OrderManagement = () => {
   useEffect(() => {
     dispatch(fetchOrders(filters));
   }, [dispatch, filters]);
+  
+  // Filtering orders based on search input
+  const filteredOrders = orders.filter((order) =>
+    order.customerName.toLowerCase().includes(search.toLowerCase())
+  );
 
   // Handler for cancel order
   const handleCancelOrder = (oid) => {
@@ -76,187 +86,109 @@ const OrderManagement = () => {
         <Sidebar />
 
         {/* Main Content */}
+
         <div className="flex-1 p-0 overflow-y-auto">
           <div className="p-0 sm:p-8 md:p-10 lg:p-12 w-full mx-auto">
-            <div className="bg-white shadow-xl rounded-none p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-semibold text-gray-800">
-                  Order Management
-                </h2>
+            <div className="p-6 space-y-6 bg-gray-50">
+              {/* Page Title */}
+              <h2 className="text-4xl font-bold text-gray-800 text-center">
+                Order Management
+              </h2>
 
-                <div className="flex gap-4 mb-4">
-                  <div className="relative">
-                    <select
-                      name="status"
-                      value={filters.status || ""}
-                      onChange={handleFilterChange}
-                      className="p-2 border rounded w-[150px] appearance-none pr-8"
-                    >
-                      <option value="">All Status</option>
-                      <option value="pending">Pending</option>
-                      <option value="processing">Processing</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="delivered">Delivered</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                      <img
-                        src={dropArrowIcon}
-                        alt="dropdown arrow"
-                        className="w-4"
-                      />
-                    </div>
-                  </div>
+              {/* Search and Export Options */}
+              <div className="flex flex-wrap justify-between items-center gap-6 p-6 bg-white shadow-sm rounded-lg">
+                {/* Search Input & Button */}
+                <div className="flex items-center gap-4 flex-1">
+                  <input
+                    type="text"
+                    placeholder="Search orders..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="w-full max-w-md p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
+                  />
+                  <button className="flex items-center justify-center w-36 px-5 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition">
+                    <FaSearch className="mr-2" />
+                    <span>Search</span>
+                  </button>
+                </div>
 
-                  <div className="relative">
-                    <select
-                      name="sortOrder"
-                      value={filters.sortOrder}
-                      onChange={handleFilterChange}
-                      className="p-2 border rounded w-[150px] appearance-none pr-8"
-                    >
-                      <option value="desc">Newest First</option>
-                      <option value="asc">Oldest First</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
-                      <img
-                        src={dropArrowIcon}
-                        alt="dropdown arrow"
-                        className="w-4"
-                      />
-                    </div>
-                  </div>
+                {/* Filters and Export Section */}
+                <div className="flex items-center gap-4">
+                  {/* Status Filter Dropdown */}
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="w-52 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="processing">Processing</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+
+                  {/* Date Sort Dropdown */}
+                  <select
+                    value={dateSort}
+                    onChange={(e) => setDateSort(e.target.value)}
+                    className="w-52 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                  </select>
+
+                  {/* Export Button */}
+                  <button className="flex items-center justify-center w-36 px-5 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700 transition">
+                    <FaDownload className="mr-2" />
+                    <span>Export</span>
+                  </button>
                 </div>
               </div>
 
-              {/* orderStatus === "fetch-loading" & Empty State */}
-              {orderStatus === "fetch-loading" ? (
-                <div className="text-center text-gray-500 py-10">
-                  Loading orders...
-                </div>
-              ) : orders.length === 0 ? (
-                // Show no orders available
-                <div className="flex flex-col items-center text-center py-6">
-                  <img
-                    src={emptyOrdersImg}
-                    alt="empty order image"
-                    className="w-[150px]"
-                  />
-                  <p className="text-center text-gray-700 font-semibold py-6">
-                    No{" "}
-                    <span className="text-purple-600">
-                      {filters.status ? filters.status + " " : ""}
-                    </span>
-                    orders found.
-                  </p>
-                </div>
-              ) : (
-                // Table Structure
-                <div className="overflow-x-auto">
-                  <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
-                    <thead className="bg-gray-200 text-gray-700">
-                      <tr>
-                        <th className="py-3 px-6 text-left">Index</th>
-                        <th className="py-3 px-6 text-left">Order ID</th>
-                        <th className="py-3 px-6 text-left">Customer</th>
-                        <th className="py-3 px-6 text-left">Total</th>
-                        <th className="py-3 px-6 text-left">Status</th>
-                        <th className="py-3 px-6 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((order, index) => {
-                        // Calculate the starting index based on the current page
-                        const currentIndex =
-                          (filters.page - 1) * filters.limit + index + 1;
-
-                        return (
-                          <tr
-                            key={order._id}
-                            className="border-b border-gray-200 hover:bg-gray-100"
-                          >
-                            <td className="py-4 px-6 text-gray-800">
-                              {currentIndex}
-                            </td>
-                            <td className="py-4 px-6 text-gray-800">
-                              {order._id}
-                            </td>
-                            <td className="py-4 px-6 text-gray-800">
-                              {order.email}
-                            </td>
-                            <td className="py-4 px-6 text-gray-800">
-                              {order.payment.amount.toFixed(2)} MVR
-                            </td>
-                            <td className="py-4 px-6">
-                              <span
-                                className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                  order.status === "pending"
-                                    ? "bg-yellow-500 text-gray-900"
-                                    : order.status === "processing"
-                                    ? "bg-slate-500 text-white"
-                                    : order.status === "shipped"
-                                    ? "bg-blue-500 text-white"
-                                    : order.status === "delivered"
-                                    ? "bg-green-500 text-white"
-                                    : "bg-red-500 text-white"
-                                }`}
-                              >
-                                {order.status}
-                              </span>
-                            </td>
-                            <td className="py-4 px-6 flex space-x-2 justify-center">
-                              <button
-                                //onClick={() => handleStatusUpdate(order._id, "shipped")}
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
-                              >
-                                Mark as Shipped
-                              </button>
-                              <button
-                                onClick={() => handleCancelOrder(order._id)}
-                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
-                              >
-                                Cancel
-                              </button>
-                              <Link
-                                to={`/order/${order._id}`}
-                                className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm"
-                              >
-                                View
-                              </Link>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-
-                  {/* ------------Pagination--------------- */}
-                  <div className="flex justify-end items-center mt-4 space-x-4">
-                    {/* Previous Button */}
-                    <button
-                      onClick={() => handlePagination("prev")}
-                      disabled={filters.page === 1}
-                      className={
-                        "px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
-                      }
+              {/* Orders Table */}
+              <table className="min-w-full table-auto bg-white border border-gray-200 rounded-lg shadow-sm mt-6">
+                <thead className="bg-gray-100 text-base">
+                  <tr>
+                    <th className="p-4 text-left">Order ID</th>
+                    <th className="p-4 text-left">Delivery Date</th>
+                    <th className="p-4 text-left">Time Slot</th>
+                    <th className="p-4 text-left">Customer Name</th>
+                    <th className="p-4 text-left">Branch</th>
+                    <th className="p-4 text-left">Total Amount</th>
+                    <th className="p-4 text-left">Order Status</th>
+                    <th className="p-4 text-left">Order Type</th>
+                    <th className="p-4 text-left">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredOrders.map((order) => (
+                    <tr
+                      key={order.orderId}
+                      className="border-b hover:bg-gray-50"
                     >
-                      Previous
-                    </button>
-
-                    {/* Page Indicator */}
-                    <span className="text-gray-700">Page {filters.page}</span>
-
-                    {/* Next Button */}
-                    <button
-                      onClick={() => handlePagination("next")}
-                      disabled={orders.length < 10}
-                      className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
-                    >
-                      Next
-                    </button>
-                  </div>
-                </div>
-              )}
+                      <td className="p-4">{order.orderId}</td>
+                      <td className="p-4">{order.deliveryDate}</td>
+                      <td className="p-4">{order.timeSlot}</td>
+                      <td className="p-4">{order.customerName}</td>
+                      <td className="p-4">{order.branch}</td>
+                      <td className="p-4">{order.totalAmount}</td>
+                      <td className="p-4">{order.status}</td>
+                      <td className="p-4">{order.orderType}</td>
+                      <td className="p-4">
+                        <Link to="/manage-order-details">
+                          <button className="text-blue-500 hover:underline mr-4">
+                            <FaEye className="mr-2" size={24} />
+                          </button>
+                        </Link>
+                        <button className="text-yellow-500 hover:underline">
+                          <FaEdit className="mr-2" size={24} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -265,4 +197,4 @@ const OrderManagement = () => {
   );
 };
 
-export default OrderManagement;
+export default AdminOrderManagement;
