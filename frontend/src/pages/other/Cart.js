@@ -237,23 +237,31 @@ const Cart = () => {
                 Grand Total:
                 <span className="text-purple-600">{total.toFixed(2)} MVR</span>
               </h4>
-              <div className="text-center">
-                <Link
-                  to={"#"}
-                  onClick={checkoutHandler}
-                  className={`mt-5 block text-center ${
-                    checkoutLoading
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-purple-500 hover:bg-purple-600"
-                  } text-white font-medium px-4 py-2 rounded-md transition text-sm md:text-base justify-center inline-block`}
-                >
-                  {checkoutLoading
-                    ? "Processing..."
-                    : checkoutError
-                    ? "Try Again"
-                    : "Proceed to Checkout"}
-                </Link>
-                {/* <Link
+
+              <Link
+                to={"#"}
+                onClick={checkoutHandler}
+                className={`mt-5 block text-center ${
+                  checkoutLoading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-purple-500 hover:bg-purple-600"
+                } text-white font-medium px-6 py-2 rounded-md transition`}
+              >
+                {checkoutLoading
+                  ? "Processing..."
+                  : checkoutError
+                  ? "Try Again"
+                  : "Proceed to Checkout"}
+              </Link>
+
+              {checkoutError && (
+                <div className="mt-4 w-full bg-red-100 border-1 border-red-500 text-red-700 p-4 rounded-md mb-4">
+                  <p className="text-sm font-medium text-red-700">
+                    {checkoutError}
+                  </p>
+                </div>
+              )}
+              {/* <Link
                 to={process.env.PUBLIC_URL + "/checkout"}
                 className="mt-5 block text-center bg-purple-500 text-white font-medium px-6 py-2 rounded-md hover:bg-purple-600 transition"
               >

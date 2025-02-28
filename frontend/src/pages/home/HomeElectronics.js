@@ -7,10 +7,26 @@ import {
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaCartPlus } from "react-icons/fa";
-import { Fragment, React } from "react";
+import { Fragment, React, useEffect } from "react";
 import Slider from "react-slick";
 import LayoutOne from "../../layouts/LayoutOne";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories } from "../../store/slices/category-slice";
+import { Link, useNavigate } from "react-router-dom";
+import bannerImg from "../../assets/images/bannerv2.png";
+
 const HomeElectronics = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { categories, loadingCategories, errorCategory } = useSelector(
+    (state) => state.categories
+  );
+
+  // effect hook for fetch categories
+  useEffect(() => {
+    dispatch(fetchCategories());
+  }, [dispatch]);
+
   // Slick slider settings for the product carousel
   const productSliderSettings = {
     dots: true,
@@ -180,22 +196,25 @@ const HomeElectronics = () => {
             {/* Static Images */}
             <div className="w-full h-full">
               <img
-                src="https://dummyimage.com/1920x600/ff6347/fff"
+                src={bannerImg}
                 alt="Hero 1"
                 className="w-full h-full object-cover object-center transition-transform transform hover:scale-110 duration-700"
               />
             </div>
 
             {/* Text Overlay */}
-            <div className="absolute inset-0 flex items-center justify-center text-white text-center bg-gradient-to-b from-purple-800 to-transparent p-6">
+            <div className="absolute inset-0 flex items-center justify-center text-white text-center bg-[linear-gradient(to_bottom,_transparent,_#000000)] p-6">
               <div className="space-y-4 animate-fade-down">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold animate-slide-down">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl text-white text-shadow-md font-extrabold animate-slide-down">
                   Discover the Future of Electronics
                 </h1>
-                <p className="text-lg sm:text-xl lg:text-2xl animate-slide-down-delay">
+                <p className="text-lg sm:text-xl lg:text-2xl text-gray-100 text-shadow-md animate-slide-down-delay">
                   Exclusive gadgets & unbeatable deals.
                 </p>
-                <button className="mt-6 px-8 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105">
+                <button
+                  className="mt-6 px-8 py-3 bg-purple-600 text-white font-semibold rounded-full hover:bg-purple-700 transition duration-300 ease-in-out shadow-lg transform hover:scale-105"
+                  onClick={() => navigate("/product-catalogue")}
+                >
                   Shop Now
                 </button>
               </div>
@@ -208,23 +227,21 @@ const HomeElectronics = () => {
               Shop by Category
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {["Laptops", "Smartphones", "Accessories", "Gaming"].map(
-                (category, index) => (
-                  <div
-                    key={index}
-                    className="bg-white p-4 transition-all transform hover:scale-105 hover:shadow-xl duration-300 ease-in-out"
-                  >
-                    <img
-                      src={`https://dummyimage.com/300x350/000/fff`}
-                      alt={category}
-                      className=" mx-auto"
-                    />
-                    <h3 className="text-xl font-semibold text-center mt-3">
-                      {category}
-                    </h3>
-                  </div>
-                )
-              )}
+              {categories &&
+                categories.map((category, index) => (
+                  <Link key={index} to={`/product-catalogue/${category.slug}`}>
+                    <div className="bg-white p-4 transition-all transform hover:scale-105 hover:shadow-xl duration-300 ease-in-out">
+                      <img
+                        src={category.image.url}
+                        alt={category.image.alt}
+                        className="h-[200px] mx-auto"
+                      />
+                      <h3 className="text-xl font-semibold text-center mt-3">
+                        {category.name}
+                      </h3>
+                    </div>
+                  </Link>
+                ))}
             </div>
           </div>
 

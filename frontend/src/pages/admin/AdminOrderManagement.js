@@ -1,77 +1,80 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { FaSearch, FaDownload, FaEye, FaEdit } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import AdminNavbar from "./components/AdminNavbar";
 import Sidebar from "./components/Sidebar";
-const AdminOrderManagement = () => {
-  const [search, setSearch] = useState("");
+import { useDispatch, useSelector } from "react-redux";
+import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
+import { toast } from "react-toastify";
+import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
+import dropArrowIcon from "../../assets/icons/dropArrow.svg";
+import { FaSearch, FaDownload, FaEye, FaEdit } from "react-icons/fa";
 
+const AdminOrderManagement = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {
+    orders,
+    status: orderStatus,
+    error: orderError,
+  } = useSelector((state) => state.orders);
+  
+  const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateSort, setDateSort] = useState("newest");
 
-  // Sample order data
-  const orders = [
-    {
-      orderId: "1001",
-      deliveryDate: "2025-02-28",
-      timeSlot: "10:00 AM - 12:00 PM",
-      customerName: "John Doe",
-      contact: "123-456-7890",
-      branch: "Downtown",
-      totalAmount: "$150",
-      status: "Confirmed",
-      orderType: "Delivery",
-    },
-    {
-      orderId: "1002",
-      deliveryDate: "2025-03-01",
-      timeSlot: "2:00 PM - 4:00 PM",
-      customerName: "Jane Smith",
-      contact: "987-654-3210",
-      branch: "Uptown",
-      totalAmount: "$200",
-      status: "Out for Delivery",
-      orderType: "Delivery",
-    },
-    {
-      orderId: "1003",
-      deliveryDate: "2025-03-02",
-      timeSlot: "12:00 PM - 2:00 PM",
-      customerName: "Mike Johnson",
-      contact: "555-123-4567",
-      branch: "Midtown",
-      totalAmount: "$180",
-      status: "Pending",
-      orderType: "Pickup",
-    },
-    {
-      orderId: "1004",
-      deliveryDate: "2025-03-03",
-      timeSlot: "4:00 PM - 6:00 PM",
-      customerName: "Emily Davis",
-      contact: "444-987-6543",
-      branch: "Eastside",
-      totalAmount: "$250",
-      status: "Delivered",
-      orderType: "Delivery",
-    },
-    {
-      orderId: "1005",
-      deliveryDate: "2025-03-04",
-      timeSlot: "8:00 AM - 10:00 AM",
-      customerName: "Chris Brown",
-      contact: "333-222-1111",
-      branch: "Westside",
-      totalAmount: "$120",
-      status: "Processing",
-      orderType: "Pickup",
-    },
-  ];
+  const [filters, setFilters] = useState({
+    status: undefined,
+    sortBy: "date",
+    sortOrder: "desc",
+    page: 1,
+    limit: 10,
+  });
 
+  // Efect hook for fetch orders
+  useEffect(() => {
+    dispatch(fetchOrders(filters));
+  }, [dispatch, filters]);
+  
   // Filtering orders based on search input
   const filteredOrders = orders.filter((order) =>
     order.customerName.toLowerCase().includes(search.toLowerCase())
   );
+
+  // Handler for cancel order
+  const handleCancelOrder = (oid) => {
+    console.log("order-id : ", oid);
+
+    dispatch(cancelOrder(oid))
+      .unwrap()
+      .then(() => {
+        toast.success("Order cancelled successfully.");
+        dispatch(fetchOrders(filters))
+          .unwrap()
+          .then(() => {
+            console.log("🔰 Orders are re-fetched!");
+          });
+      })
+      .catch(() => {
+        toast.error("Failed to cancel order.");
+      });
+  };
+
+  // handler for filterChange
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value || undefined, // undefine use when value is empty, then mark as undefine
+      page: 1,
+    });
+  };
+
+  // handler for pagination
+  const handlePagination = (direction) => {
+    setFilters((prev) => ({
+      ...prev,
+      page: direction === "next" ? prev.page + 1 : Math.max(prev.page - 1, 1),
+    }));
+  };
 
   return (
     <div className="flex flex-col h-screen">
