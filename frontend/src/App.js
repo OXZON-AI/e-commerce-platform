@@ -134,6 +134,15 @@ const App = () => {
               }
             />
 
+            <Route
+              path={process.env.PUBLIC_URL + "/product-catalogue/:categoryUrl"}
+              element={
+                <ClientRouteProtector>
+                  <ProductListPage />
+                </ClientRouteProtector>
+              }
+            />
+
             {/* Route for individual product detail page with dynamic product ID */}
             <Route
               path={process.env.PUBLIC_URL + "/product/:slug"}
