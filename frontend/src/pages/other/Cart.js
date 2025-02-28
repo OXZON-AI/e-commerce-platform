@@ -270,7 +270,6 @@ const Cart = () => {
               </div>
             </div>
           </div>
-        </div>
       </LayoutOne>
     </Fragment>
   );
