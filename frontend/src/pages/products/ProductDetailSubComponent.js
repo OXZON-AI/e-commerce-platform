@@ -103,87 +103,62 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
           <p>{prodDetails.description.detailed}</p>
         )}
         {activeTab === "reviews" && (
-          <div className="flex flex-wrap justify-between">
-            {/* Left Side: Sample Reviews */}
-            <div className="w-full lg:w-2/3 pr-4 mb-8 lg:mb-0">
-              <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
-              <div className="border-b pb-4 mb-4">
-                <p className="font-semibold">John Doe</p>
-                <div className="flex mb-2">
-                  {"★".repeat(4)}
-                  {"☆".repeat(1)}
-                </div>
-                <p>
-                  Great laptop for gaming and productivity! Highly recommended.
-                </p>
-                <button className="text-blue-500 text-sm mt-2">Reply</button>
+        <div className="grid grid-cols-1 lg:grid-cols-[2.2fr_1.8fr] gap-4">
+        {/* Left Side: Customer Reviews */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
+          <h3 className="text-2xl font-semibold mb-4">Customer Reviews</h3>
+          <div className="space-y-4">
+            <div className="pb-3 border-b border-gray-200">
+              <p className="font-semibold">John Doe</p>
+              <div className="flex text-yellow-500 text-lg">
+                {"★".repeat(4)}{"☆".repeat(1)}
               </div>
-              <div className="border-b pb-4 mb-4">
-                <p className="font-semibold">Jane Smith</p>
-                <div className="flex mb-2">{"★".repeat(5)}</div>
-                <p>
-                  Excellent build quality and performance. Worth every penny!
-                </p>
-                <button className="text-blue-500 text-sm mt-2">Reply</button>
-              </div>
+              <p className="text-gray-700">Great laptop for gaming and productivity! Highly recommended.</p>
+              <button className="text-blue-500 text-sm mt-2">Reply</button>
             </div>
-
-            {/* Right Side: Add a Review Form */}
-            <div className="w-full lg:w-1/3 pl-4 border-l p-4 bg-white rounded-lg shadow-sm">
-              <h3 className="text-xl font-semibold mb-4">Add a Review</h3>
-              <form onSubmit={handleSubmit}>
-                <div className="mb-4">
-                  <label className="block mb-2">Your Rating:</label>
-                  <div className="flex">
-                    {"★"
-                      .repeat(5)
-                      .split("")
-                      .map((_, index) => (
-                        <button
-                          key={index}
-                          className="text-yellow-500 text-xl"
-                          type="button"
-                        >
-                          ★
-                        </button>
-                      ))}
-                  </div>
-                </div>
-                <div className="flex space-x-4 mb-4">
-                  <div className="flex-1">
-                    <label className="block mb-2">Name</label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label className="block mb-2">Email</label>
-                    <input
-                      type="email"
-                      className="w-full p-2 border rounded"
-                      placeholder="Enter your email"
-                    />
-                  </div>
-                </div>
-                <div className="mb-4">
-                  <label className="block mb-2">Message</label>
-                  <textarea
-                    className="w-full p-2 border rounded"
-                    rows="3"
-                    placeholder="Write your review"
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-none"
-                >
-                  Submit Review
-                </button>
-              </form>
+            <div className="pb-3 border-b border-gray-200">
+              <p className="font-semibold">Jane Smith</p>
+              <div className="flex text-yellow-500 text-lg">{"★".repeat(5)}</div>
+              <p className="text-gray-700">Excellent build quality and performance. Worth every penny!</p>
+              <button className="text-blue-500 text-sm mt-2">Reply</button>
             </div>
           </div>
+        </div>
+      
+        {/* Right Side: Add a Review (More Extended) */}
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
+          <h3 className="text-2xl font-semibold mb-4">Add a Review</h3>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block mb-2 font-medium">Your Rating:</label>
+              <div className="flex space-x-1">
+                {"★".repeat(5).split("").map((_, index) => (
+                  <button key={index} className="text-yellow-500 text-2xl" type="button">
+                    ★
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block mb-1 font-medium">Name</label>
+                <input type="text" className="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter your name" />
+              </div>
+              <div>
+                <label className="block mb-1 font-medium">Email</label>
+                <input type="email" className="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter your email" />
+              </div>
+            </div>
+            <div>
+              <label className="block mb-1 font-medium">Message</label>
+              <textarea className="w-full p-2 border border-gray-300 rounded-md" rows="4" placeholder="Write your review"></textarea>
+            </div>
+            <button type="submit" className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-md transition">
+              Submit Review
+            </button>
+          </form>
+        </div>
+      </div>      
         )}
       </div>
       {/* Success Message */}
