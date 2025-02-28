@@ -7,9 +7,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCart } from "../../store/slices/cart-slice";
 import { fetchProductDetails } from "../../store/slices/product-slice";
 import HashLoader from "react-spinners/HashLoader";
+import { useNavigate } from "react-router-dom";
 
 const OrderHistory = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const {
     orders,
     status: orderStatus,
@@ -170,9 +172,21 @@ const OrderHistory = () => {
               </div>
             ) : orders.length === 0 ? (
               // Show no orders available
-              <p className="text-center text-gray-700 font-semibold py-6">
-                No <span className="text-purple-600">{filters.status ? filters.status + " " : ""}</span>orders found.
-              </p>
+              <div className="flex flex-col items-center text-center py-6">
+                <p className="text-center text-gray-700 font-semibold py-6">
+                  No{" "}
+                  <span className="text-purple-600">
+                    {filters.status ? filters.status + " " : ""}
+                  </span>
+                  orders found.
+                </p>
+                <button
+                  className="px-6 py-2 border-1 border-purple-500 bg-purple-100 font-medium text-purple-600 rounded-lg hover:bg-purple-600 hover:text-white transition"
+                  onClick={() => navigate("/product-catalogue")}
+                >
+                  Shop Now
+                </button>
+              </div>
             ) : (
               // Show Table Only If There’s No Loading/Error -----------------------------------------------------------------
               <div className="overflow-x-auto">
@@ -245,9 +259,7 @@ const OrderHistory = () => {
                               <td className="p-3">
                                 {getStatusBadge(order.status)}
                               </td>
-                              <td className="p-3">
-                                {}
-                              </td>
+                              <td className="p-3">{}</td>
                               <td className="p-3 flex items-center gap-2">
                                 <button
                                   className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
