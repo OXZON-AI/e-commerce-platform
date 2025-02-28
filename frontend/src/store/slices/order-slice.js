@@ -4,9 +4,11 @@ import axiosInstance from "../../axiosConfig";
 // Async thunk to fetch orders
 export const fetchOrders = createAsyncThunk(
   "orders/fetchOrders",
-  async (_, { rejectWithValue }) => {
+  async (filters = {}, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/v1/orders/");
+      const response = await axiosInstance.get("/v1/orders/", {
+        params: filters,
+      });
       console.log("orders-slice : ", response.data);
 
       return response.data;
@@ -42,11 +44,13 @@ export const cancelOrder = createAsyncThunk(
     try {
       const response = await axiosInstance.patch(
         `/v1/orders/${oid}/cancel`,
-        {},
+        {}
       );
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to cancel order");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to cancel order"
+      );
     }
   }
 );
