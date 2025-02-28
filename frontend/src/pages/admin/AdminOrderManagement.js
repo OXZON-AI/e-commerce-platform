@@ -165,62 +165,68 @@ const OrderManagement = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {orders.map((order, index) => (
-                        <tr
-                          key={order._id}
-                          className="border-b border-gray-200 hover:bg-gray-100"
-                        >
-                          <td className="py-4 px-6 text-gray-800">
-                            #{index + 1}
-                          </td>
-                          <td className="py-4 px-6 text-gray-800">
-                            {order._id}
-                          </td>
-                          <td className="py-4 px-6 text-gray-800">
-                            {order.email}
-                          </td>
-                          <td className="py-4 px-6 text-gray-800">
-                            ${order.payment.amount.toFixed(2)}
-                          </td>
-                          <td className="py-4 px-6">
-                            <span
-                              className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                                order.status === "pending"
-                                  ? "bg-yellow-500 text-gray-900"
-                                  : order.status === "processing"
-                                  ? "bg-slate-500 text-white"
-                                  : order.status === "shipped"
-                                  ? "bg-blue-500 text-white"
-                                  : order.status === "delivered"
-                                  ? "bg-green-500 text-white"
-                                  : "bg-red-500 text-white"
-                              }`}
-                            >
-                              {order.status}
-                            </span>
-                          </td>
-                          <td className="py-4 px-6 flex space-x-2 justify-center">
-                            <button
-                              //onClick={() => handleStatusUpdate(order._id, "shipped")}
-                              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
-                            >
-                              Mark as Shipped
-                            </button>
-                            <button
-                              onClick={() => handleCancelOrder(order._id)}
-                              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
-                            >
-                              Cancel
-                            </button>
-                            <Link
-                              to={`/order/${order._id}`}
-                              className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm"
-                            >
-                              View
-                            </Link>
-                          </td>
-                        </tr>
-                      ))}
+                      {orders.map((order, index) => {
+                        // Calculate the starting index based on the current page
+                        const currentIndex =
+                          (filters.page - 1) * filters.limit + index + 1;
+
+                        return (
+                          <tr
+                            key={order._id}
+                            className="border-b border-gray-200 hover:bg-gray-100"
+                          >
+                            <td className="py-4 px-6 text-gray-800">
+                              {currentIndex}
+                            </td>
+                            <td className="py-4 px-6 text-gray-800">
+                              {order._id}
+                            </td>
+                            <td className="py-4 px-6 text-gray-800">
+                              {order.email}
+                            </td>
+                            <td className="py-4 px-6 text-gray-800">
+                              {order.payment.amount.toFixed(2)} MVR
+                            </td>
+                            <td className="py-4 px-6">
+                              <span
+                                className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                                  order.status === "pending"
+                                    ? "bg-yellow-500 text-gray-900"
+                                    : order.status === "processing"
+                                    ? "bg-slate-500 text-white"
+                                    : order.status === "shipped"
+                                    ? "bg-blue-500 text-white"
+                                    : order.status === "delivered"
+                                    ? "bg-green-500 text-white"
+                                    : "bg-red-500 text-white"
+                                }`}
+                              >
+                                {order.status}
+                              </span>
+                            </td>
+                            <td className="py-4 px-6 flex space-x-2 justify-center">
+                              <button
+                                //onClick={() => handleStatusUpdate(order._id, "shipped")}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+                              >
+                                Mark as Shipped
+                              </button>
+                              <button
+                                onClick={() => handleCancelOrder(order._id)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
+                              >
+                                Cancel
+                              </button>
+                              <Link
+                                to={`/order/${order._id}`}
+                                className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm"
+                              >
+                                View
+                              </Link>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
 

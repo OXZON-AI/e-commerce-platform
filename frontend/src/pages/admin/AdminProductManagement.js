@@ -860,82 +860,88 @@ const AdminProductManagement = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((product, index) => (
-                      <tr key={product._id} className="border-t">
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          {index + 1}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          <img
-                            src={
-                              product.defaultVariant?.image?.url ||
-                              placeholderImage
-                            }
-                            alt={
-                              product.defaultVariant?.image?.alt ||
-                              "Product Image"
-                            }
-                            onError={(e) => {
-                              e.target.src = placeholderImage;
-                            }}
-                            className="w-12 h-12 object-cover rounded-lg shadow-md"
-                          />
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          {product.name}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          {product.description?.short ? (
-                            <span className="text-gray-700">
-                              Description Provided
-                            </span>
-                          ) : (
-                            <span className="text-yellow-500">N/A</span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          {product.defaultVariant?.price || "N/A"} MVR
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          {product.defaultVariant?.stock ? (
-                            <div className="border-1 border-blue-500 bg-blue-100 text-blue-600 px-2 py-1 rounded">
-                              {product.defaultVariant.stock}
-                            </div>
-                          ) : (
-                            <div className="border-1 border-red-500 bg-red-100 text-red-600 px-2 py-1 rounded">
-                              Out of Stock!
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          {product.category?.name || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          {product.brand || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">
-                          {product.isActive === true
-                            ? "🟢 Active"
-                            : product.isActive === false
-                            ? "🟡 Inactive"
-                            : "N/A"}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-right space-x-2">
-                          <button
-                            onClick={() => openModal(product.slug)}
-                            className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-400 transition-all duration-200"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => openDeleteModal(product._id)}
-                            className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-500 transition-all duration-200"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {items.map((product, index) => {
+                      // Calculate the starting index based on the current page
+                      const currentIndex =
+                        (filters.page - 1) * filters.limit + index + 1;
+
+                      return (
+                        <tr key={product._id} className="border-t">
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {currentIndex}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            <img
+                              src={
+                                product.defaultVariant?.image?.url ||
+                                placeholderImage
+                              }
+                              alt={
+                                product.defaultVariant?.image?.alt ||
+                                "Product Image"
+                              }
+                              onError={(e) => {
+                                e.target.src = placeholderImage;
+                              }}
+                              className="w-12 h-12 object-cover rounded-lg shadow-md"
+                            />
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {product.name}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {product.description?.short ? (
+                              <span className="text-gray-700">
+                                Description Provided
+                              </span>
+                            ) : (
+                              <span className="text-yellow-500">N/A</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {product.defaultVariant?.price || "N/A"} MVR
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {product.defaultVariant?.stock ? (
+                              <div className="border-1 border-blue-500 bg-blue-100 text-blue-600 px-2 py-1 rounded">
+                                {product.defaultVariant.stock}
+                              </div>
+                            ) : (
+                              <div className="border-1 border-red-500 bg-red-100 text-red-600 px-2 py-1 rounded">
+                                Out of Stock!
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {product.category?.name || "N/A"}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {product.brand || "N/A"}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-700">
+                            {product.isActive === true
+                              ? "🟢 Active"
+                              : product.isActive === false
+                              ? "🟡 Inactive"
+                              : "N/A"}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-right space-x-2">
+                            <button
+                              onClick={() => openModal(product.slug)}
+                              className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-400 transition-all duration-200"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => openDeleteModal(product._id)}
+                              className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-500 transition-all duration-200"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}
