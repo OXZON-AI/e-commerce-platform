@@ -168,6 +168,11 @@ const OrderHistory = () => {
               <div className="my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
                 <span className="mt-3">{orderError}</span>
               </div>
+            ) : orders.length === 0 ? (
+              // Show no orders available
+              <p className="text-center text-gray-700 font-semibold py-6">
+                No <span className="text-purple-600">{filters.status ? filters.status + " " : ""}</span>orders found.
+              </p>
             ) : (
               // Show Table Only If There’s No Loading/Error -----------------------------------------------------------------
               <div className="overflow-x-auto">
@@ -180,7 +185,7 @@ const OrderHistory = () => {
                       <th className="p-3 text-left">Date</th>
                       <th className="p-3 text-left">Total price</th>
                       <th className="p-3 text-left">Order Status</th>
-                      {/* <th className="p-3 text-left">Loyalty Points</th> */}
+                      <th className="p-3 text-left">Loyalty Points</th>
                       <th className="p-3 text-left">Action</th>
                     </tr>
                   </thead>
@@ -192,12 +197,12 @@ const OrderHistory = () => {
                             key={order._id}
                             className="bg-gray-200 font-medium"
                           >
-                            <td className="p-3" colSpan="5">
+                            <td className="p-3" colSpan="6">
                               Order ID: {order._id} -{" "}
                               {new Date(order.createdAt).toLocaleDateString()}
                             </td>
-                            <td className="p-3" colSpan="1">
-                              {order.earnedPoints}
+                            <td className="p-3 text-green-600" colSpan="1">
+                              +{order.earnedPoints}
                             </td>
                             <td className="p-3 text-left" colSpan="1">
                               {order.status === "pending" ? (
@@ -239,6 +244,9 @@ const OrderHistory = () => {
                               </td>
                               <td className="p-3">
                                 {getStatusBadge(order.status)}
+                              </td>
+                              <td className="p-3">
+                                {}
                               </td>
                               <td className="p-3 flex items-center gap-2">
                                 <button
