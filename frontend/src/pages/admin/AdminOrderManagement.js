@@ -38,6 +38,11 @@ const OrderManagement = () => {
       .unwrap()
       .then(() => {
         toast.success("Order cancelled successfully.");
+        dispatch(fetchOrders(filters))
+          .unwrap()
+          .then(() => {
+            console.log("🔰 Orders are re-fetched!");
+          });
       })
       .catch(() => {
         toast.error("Failed to cancel order.");
