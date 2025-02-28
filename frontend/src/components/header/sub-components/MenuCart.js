@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 // import { getDiscountPrice } from "../../../helpers/product";
@@ -17,6 +17,7 @@ const MenuCart = () => {
     status: cartStatus,
     error: cartError,
   } = useSelector((state) => state.cart);
+  const [variantIdToBeDeleted, setVariantIdToBeDeleted] = useState(null);
   // const { loading: checkoutLoading, error: checkoutError } = useSelector(
   //   (state) => state.checkout
   // );
@@ -33,19 +34,39 @@ const MenuCart = () => {
 
   // cart item remove handler
   const cartItemDeleteHandler = (variantId) => {
-    dispatch(removeFromCart(variantId));
-  };
-
-  // cart re-fetch handler
-  const cartReFetch = () => {
-    dispatch(fetchCart())
+    dispatch(removeFromCart(variantId))
       .unwrap()
       .then(() => {
-        toast.info("Cart Re Fetched!");
+        toast.success("Item Removed!");
       })
       .catch(() => {
-        toast.error("Cart Re Fetch Failed!");
+        toast.error("Failed to remove!");
       });
+
+    setVariantIdToBeDeleted(variantId); // taking variant id to local state for re-try option
+  };
+
+  // cart re-try handler
+  const cartReTry = () => {
+    if (cartStatus === "failed-fetch-cart") {
+      dispatch(fetchCart())
+        .unwrap()
+        .then(() => {
+          toast.info("Cart Re Fetched!");
+        })
+        .catch(() => {
+          toast.error("Cart Re Fetch Failed!");
+        });
+    } else if (cartStatus === "failed-remove-item-cart") {
+      dispatch(removeFromCart(variantIdToBeDeleted))
+      .unwrap()
+      .then(() => {
+        toast.success("Item Removed!");
+      })
+      .catch(() => {
+        toast.error("Failed to remove!");
+      });
+    }
   };
 
   // Checkout button handler - Payment Integration - Stripe Payment Gateway
@@ -72,7 +93,7 @@ const MenuCart = () => {
           </p>
           <button
             className="border bg-white text-gray-500 text-sm font-medium px-4 py-2 rounded-md mt-2 hover: !important"
-            onClick={() => cartReFetch()}
+            onClick={() => cartReTry()}
           >
             <p className="text-sm font-medium text-gray-500">Re-Try!</p>
           </button>
