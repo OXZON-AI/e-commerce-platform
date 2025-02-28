@@ -6,13 +6,14 @@ import {
   clearBrands,
 } from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import LayoutOne from "../../layouts/LayoutOne";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid"; // Import search icon
 
 const ProductListPage = () => {
+  const { categoryUrl } = useParams(); // Get category slug from url
   const dispatch = useDispatch(); // Dispatch function to interact with Redux store
   const navigate = useNavigate();
   const {
@@ -34,7 +35,7 @@ const ProductListPage = () => {
   // Local state to manage the filters
   const [filters, setFilters] = useState({
     search: "",
-    category: "All Categories",
+    category: categoryUrl || "All Categories", // Use category from URL if there is or default to "All Categories"
     brand: "All Brands",
     sortBy: "", // Field to sort by (ratings or price)
     sortOrder: "", // Sort order (ascending or descending)
@@ -85,6 +86,15 @@ const ProductListPage = () => {
 
     return query;
   };
+
+  // Effect hook to update categoryUrl inside filter when URL changes
+  useEffect(() => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      category: categoryUrl || "All Categories", // Use category from URL if there is or default to "All Categories"
+      page: 1, // Reset pagination
+    }));
+  }, [categoryUrl]);
 
   // Effect hook to fetch products when filters change or component mounts
   useEffect(() => {
