@@ -196,7 +196,7 @@ const OrderHistory = () => {
                 <img
                   src={emptyOrdersImg}
                   alt="empty order image"
-                  className="w-25"
+                  className="w-[100px]"
                 />
                 <p className="text-center text-gray-700 font-semibold py-6">
                   No{" "}
