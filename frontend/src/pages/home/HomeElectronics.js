@@ -12,6 +12,7 @@ import Slider from "react-slick";
 import LayoutOne from "../../layouts/LayoutOne";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../store/slices/category-slice";
+import { Link } from "react-router-dom";
 
 const HomeElectronics = () => {
   const dispatch = useDispatch();
@@ -223,19 +224,18 @@ const HomeElectronics = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {categories &&
                 categories.map((category, index) => (
-                  <div
-                    key={index}
-                    className="bg-white p-4 transition-all transform hover:scale-105 hover:shadow-xl duration-300 ease-in-out"
-                  >
-                    <img
-                      src={category.image.url}
-                      alt={category.image.alt}
-                      className="h-[200px] mx-auto"
-                    />
-                    <h3 className="text-xl font-semibold text-center mt-3">
-                      {category.name}
-                    </h3>
-                  </div>
+                  <Link key={index} to={`/product-catalogue/${category.slug}`}>
+                    <div className="bg-white p-4 transition-all transform hover:scale-105 hover:shadow-xl duration-300 ease-in-out">
+                      <img
+                        src={category.image.url}
+                        alt={category.image.alt}
+                        className="h-[200px] mx-auto"
+                      />
+                      <h3 className="text-xl font-semibold text-center mt-3">
+                        {category.name}
+                      </h3>
+                    </div>
+                  </Link>
                 ))}
             </div>
           </div>
