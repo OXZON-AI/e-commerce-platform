@@ -39,7 +39,8 @@ const OrderHistory = () => {
       .unwrap()
       .then(() => {
         toast.success("Order cancelled successfully.");
-        dispatch(fetchOrders())
+        // Use current filters (which include the current page) when refetching orders
+        dispatch(fetchOrders(filters))
           .unwrap()
           .then(() => {
             console.log("🔰 Orders are re-fetched!");
