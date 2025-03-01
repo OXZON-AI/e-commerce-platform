@@ -1,5 +1,6 @@
 import { Order } from "../models/order.model.js";
 import { Variant } from "../models/variant.model.js";
+import { cancel } from "../services/order.service.js";
 import { customError } from "../utils/error.util.js";
 import { logger } from "../utils/logger.util.js";
 import {
@@ -188,23 +189,35 @@ export const updateOrderStatus = async (req, res, next) => {
 
   if (error) return next(error);
 
-  const { oid, status } = value;
-
+  const { oid, user, isGuest, status } = value;
   try {
-    const order = await Order.findByIdAndUpdate(
-      oid,
-      {
-        $set: {
-          status,
-        },
-      },
-      { new: true }
-    );
+    let order = null;
 
-    if (!order) {
-      const error = customError(404, "Order not found");
-      logger.error(`Order with id ${oid} not found: `, error);
-      return next(error);
+    if (status === "cancelled") {
+      order = await cancel(oid, user, isGuest);
+    } else {
+      order = await Order.findOne({ _id: oid, isGuest });
+
+      if (!order) {
+        const error = customError(404, "Order not found");
+        logger.error(`Order with id ${oid} not found: `, error);
+        return next(error);
+      }
+
+      if (order.status === "cancelled") {
+        const error = customError(
+          400,
+          "Can't update status of cancelled order"
+        );
+        logger.error(
+          `Attempt to update status of cancelled order with id ${oid}: `,
+          error
+        );
+        return next(error);
+      }
+
+      order.status = status;
+      await order.save();
     }
 
     logger.info(`Status of the order with id ${oid} updated successfully.`);
@@ -225,68 +238,15 @@ export const cancelOrder = async (req, res, next) => {
 
   const { oid } = value;
 
-  const session = await mongoose.startSession();
-  session.startTransaction();
   try {
-    const order = await Order.findOne({
-      _id: oid,
-      user: id,
-    }).session(session);
+    await cancel(oid, id);
 
-    if (!order) {
-      const error = customError(404, "Order not found");
-      logger.error(`Order with id ${oid} not found: `, error);
-      return next(error);
-    }
-
-    if (order.status !== "pending") {
-      const error = customError(
-        400,
-        order.status === "cancelled"
-          ? "Order is already cancelled."
-          : `Order is ${order.status}. Order can't be cancelled.`
-      );
-
-      logger.error(`Order not allowed to be cancelled: `, error);
-      return next(error);
-    }
-
-    const stripe = new Stripe(process.env.STRIPE_SECRET);
-
-    const refund = await stripe.refunds.create({
-      payment_intent: order.payment.transactionId,
-    });
-
-    const bulkOperations = [];
-
-    order.items.forEach((item) => {
-      bulkOperations.push({
-        updateOne: {
-          filter: { _id: item.variant },
-          update: { $inc: { stock: item.quantity } },
-        },
-      });
-    });
-
-    order.payment.refundId = refund.id;
-    order.status = "cancelled";
-
-    await order.save({ session });
-    await Variant.bulkWrite(bulkOperations, { session });
-
-    await session.commitTransaction();
-
-    logger.info(`Order ${oid} cancelled with refund id ${refund.id}.`);
     return res.status(200).json({
       message:
         "Order cancelled successfully. It may take a few days for the money to reach you.",
     });
   } catch (error) {
-    await session.abortTransaction();
-
     logger.error(`Order ${oid} cancel failed for user ${id}: `, error);
     return next(error);
-  } finally {
-    await session.endSession();
   }
 };
