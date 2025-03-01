@@ -95,8 +95,22 @@ export const fetchRelatedProducts = createAsyncThunk(
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          "Failed Retrive Related Product Details!"
+        error.response?.data?.message || "Failed Retrive Related Products!"
+      );
+    }
+  }
+);
+
+// Async thunk to get recommend products
+export const fetchRecommendProducts = createAsyncThunk(
+  "peoduct/recommendProduct",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("v1/products/recommendations/");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed Retrive Recommend Products!"
       );
     }
   }
