@@ -294,7 +294,7 @@ const HomeElectronics = () => {
                 recommendProducts.map((categoryItem) => (
                   <div
                     key={categoryItem._id}
-                    className="bg-white p-6 rounded-lg shadow-lg"
+                    className="bg-white p-6 rounded-lg"
                   >
                     {/* Category Name Container */}
                     <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -311,7 +311,7 @@ const HomeElectronics = () => {
                           >
                             {/* Product Image (Centered) */}
                             <div className="flex justify-center items-center mb-4">
-                              <div className="h-48 w-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <div className="h-48 w-48 bg-whhite rounded-lg flex items-center justify-center">
                                 <img
                                   src={
                                     product.defaultVariant.image.url ||
