@@ -31,6 +31,17 @@ export const updateStatusSchema = Joi.object({
     .messages({
       "string.pattern.base": "Order id must be a valid ObjectId",
     }),
+  user: Joi.when("isGuest", {
+    is: Joi.equal(false),
+    then: Joi.string()
+      .regex(/^[0-9a-fA-F]{24}$/)
+      .messages({
+        "string.pattern.base": "User id must be a valid ObjectId",
+      })
+      .required(),
+    otherwise: Joi.forbidden(),
+  }),
+  isGuest: Joi.boolean().required(),
   status: Joi.string()
     .trim()
     .valid("pending", "processing", "shipped", "delivered", "cancelled")
