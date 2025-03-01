@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../store/slices/category-slice";
 import { Link, useNavigate } from "react-router-dom";
 import bannerImg from "../../assets/images/bannerv2.png";
+import { fetchRecommendProducts } from "../../store/slices/product-slice";
+import placeholderImage from "../../assets/images/placeholder_image.png";
 
 const HomeElectronics = () => {
   const dispatch = useDispatch();
@@ -21,10 +23,20 @@ const HomeElectronics = () => {
   const { categories, loadingCategories, errorCategory } = useSelector(
     (state) => state.categories
   );
+  const {
+    recommendProducts,
+    loading: productLoading,
+    error: productError,
+  } = useSelector((state) => state.product);
 
   // effect hook for fetch categories
   useEffect(() => {
     dispatch(fetchCategories());
+  }, [dispatch]);
+
+  // effect hook for fetch user recommend products
+  useEffect(() => {
+    dispatch(fetchRecommendProducts());
   }, [dispatch]);
 
   // Slick slider settings for the product carousel
@@ -277,28 +289,67 @@ const HomeElectronics = () => {
             <h2 className="text-4xl font-bold text-center text-black mb-10">
               Just for You
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-              {[...Array(16)].map((_, index) => (
-                <div
-                  key={index}
-                  className="bg-white p-6 hover:shadow-2xl transition-transform transform hover:scale-105 duration-300 ease-in-out text-center"
-                >
-                  <img
-                    src={`https://dummyimage.com/300x300/979797/fff&text=Product+${
-                      index + 1
-                    }`}
-                    alt={`Product ${index + 1}`}
-                    className="w-full h-64 object-cover mb-4"
-                  />
-                  <h3 className="text-xl font-semibold text-purple-800">
-                    Product Name {index + 1}
-                  </h3>
-                  <p className="text-gray-600 text-lg">$299.99</p>
-                  <button className="mt-4 px-6 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition duration-300 ease-in-out transform hover:scale-105">
-                    <FaCartPlus className="inline mr-2" /> Add to Cart
-                  </button>
-                </div>
-              ))}
+            <div className="space-y-8">
+              {recommendProducts &&
+                recommendProducts.map((categoryItem) => (
+                  <div
+                    key={categoryItem._id}
+                    className="bg-white p-6 rounded-lg shadow-lg"
+                  >
+                    {/* Category Name Container */}
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                      {categoryItem.category.name}
+                    </h2>
+
+                    {/* Products Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                      {categoryItem.prdoducts &&
+                        categoryItem.prdoducts.map((product) => (
+                          <div
+                            key={product._id}
+                            className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out"
+                          >
+                            <div className="flex flex-col md:flex-row items-center">
+                              {/* Product Image */}
+                              <div className="flex-shrink-0 mb-4 md:mb-0 mr-0">
+                                <div className="h-48 w-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                                  <img
+                                    src={
+                                      product.defaultVariant.image.url ||
+                                      placeholderImage
+                                    }
+                                    alt={
+                                      product.defaultVariant.image.alt ||
+                                      "Recommen product image"
+                                    }
+                                    onError={(e) => {
+                                      e.target.src = placeholderImage;
+                                    }}
+                                    className="h-40 object-contain"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Product Details */}
+                            <h3 className="text-lg font-semibold text-purple-800 text-center">
+                              {product.name}
+                            </h3>
+                            <p className="text-gray-600 text-md text-center">
+                              {product.defaultVariant.price}
+                            </p>
+
+                            {/* Centered Add to Cart Button */}
+                            <div className="flex justify-center mt-3">
+                              <button className="px-5 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition duration-300 ease-in-out flex items-center">
+                                <FaCartPlus className="mr-2" /> Add to Cart
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
 
