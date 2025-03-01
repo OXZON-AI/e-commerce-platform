@@ -298,7 +298,7 @@ const HomeElectronics = () => {
                   >
                     {/* Category Name Container */}
                     <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                      {categoryItem.category.name}
+                      {categoryItem.category.name} for you!
                     </h2>
 
                     {/* Products Grid */}
@@ -309,25 +309,23 @@ const HomeElectronics = () => {
                             key={product._id}
                             className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out"
                           >
-                            <div className="flex flex-col md:flex-row items-center">
-                              {/* Product Image */}
-                              <div className="flex-shrink-0 mb-4 md:mb-0 mr-0">
-                                <div className="h-48 w-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                                  <img
-                                    src={
-                                      product.defaultVariant.image.url ||
-                                      placeholderImage
-                                    }
-                                    alt={
-                                      product.defaultVariant.image.alt ||
-                                      "Recommen product image"
-                                    }
-                                    onError={(e) => {
-                                      e.target.src = placeholderImage;
-                                    }}
-                                    className="h-40 object-contain"
-                                  />
-                                </div>
+                            {/* Product Image (Centered) */}
+                            <div className="flex justify-center items-center mb-4">
+                              <div className="h-48 w-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <img
+                                  src={
+                                    product.defaultVariant.image.url ||
+                                    placeholderImage
+                                  }
+                                  alt={
+                                    product.defaultVariant.image.alt ||
+                                    "Recommen product image"
+                                  }
+                                  onError={(e) => {
+                                    e.target.src = placeholderImage;
+                                  }}
+                                  className="h-40 object-contain"
+                                />
                               </div>
                             </div>
 
