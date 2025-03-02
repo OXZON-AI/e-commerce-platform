@@ -189,8 +189,8 @@ const RegisteredUsers = () => {
                     {users &&
                       users.map((user, index) => {
                         // Calculate the starting index based on the current page
-                        // const currentIndex =
-                        // (filters.page - 1) * filters.limit + index + 1;
+                        const currentIndex =
+                        (filters.page - 1) * filters.limit + index + 1;
 
                         return (
                           <tr
@@ -198,7 +198,7 @@ const RegisteredUsers = () => {
                             className="border-b border-gray-200 hover:bg-gray-50"
                           >
                             <td className="px-6 py-4 text-gray-700">
-                              {index + 1}
+                              {currentIndex}
                             </td>
                             <td className="px-6 py-4 text-gray-700">
                               {user.name}
