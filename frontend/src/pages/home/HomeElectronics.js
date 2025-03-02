@@ -16,6 +16,7 @@ import { Link, useNavigate } from "react-router-dom";
 import bannerImg from "../../assets/images/bannerv2.png";
 import { fetchRecommendProducts } from "../../store/slices/product-slice";
 import placeholderImage from "../../assets/images/placeholder_image.png";
+import recommendsImg from "../../assets/images/recommends.svg";
 
 const HomeElectronics = () => {
   const dispatch = useDispatch();
@@ -309,8 +310,8 @@ const HomeElectronics = () => {
 
                       {/* Products Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {categoryItem.prdoducts &&
-                          categoryItem.prdoducts.map((product) => (
+                        {categoryItem.products &&
+                          categoryItem.products.map((product) => (
                             <div
                               key={product._id}
                               className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out"
@@ -356,7 +357,41 @@ const HomeElectronics = () => {
                   ))}
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div className="w-full bg-white py-16 flex items-center justify-center">
+              <div className="container mx-auto flex flex-col md:flex-row items-center">
+                {/* Left Side - Vector Image */}
+                <div className="w-full md:w-1/2 flex justify-center">
+                  <img
+                    src={recommendsImg} // Replace with your actual vector image path
+                    alt="Recommend vector Image"
+                    className="max-w-sm md:max-w-md"
+                  />
+                </div>
+
+                {/* Right Side - Instruction Text */}
+                <div className="w-full md:w-1/2 text-start md:text-left px-6">
+                  <h2 className="text-3xl font-bold text-gray-800">
+                    Log in or Sign up for Recommendations
+                  </h2>
+                  <p className="text-gray-600 mt-3">
+                    <span className="font-medium">
+                      We will recommend the best products based on your
+                      experience with us.
+                    </span>{" "}
+                    Sign up or log in now to get personalized suggestions!
+                  </p>
+
+                  {/* Login Button */}
+                  <div className="mt-5">
+                    <button className="px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-md hover:bg-blue-700 transition duration-300" onClick={() => navigate("/login-register")}>
+                      Log In / Sign Up
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Promotional Banner */}
           {/* <div
