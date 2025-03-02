@@ -28,6 +28,11 @@ const HomeElectronics = () => {
     loading: productLoading,
     error: productError,
   } = useSelector((state) => state.product);
+  const {
+    userInfo,
+    loading: userLoading,
+    error: userError,
+  } = useSelector((state) => state.user);
 
   // effect hook for fetch categories
   useEffect(() => {
@@ -285,71 +290,73 @@ const HomeElectronics = () => {
           </div>
 
           {/* Just for You Section */}
-          <div className="container mx-auto py-12">
-            <h2 className="text-4xl font-bold text-center text-black mb-10">
-              Just for You
-            </h2>
-            <div className="space-y-8">
-              {recommendProducts &&
-                recommendProducts.map((categoryItem) => (
-                  <div
-                    key={categoryItem._id}
-                    className="bg-white p-6 rounded-lg"
-                  >
-                    {/* Category Name Container */}
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                      {categoryItem.category.name} for you!
-                    </h2>
+          {userInfo && userInfo ? (
+            <div className="container mx-auto py-12">
+              <h2 className="text-4xl font-bold text-center text-black mb-10">
+                Just for You
+              </h2>
+              <div className="space-y-8">
+                {recommendProducts &&
+                  recommendProducts.map((categoryItem) => (
+                    <div
+                      key={categoryItem._id}
+                      className="bg-white p-6 rounded-lg"
+                    >
+                      {/* Category Name Container */}
+                      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                        {categoryItem.category.name} for you!
+                      </h2>
 
-                    {/* Products Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                      {categoryItem.prdoducts &&
-                        categoryItem.prdoducts.map((product) => (
-                          <div
-                            key={product._id}
-                            className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out"
-                          >
-                            {/* Product Image (Centered) */}
-                            <div className="flex justify-center items-center mb-4">
-                              <div className="h-48 w-48 bg-whhite rounded-lg flex items-center justify-center">
-                                <img
-                                  src={
-                                    product.defaultVariant.image.url ||
-                                    placeholderImage
-                                  }
-                                  alt={
-                                    product.defaultVariant.image.alt ||
-                                    "Recommen product image"
-                                  }
-                                  onError={(e) => {
-                                    e.target.src = placeholderImage;
-                                  }}
-                                  className="h-40 object-contain"
-                                />
+                      {/* Products Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {categoryItem.prdoducts &&
+                          categoryItem.prdoducts.map((product) => (
+                            <div
+                              key={product._id}
+                              className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out"
+                            >
+                              {/* Product Image (Centered) */}
+                              <div className="flex justify-center items-center mb-4">
+                                <div className="h-48 w-48 bg-whhite rounded-lg flex items-center justify-center">
+                                  <img
+                                    src={
+                                      product.defaultVariant.image.url ||
+                                      placeholderImage
+                                    }
+                                    alt={
+                                      product.defaultVariant.image.alt ||
+                                      "Recommen product image"
+                                    }
+                                    onError={(e) => {
+                                      e.target.src = placeholderImage;
+                                    }}
+                                    className="h-40 object-contain"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Product Details */}
+                              <h3 className="text-lg font-semibold text-purple-800 text-center">
+                                {product.name}
+                              </h3>
+                              <p className="text-gray-600 text-md text-center">
+                                {product.defaultVariant.price}
+                              </p>
+
+                              {/* Centered Add to Cart Button */}
+                              <div className="flex justify-center mt-3">
+                                <button className="px-5 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition duration-300 ease-in-out flex items-center">
+                                  <FaCartPlus className="mr-2" /> Add to Cart
+                                </button>
                               </div>
                             </div>
-
-                            {/* Product Details */}
-                            <h3 className="text-lg font-semibold text-purple-800 text-center">
-                              {product.name}
-                            </h3>
-                            <p className="text-gray-600 text-md text-center">
-                              {product.defaultVariant.price}
-                            </p>
-
-                            {/* Centered Add to Cart Button */}
-                            <div className="flex justify-center mt-3">
-                              <button className="px-5 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition duration-300 ease-in-out flex items-center">
-                                <FaCartPlus className="mr-2" /> Add to Cart
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                          ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+              </div>
             </div>
-          </div>
+          ) : null}
 
           {/* Promotional Banner */}
           {/* <div
