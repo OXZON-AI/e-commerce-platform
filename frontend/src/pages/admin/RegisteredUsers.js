@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchUsers,
@@ -8,20 +8,54 @@ import {
 
 import Sidebar from "./components/Sidebar";
 import AdminNavbar from "./components/AdminNavbar";
+import dropArrowIcon from "../../assets/icons/dropArrow.svg";
+import { toast } from "react-toastify";
 
 const RegisteredUsers = () => {
   const dispatch = useDispatch();
   const { users, loading, error } = useSelector((state) => state.users);
+  const [filters, setFilters] = useState({
+    userType: undefined,
+    sortBy: "",
+    sortOrder: "",
+    page: 1, // Current page for pagination
+    limit: 10, // Number of users per page
+  });
 
   useEffect(() => {
     dispatch(clearError());
-    dispatch(fetchUsers()); // Fetch all registered users on component mount
-  }, [dispatch]);
+    dispatch(fetchUsers(filters)); // Fetch all registered users on component mount
+  }, [dispatch, filters]);
 
+  // handler for delete user
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
-      dispatch(deleteUser(id));
+      dispatch(deleteUser(id))
+        .unwrap()
+        .then(() => {
+          dispatch(fetchUsers(filters)).unwrap();
+        })
+        .catch((err) => {
+          console.error("User Delete failed! Error : ", err.message);
+        });
     }
+  };
+
+  // handler for filterChange
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value || undefined, // undefine use when value is empty, then mark as undefine
+      page: 1,
+    });
+  };
+
+  // handler for pagination
+  const handlePagination = (direction) => {
+    setFilters((prev) => ({
+      ...prev,
+      page: direction === "next" ? prev.page + 1 : Math.max(prev.page - 1, 1),
+    }));
   };
 
   return (
@@ -40,6 +74,69 @@ const RegisteredUsers = () => {
               <h1 className="text-2xl font-semibold text-gray-800 text-center mb-6">
                 Registered Users
               </h1>
+
+              <div className="flex gap-4 mb-4">
+                <div className="relative">
+                  <select
+                    name="userType"
+                    value={filters.userType || ""}
+                    onChange={handleFilterChange}
+                    className="p-2 border rounded w-[150px] appearance-none pr-8"
+                  >
+                    <option value="">All Users</option>
+                    <option value="customer">Customer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                    <img
+                      src={dropArrowIcon}
+                      alt="dropdown arrow"
+                      className="w-4"
+                    />
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <select
+                    name="sortBy"
+                    value={filters.sortBy}
+                    onChange={handleFilterChange}
+                    className="p-2 border rounded w-[150px] appearance-none pr-8"
+                  >
+                    <option value="">Sort By</option>
+                    <option value="points">Points</option>
+                    <option value="createdAt">Date</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                    <img
+                      src={dropArrowIcon}
+                      alt="dropdown arrow"
+                      className="w-4"
+                    />
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <select
+                    name="sortOrder"
+                    value={filters.sortOrder}
+                    onChange={handleFilterChange}
+                    className="p-2 border rounded w-[150px] appearance-none pr-8"
+                  >
+                    <option value="">Sort Order</option>
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                    <img
+                      src={dropArrowIcon}
+                      alt="dropdown arrow"
+                      className="w-4"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="overflow-x-auto">
                 {loading && <p>Loading...</p>}
                 {error && <p className="text-red-500">{error}</p>}
