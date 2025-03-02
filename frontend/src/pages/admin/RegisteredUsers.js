@@ -135,6 +135,22 @@ const RegisteredUsers = () => {
                     />
                   </div>
                 </div>
+
+                {/* Reset Button */}
+                <button
+                  onClick={() =>
+                    setFilters({
+                      userType: undefined,
+                      sortBy: undefined,
+                      sortOrder: undefined,
+                      page: 1, // Current page for pagination
+                      limit: 10, // Number of users per page
+                    })
+                  }
+                  className="px-4 py-2 bg-purple-500 text-white rounded-md"
+                >
+                  Reset All Filters
+                </button>
               </div>
 
               <div className="overflow-x-auto">
