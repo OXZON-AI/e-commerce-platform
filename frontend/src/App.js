@@ -96,27 +96,59 @@ const App = () => {
 
             <Route
               path={process.env.PUBLIC_URL + "/"}
-              element={<HomeElectronics />}
+              element={
+                <ClientRouteProtector>
+                  <HomeElectronics />
+                </ClientRouteProtector>
+              }
             />
 
             <Route
               path={process.env.PUBLIC_URL + "/order-history"}
-              element={<OrderHistory />}
+              element={
+                <ClientRouteProtector>
+                  <ProtectedRoute>
+                    <OrderHistory />
+                  </ProtectedRoute>
+                </ClientRouteProtector>
+              }
             />
 
             <Route
               path={process.env.PUBLIC_URL + "/about"}
-              element={<AboutUs />}
+              element={
+                <ClientRouteProtector>
+                  <AboutUs />
+                </ClientRouteProtector>
+              }
             />
 
             <Route
               path={process.env.PUBLIC_URL + "/contact"}
-              element={<ContactUs />}
+              element={
+                <ClientRouteProtector>
+                  <ContactUs />
+                </ClientRouteProtector>
+              }
             />
 
-            <Route path={process.env.PUBLIC_URL + "/faqs"} element={<FAQ />} />
+            <Route
+              path={process.env.PUBLIC_URL + "/faqs"}
+              element={
+                <ClientRouteProtector>
+                  <FAQ />
+                </ClientRouteProtector>
+              }
+            />
 
-            <Route path={process.env.PUBLIC_URL + "/cart"} element={<Cart />} />
+            <Route
+              path={process.env.PUBLIC_URL + "/cart"}
+              element={
+                <ClientRouteProtector>
+                  <Cart />
+                </ClientRouteProtector>
+              }
+            />
 
             <Route
               path={process.env.PUBLIC_URL + "/checkout"}
