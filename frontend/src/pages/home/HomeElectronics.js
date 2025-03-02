@@ -20,6 +20,8 @@ import {
 } from "../../store/slices/product-slice";
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import recommendsImg from "../../assets/images/recommends.svg";
+import { addToCart, fetchCart } from "../../store/slices/cart-slice";
+import { toast } from "react-toastify";
 
 const HomeElectronics = () => {
   const dispatch = useDispatch();
@@ -38,6 +40,9 @@ const HomeElectronics = () => {
     loading: userLoading,
     error: userError,
   } = useSelector((state) => state.user);
+  const { status: cartStatus, error: cartError } = useSelector(
+    (state) => state.cart
+  );
 
   // effect hook for fetch categories
   useEffect(() => {
@@ -53,6 +58,28 @@ const HomeElectronics = () => {
   useEffect(() => {
     dispatch(fetchRecommendProducts());
   }, [dispatch]);
+
+  // handler for addToCart
+  const addToCartHandler = async (product) => {
+    if (product.defaultVariant?.stock > 0) {
+      try {
+        await dispatch(
+          addToCart({
+            variantId: product.defaultVariant?._id,
+            quantity: 1,
+          })
+        ).unwrap(); // Ensures we get the resolved response of the async thunk
+
+        toast.success("item added to cart!");
+
+        await dispatch(fetchCart()).unwrap(); // Wait for addToCart to complete, then fetch the latest cart
+      } catch (error) {
+        toast.error("Something went wrong!");
+      }
+    } else {
+      toast.error("Out of stock!");
+    }
+  };
 
   // Slick slider settings for the product carousel
   const productSliderSettings = {
@@ -313,7 +340,18 @@ const HomeElectronics = () => {
 
                       {/* Centered Add to Cart Button */}
                       <div className="flex justify-center mt-3">
-                        <button className="px-5 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 ease-in-out flex items-center">
+                        <button
+                          className={`px-5 py-2 bg-blue-600 text-white font-semibold rounded-md ${
+                            product.defaultVariant?.stock > 0
+                              ? "bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300"
+                              : "bg-gray-400 cursor-not-allowed"
+                          } transition duration-300 ease-in-out flex items-center`}
+                          disabled={
+                            product.defaultVariant?.stock === 0 ||
+                            cartStatus === "loading-add-to-cart"
+                          }
+                          onClick={() => addToCartHandler(product)}
+                        >
                           <FaCartPlus className="mr-2" /> Add to Cart
                         </button>
                       </div>
@@ -379,7 +417,18 @@ const HomeElectronics = () => {
 
                               {/* Centered Add to Cart Button */}
                               <div className="flex justify-center mt-3">
-                                <button className="px-5 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition duration-300 ease-in-out flex items-center">
+                                <button
+                                  className={`px-5 py-2 bg-blue-600 text-white font-semibold rounded-md ${
+                                    product.defaultVariant?.stock > 0
+                                      ? "bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300"
+                                      : "bg-gray-400 cursor-not-allowed"
+                                  } transition duration-300 ease-in-out flex items-center`}
+                                  disabled={
+                                    product.defaultVariant?.stock === 0 ||
+                                    cartStatus === "loading-add-to-cart"
+                                  }
+                                  onClick={() => addToCartHandler(product)}
+                                >
                                   <FaCartPlus className="mr-2" /> Add to Cart
                                 </button>
                               </div>
