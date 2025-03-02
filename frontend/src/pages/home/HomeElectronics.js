@@ -14,7 +14,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCategories } from "../../store/slices/category-slice";
 import { Link, useNavigate } from "react-router-dom";
 import bannerImg from "../../assets/images/bannerv2.png";
-import { fetchRecommendProducts } from "../../store/slices/product-slice";
+import {
+  fetchProducts,
+  fetchRecommendProducts,
+} from "../../store/slices/product-slice";
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import recommendsImg from "../../assets/images/recommends.svg";
 
@@ -26,6 +29,7 @@ const HomeElectronics = () => {
   );
   const {
     recommendProducts,
+    items,
     loading: productLoading,
     error: productError,
   } = useSelector((state) => state.product);
@@ -38,6 +42,11 @@ const HomeElectronics = () => {
   // effect hook for fetch categories
   useEffect(() => {
     dispatch(fetchCategories());
+  }, [dispatch]);
+
+  // effect hook for fetch products
+  useEffect(() => {
+    dispatch(fetchProducts());
   }, [dispatch]);
 
   // effect hook for fetch user recommend products
@@ -264,29 +273,53 @@ const HomeElectronics = () => {
           </div>
 
           {/* Featured Products with Sliding Effect */}
+          {/* Featured Products with Sliding Effect */}
           <div className="container mx-auto py-12">
             <h2 className="text-3xl font-bold text-center mb-6">
               Featured Products
             </h2>
             <Slider {...productSliderSettings}>
-              {[1, 2, 3, 4, 5, 6].map((product) => (
-                <div key={product} className="p-4">
-                  <div className="bg-white p-4 rounded-none hover:shadow-2xl transition-transform transform hover:scale-105 duration-300 ease-in-out text-center">
-                    <img
-                      src={`https://dummyimage.com/300x200/000/fff`}
-                      alt={`Product ${product}`}
-                      className=" mb-4"
-                    />
-                    <h3 className="text-lg font-semibold">
-                      Product Name {product}
-                    </h3>
-                    <p className="text-gray-500">$299.99</p>
-                    <button className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105">
-                      <FaCartPlus className="inline mr-2" /> Add to Cart
-                    </button>
+              {items &&
+                items.map((product) => (
+                  <div key={product._id} className="p-4">
+                    <div className="bg-white p-4 rounded-lg hover:shadow-md transition-transform transform hover:scale-105 duration-300 ease-in-out text-center">
+                      {/* Product Image (Centered) */}
+                      <div className="flex justify-center items-center mb-4">
+                        <div className="h-48 w-48 bg-white rounded-lg flex items-center justify-center">
+                          <img
+                            src={
+                              product.defaultVariant?.image?.url ||
+                              placeholderImage
+                            }
+                            alt={
+                              product.defaultVariant?.image?.alt ||
+                              "Recommended product image"
+                            }
+                            onError={(e) => {
+                              e.target.src = placeholderImage;
+                            }}
+                            className="h-40 object-contain"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Product Details */}
+                      <h3 className="text-md font-semibold text-gray-800 text-center truncate">
+                        {product.name}
+                      </h3>
+                      <p className="text-gray-600 text-md text-center">
+                        {product.defaultVariant?.price}
+                      </p>
+
+                      {/* Centered Add to Cart Button */}
+                      <div className="flex justify-center mt-3">
+                        <button className="px-5 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition duration-300 ease-in-out flex items-center">
+                          <FaCartPlus className="mr-2" /> Add to Cart
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </Slider>
           </div>
 
@@ -384,7 +417,10 @@ const HomeElectronics = () => {
 
                   {/* Login Button */}
                   <div className="mt-5">
-                    <button className="px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-md hover:bg-blue-700 transition duration-300" onClick={() => navigate("/login-register")}>
+                    <button
+                      className="px-6 py-3 bg-blue-600 text-white text-lg font-semibold rounded-md hover:bg-blue-700 transition duration-300"
+                      onClick={() => navigate("/login-register")}
+                    >
                       Log In / Sign Up
                     </button>
                   </div>

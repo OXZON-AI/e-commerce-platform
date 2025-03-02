@@ -37,7 +37,7 @@ const LoginRegister = () => {
   // Efect hook for if user already on the state redirection
   useEffect(() => {
     if (userInfo) {
-      navigate(userInfo.role === "admin" ? "/admin-product" : "/");
+      navigate(userInfo.role === "admin" ? "/dashboard" : "/");
     }
   }, [userInfo, navigate]);
 
