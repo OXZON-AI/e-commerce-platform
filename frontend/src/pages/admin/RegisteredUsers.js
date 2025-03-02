@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchUsers,
@@ -8,20 +8,54 @@ import {
 
 import Sidebar from "./components/Sidebar";
 import AdminNavbar from "./components/AdminNavbar";
+import dropArrowIcon from "../../assets/icons/dropArrow.svg";
+import { toast } from "react-toastify";
 
 const RegisteredUsers = () => {
   const dispatch = useDispatch();
   const { users, loading, error } = useSelector((state) => state.users);
+  const [filters, setFilters] = useState({
+    userType: undefined,
+    sortBy: undefined,
+    sortOrder: undefined,
+    page: 1, // Current page for pagination
+    limit: 10, // Number of users per page
+  });
 
   useEffect(() => {
     dispatch(clearError());
-    dispatch(fetchUsers()); // Fetch all registered users on component mount
-  }, [dispatch]);
+    dispatch(fetchUsers(filters)); // Fetch all registered users on component mount
+  }, [dispatch, filters]);
 
+  // handler for delete user
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
-      dispatch(deleteUser(id));
+      dispatch(deleteUser(id))
+        .unwrap()
+        .then(() => {
+          dispatch(fetchUsers(filters)).unwrap();
+        })
+        .catch((err) => {
+          console.error("User Delete failed! Error : ", err.message);
+        });
     }
+  };
+
+  // handler for filterChange
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value || undefined, // undefine use when value is empty, then mark as undefine
+      page: 1,
+    });
+  };
+
+  // handler for pagination
+  const handlePagination = (direction) => {
+    setFilters((prev) => ({
+      ...prev,
+      page: direction === "next" ? prev.page + 1 : Math.max(prev.page - 1, 1),
+    }));
   };
 
   return (
@@ -40,6 +74,85 @@ const RegisteredUsers = () => {
               <h1 className="text-2xl font-semibold text-gray-800 text-center mb-6">
                 Registered Users
               </h1>
+
+              <div className="flex gap-4 mb-4">
+                <div className="relative">
+                  <select
+                    name="userType"
+                    value={filters.userType || ""}
+                    onChange={handleFilterChange}
+                    className="p-2 border rounded w-[150px] appearance-none pr-8"
+                  >
+                    <option value="">All Users</option>
+                    <option value="customer">Customer</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                    <img
+                      src={dropArrowIcon}
+                      alt="dropdown arrow"
+                      className="w-4"
+                    />
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <select
+                    name="sortBy"
+                    value={filters.sortBy || ""}
+                    onChange={handleFilterChange}
+                    className="p-2 border rounded w-[150px] appearance-none pr-8"
+                  >
+                    <option value="">Sort By</option>
+                    <option value="points">Points</option>
+                    <option value="date">Date</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                    <img
+                      src={dropArrowIcon}
+                      alt="dropdown arrow"
+                      className="w-4"
+                    />
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <select
+                    name="sortOrder"
+                    value={filters.sortOrder || ""}
+                    onChange={handleFilterChange}
+                    className="p-2 border rounded w-[150px] appearance-none pr-8"
+                  >
+                    <option value="">Sort Order</option>
+                    <option value="desc">Desc</option>
+                    <option value="asc">Asc</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
+                    <img
+                      src={dropArrowIcon}
+                      alt="dropdown arrow"
+                      className="w-4"
+                    />
+                  </div>
+                </div>
+
+                {/* Reset Button */}
+                <button
+                  onClick={() =>
+                    setFilters({
+                      userType: undefined,
+                      sortBy: undefined,
+                      sortOrder: undefined,
+                      page: 1, // Current page for pagination
+                      limit: 10, // Number of users per page
+                    })
+                  }
+                  className="px-4 py-2 bg-purple-500 text-white rounded-md"
+                >
+                  Reset All Filters
+                </button>
+              </div>
+
               <div className="overflow-x-auto">
                 {loading && <p>Loading...</p>}
                 {error && <p className="text-red-500">{error}</p>}
@@ -58,6 +171,9 @@ const RegisteredUsers = () => {
                       <th className="text-left px-6 py-3 text-gray-600 font-medium">
                         Email
                       </th>
+                      <th className="text-left px-6 py-3 text-gray-600 font-medium">
+                        Registered Date
+                      </th>
                       <th className="text-center px-6 py-3 text-gray-600 font-medium">
                         Loyalty Points
                       </th>
@@ -73,8 +189,8 @@ const RegisteredUsers = () => {
                     {users &&
                       users.map((user, index) => {
                         // Calculate the starting index based on the current page
-                        // const currentIndex =
-                        // (filters.page - 1) * filters.limit + index + 1;
+                        const currentIndex =
+                        (filters.page - 1) * filters.limit + index + 1;
 
                         return (
                           <tr
@@ -82,7 +198,7 @@ const RegisteredUsers = () => {
                             className="border-b border-gray-200 hover:bg-gray-50"
                           >
                             <td className="px-6 py-4 text-gray-700">
-                              {index + 1}
+                              {currentIndex}
                             </td>
                             <td className="px-6 py-4 text-gray-700">
                               {user.name}
@@ -92,6 +208,9 @@ const RegisteredUsers = () => {
                             </td>
                             <td className="px-6 py-4 text-gray-700">
                               {user.email}
+                            </td>
+                            <td className="px-6 py-4 text-gray-700">
+                              {new Date(user.createdAt).toLocaleDateString()}
                             </td>
                             <td className="px-6 py-4 text-center text-gray-700">
                               {user.loyaltyPoints}
@@ -124,6 +243,32 @@ const RegisteredUsers = () => {
                     )}
                   </tbody>
                 </table>
+
+                {/* ------------Pagination--------------- */}
+                <div className="flex justify-end items-center mt-4 space-x-4">
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => handlePagination("prev")}
+                    disabled={filters.page === 1}
+                    className={
+                      "px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                    }
+                  >
+                    Previous
+                  </button>
+
+                  {/* Page Indicator */}
+                  <span className="text-gray-700">Page {filters.page}</span>
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => handlePagination("next")}
+                    disabled={users.length < 10}
+                    className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </div>
