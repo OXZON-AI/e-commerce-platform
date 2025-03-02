@@ -232,17 +232,6 @@ const MyAccount = () => {
                                   </p>
                                 )}
                               </div>
-                              <div className="col-span-full">
-                                <label className="block text-sm font-medium text-gray-600 mb-1">
-                                  Address
-                                </label>
-                                <input
-                                  type="text"
-                                  name="address"
-                                  value={"Ignore for now"}
-                                  className="w-full border border-gray-300 rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
-                                />
-                              </div>
                               <div>
                                 <label className="block text-sm font-medium text-gray-600 mb-1">
                                   Email Address
