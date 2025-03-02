@@ -13,6 +13,7 @@ import {
   fetchProductDetails,
 } from "../../store/slices/product-slice";
 import { addToCart, fetchCart } from "../../store/slices/cart-slice";
+import { toast } from "react-toastify";
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -44,20 +45,17 @@ const ProductDetailPage = () => {
           })
         ).unwrap(); // Ensures we get the resolved response of the async thunk
 
-        setNotification({
-          type: "success",
-          message: `${quantity} item(s) added to cart!`,
-        });
+        toast.success(`${quantity} item(s) added to cart!`);
 
-        await dispatch(fetchCart()); // Wait for addToCart to complete, then fetch the latest cart
+        await dispatch(fetchCart()).unwrap(); // Wait for addToCart to complete, then fetch the latest cart
       } catch (error) {
         setNotification({ type: "error", message: "Something went wrong!" });
       }
     } else {
-      setNotification({ type: "error", message: "Out of stock!" });
+      toast.error("Out of stock!");
     }
-    setTimeout(() => setNotification(null), 3000);
   };
+
   const sliderSettings = {
     dots: true, // Show dots for navigation
     infinite: true, // Infinite scrolling
