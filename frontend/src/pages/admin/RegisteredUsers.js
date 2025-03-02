@@ -155,6 +155,9 @@ const RegisteredUsers = () => {
                       <th className="text-left px-6 py-3 text-gray-600 font-medium">
                         Email
                       </th>
+                      <th className="text-left px-6 py-3 text-gray-600 font-medium">
+                        Registered Date
+                      </th>
                       <th className="text-center px-6 py-3 text-gray-600 font-medium">
                         Loyalty Points
                       </th>
@@ -190,6 +193,9 @@ const RegisteredUsers = () => {
                             <td className="px-6 py-4 text-gray-700">
                               {user.email}
                             </td>
+                            <td className="px-6 py-4 text-gray-700">
+                              {new Date(user.createdAt).toLocaleDateString()}
+                            </td>
                             <td className="px-6 py-4 text-center text-gray-700">
                               {user.loyaltyPoints}
                             </td>
@@ -221,6 +227,32 @@ const RegisteredUsers = () => {
                     )}
                   </tbody>
                 </table>
+
+                {/* ------------Pagination--------------- */}
+                <div className="flex justify-end items-center mt-4 space-x-4">
+                  {/* Previous Button */}
+                  <button
+                    onClick={() => handlePagination("prev")}
+                    disabled={filters.page === 1}
+                    className={
+                      "px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                    }
+                  >
+                    Previous
+                  </button>
+
+                  {/* Page Indicator */}
+                  <span className="text-gray-700">Page {filters.page}</span>
+
+                  {/* Next Button */}
+                  <button
+                    onClick={() => handlePagination("next")}
+                    disabled={users.length < 10}
+                    className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
           </div>
