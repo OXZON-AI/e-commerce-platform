@@ -310,30 +310,34 @@ const HomeElectronics = () => {
                 items.map((product) => (
                   <div key={product._id} className="p-4">
                     <div className="bg-white p-4 rounded-lg hover:shadow-md transition-transform transform hover:scale-105 duration-300 ease-in-out text-center">
-                      {/* Product Image (Centered) */}
-                      <div className="flex justify-center items-center mb-4">
-                        <div className="h-48 w-48 bg-white rounded-lg flex items-center justify-center">
-                          <img
-                            src={
-                              product.defaultVariant?.image?.url ||
-                              placeholderImage
-                            }
-                            alt={
-                              product.defaultVariant?.image?.alt ||
-                              "Recommended product image"
-                            }
-                            onError={(e) => {
-                              e.target.src = placeholderImage;
-                            }}
-                            className="h-40 object-contain"
-                          />
+                      <Link to={`/product/${product.slug}`}>
+                        {/* Product Image (Centered) */}
+                        <div className="flex justify-center items-center mb-4">
+                          <div className="h-48 w-48 bg-white rounded-lg flex items-center justify-center">
+                            <img
+                              src={
+                                product.defaultVariant?.image?.url ||
+                                placeholderImage
+                              }
+                              alt={
+                                product.defaultVariant?.image?.alt ||
+                                "Recommended product image"
+                              }
+                              onError={(e) => {
+                                e.target.src = placeholderImage;
+                              }}
+                              className="h-40 object-contain"
+                            />
+                          </div>
                         </div>
-                      </div>
+                      </Link>
 
                       {/* Product Details */}
-                      <h3 className="text-md font-semibold text-gray-800 text-center truncate">
-                        {product.name}
-                      </h3>
+                      <Link to={`/product/${product.slug}`}>
+                        <h3 className="text-md font-semibold text-gray-800 text-center truncate">
+                          {product.name}
+                        </h3>
+                      </Link>
                       <p className="text-gray-600 text-md text-center">
                         {product.defaultVariant?.price}
                       </p>
@@ -388,29 +392,33 @@ const HomeElectronics = () => {
                               className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out"
                             >
                               {/* Product Image (Centered) */}
-                              <div className="flex justify-center items-center mb-4">
-                                <div className="h-48 w-48 bg-whhite rounded-lg flex items-center justify-center">
-                                  <img
-                                    src={
-                                      product.defaultVariant.image.url ||
-                                      placeholderImage
-                                    }
-                                    alt={
-                                      product.defaultVariant.image.alt ||
-                                      "Recommen product image"
-                                    }
-                                    onError={(e) => {
-                                      e.target.src = placeholderImage;
-                                    }}
-                                    className="h-40 object-contain"
-                                  />
+                              <Link to={`/product/${product.slug}`}>
+                                <div className="flex justify-center items-center mb-4">
+                                  <div className="h-48 w-48 bg-whhite rounded-lg flex items-center justify-center">
+                                    <img
+                                      src={
+                                        product.defaultVariant.image.url ||
+                                        placeholderImage
+                                      }
+                                      alt={
+                                        product.defaultVariant.image.alt ||
+                                        "Recommen product image"
+                                      }
+                                      onError={(e) => {
+                                        e.target.src = placeholderImage;
+                                      }}
+                                      className="h-40 object-contain"
+                                    />
+                                  </div>
                                 </div>
-                              </div>
+                              </Link>
 
                               {/* Product Details */}
-                              <h3 className="text-lg font-semibold text-purple-800 text-center">
-                                {product.name}
-                              </h3>
+                              <Link to={`/product/${product.slug}`}>
+                                <h3 className="text-lg font-semibold text-purple-800 text-center">
+                                  {product.name}
+                                </h3>
+                              </Link>
                               <p className="text-gray-600 text-md text-center">
                                 {product.defaultVariant.price}
                               </p>
