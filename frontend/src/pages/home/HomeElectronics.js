@@ -417,7 +417,18 @@ const HomeElectronics = () => {
 
                               {/* Centered Add to Cart Button */}
                               <div className="flex justify-center mt-3">
-                                <button className="px-5 py-2 bg-purple-600 text-white font-semibold rounded-md hover:bg-purple-700 transition duration-300 ease-in-out flex items-center">
+                                <button
+                                  className={`px-5 py-2 bg-blue-600 text-white font-semibold rounded-md ${
+                                    product.defaultVariant?.stock > 0
+                                      ? "bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300"
+                                      : "bg-gray-400 cursor-not-allowed"
+                                  } transition duration-300 ease-in-out flex items-center`}
+                                  disabled={
+                                    product.defaultVariant?.stock === 0 ||
+                                    cartStatus === "loading-add-to-cart"
+                                  }
+                                  onClick={() => addToCartHandler(product)}
+                                >
                                   <FaCartPlus className="mr-2" /> Add to Cart
                                 </button>
                               </div>
