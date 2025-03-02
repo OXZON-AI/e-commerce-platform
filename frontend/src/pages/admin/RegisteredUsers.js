@@ -99,7 +99,7 @@ const RegisteredUsers = () => {
                 <div className="relative">
                   <select
                     name="sortBy"
-                    value={filters.sortBy}
+                    value={filters.sortBy || ""}
                     onChange={handleFilterChange}
                     className="p-2 border rounded w-[150px] appearance-none pr-8"
                   >
@@ -119,7 +119,7 @@ const RegisteredUsers = () => {
                 <div className="relative">
                   <select
                     name="sortOrder"
-                    value={filters.sortOrder}
+                    value={filters.sortOrder || ""}
                     onChange={handleFilterChange}
                     className="p-2 border rounded w-[150px] appearance-none pr-8"
                   >
