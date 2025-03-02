@@ -62,11 +62,11 @@ const HeaderOne = ({
       >
         <div className={layout === "container-fluid" ? layout : "container"}>
           <div className="row">
-            <div className="col-xl-2 col-lg-2 col-md-6 col-4">
+            <div className="col-xl-3 col-lg-3 col-md-6 col-4">
               {/* header logo */}
               <Logo imageUrl="/assets/img/logo/logo1.png" logoClass="logo" />
             </div>
-            <div className="col-xl-7 col-lg-7 d-none d-lg-block">
+            <div className="col-xl-6 col-lg-6 d-none d-lg-block">
               {/* Nav menu */}
               <NavMenu />
             </div>
