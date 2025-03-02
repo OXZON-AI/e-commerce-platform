@@ -16,8 +16,8 @@ const RegisteredUsers = () => {
   const { users, loading, error } = useSelector((state) => state.users);
   const [filters, setFilters] = useState({
     userType: undefined,
-    sortBy: "",
-    sortOrder: "",
+    sortBy: undefined,
+    sortOrder: undefined,
     page: 1, // Current page for pagination
     limit: 10, // Number of users per page
   });
@@ -105,7 +105,7 @@ const RegisteredUsers = () => {
                   >
                     <option value="">Sort By</option>
                     <option value="points">Points</option>
-                    <option value="createdAt">Date</option>
+                    <option value="date">Date</option>
                   </select>
                   <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
                     <img
@@ -124,8 +124,8 @@ const RegisteredUsers = () => {
                     className="p-2 border rounded w-[150px] appearance-none pr-8"
                   >
                     <option value="">Sort Order</option>
-                    <option value="desc">Newest First</option>
-                    <option value="asc">Oldest First</option>
+                    <option value="desc">Desc</option>
+                    <option value="asc">Asc</option>
                   </select>
                   <div className="absolute inset-y-0 right-2 flex items-center pointer-events-none">
                     <img
