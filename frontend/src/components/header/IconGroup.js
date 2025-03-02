@@ -62,7 +62,8 @@ const IconGroup = ({ iconWhiteClass }) => {
         {userInfo ? (
           <Link to="/my-account">
             {`Good ${getGreeting()}, `}
-            <span className="text-blue-700">{userInfo.name}</span>!
+            <span className="text-blue-700">{userInfo.name.split(" ")[0]}</span>
+            !
           </Link>
         ) : (
           <Link to="/login-register">Login</Link>
