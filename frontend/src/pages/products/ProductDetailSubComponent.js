@@ -4,15 +4,29 @@ import { fetchRelatedProducts } from "../../store/slices/product-slice";
 import { toast } from "react-toastify";
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import { Link } from "react-router-dom";
+import { createReview, fetchReviews } from "../../store/slices/review-slice";
 
 const ProductDetailSubComponent = ({ prodDetails }) => {
   const dispatch = useDispatch();
+  const {
+    reviews,
+    loading: reviewsLoading,
+    error: reviewsError,
+  } = useSelector((state) => state.reviews);
   const [activeTab, setActiveTab] = useState("specs");
   const [filters, setFilters] = useState({
     cid: prodDetails.category._id,
     limit: 5,
   });
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [reviewData, setReviewData] = useState({
+    rating: 5,
+    title: "",
+    comment: "",
+    variant: prodDetails.variants?.[0]?._id,
+    order: "order_id",
+    images: [],
+  });
 
   const [submitted, setSubmitted] = useState(false);
   const handleSubmit = (e) => {
@@ -29,18 +43,12 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     { id: "reviews", label: `Reviews (5)` },
   ];
 
-  // const relatedProducts = [
-  //   { id: 1, name: "Gaming Laptop XYZ", discount: "-10%", rating: 4 },
-  //   { id: 2, name: "Smartphone Pro Max", discount: "-15%", rating: 5 },
-  //   {
-  //     id: 3,
-  //     name: "Wireless Headphones",
-  //     discount: "-20%",
-  //     newTag: true,
-  //     rating: 4.5,
-  //   },
-  //   { id: 4, name: "4K Smart TV 55-inch", newTag: true, rating: 4 },
-  // ];
+  // effect hook for fetch product reviews
+  useEffect(() => {
+    if (activeTab === "reviews") {
+      dispatch(fetchReviews(prodDetails.slug));
+    }
+  }, [dispatch, activeTab, prodDetails.slug]);
 
   // efect hook for fetch related products by category
   useEffect(() => {
@@ -58,6 +66,12 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         toast.error("Faield to fetch related products!");
       }); // fetch products only realted category for productDetail page
   }, [dispatch]);
+
+  // Handler for submit reviews
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    dispatch(createReview(reviewData));
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -128,31 +142,46 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
           <div className="grid grid-cols-1 lg:grid-cols-[2.2fr_1.8fr] gap-4">
             {/* Left Side: Customer Reviews */}
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
-              <h3 className="text-2xl font-semibold mb-4">Customer Reviews</h3>
-              <div className="space-y-4">
-                <div className="pb-3 border-b border-gray-200">
-                  <p className="font-semibold">John Doe</p>
-                  <div className="flex text-yellow-500 text-lg">
-                    {"★".repeat(4)}
-                    {"☆".repeat(1)}
+              {reviewsLoading ? (
+                <p>Loading reviews...</p>
+              ) : reviewsError ? (
+                <p className="text-red-500">{reviewsError}</p>
+              ) : (
+                <div>
+                  <h3 className="text-2xl font-semibold mb-4">
+                    Customer Reviews
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="pb-3 border-b border-gray-200">
+                      <p className="font-semibold">John Doe</p>
+                      <div className="flex text-yellow-500 text-lg">
+                        {"★".repeat(4)}
+                        {"☆".repeat(1)}
+                      </div>
+                      <p className="text-gray-700">
+                        Great laptop for gaming and productivity! Highly
+                        recommended.
+                      </p>
+                      <button className="text-blue-500 text-sm mt-2">
+                        Reply
+                      </button>
+                    </div>
+                    <div className="pb-3 border-b border-gray-200">
+                      <p className="font-semibold">Jane Smith</p>
+                      <div className="flex text-yellow-500 text-lg">
+                        {"★".repeat(5)}
+                      </div>
+                      <p className="text-gray-700">
+                        Excellent build quality and performance. Worth every
+                        penny!
+                      </p>
+                      <button className="text-blue-500 text-sm mt-2">
+                        Reply
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-gray-700">
-                    Great laptop for gaming and productivity! Highly
-                    recommended.
-                  </p>
-                  <button className="text-blue-500 text-sm mt-2">Reply</button>
                 </div>
-                <div className="pb-3 border-b border-gray-200">
-                  <p className="font-semibold">Jane Smith</p>
-                  <div className="flex text-yellow-500 text-lg">
-                    {"★".repeat(5)}
-                  </div>
-                  <p className="text-gray-700">
-                    Excellent build quality and performance. Worth every penny!
-                  </p>
-                  <button className="text-blue-500 text-sm mt-2">Reply</button>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* Right Side: Add a Review (More Extended) */}
