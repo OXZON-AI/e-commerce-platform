@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { createReview, fetchReviews } from "../../store/slices/review-slice";
 import axios from "axios";
 import { fetchOrders } from "../../store/slices/order-slice";
+import { Upload } from "lucide-react";
 
 const ProductDetailSubComponent = ({ prodDetails }) => {
   const dispatch = useDispatch();
@@ -134,30 +135,29 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   };
 
   // Handler for submit reviews
-  const handleReviewSubmit = (e) => {
+  const handleReviewSubmit = async (e) => {
     e.preventDefault();
     console.log("review data : ", reviewData);
-    dispatch(createReview(reviewData))
-      .unwrap()
-      .then(() => {
-        dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
-        setSubmitted(true);
-        // Reset review data but not order id.
-        setReviewData((prev) => ({
-          ...prev,
-          rating: 5,
-          title: "",
-          comment: "",
-          variant: prodDetails.variants?.[0]?._id,
-          images: [],
-        }));
-        setPreviewImages([]);
-        // Hide success message after 3 seconds
-        setTimeout(() => setSubmitted(false), 3000);
-      })
-      .catch(() => {
-        toast.error(" Review Submition Failed!");
-      });
+
+    await dispatch(createReview(reviewData)).unwrap();
+
+    await dispatch(fetchOrders({ limit: 1000 })).unwrap(); // Fetch orders again
+    await dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
+
+    setSubmitted(true);
+
+    // Reset review data but not order id.
+    setReviewData((prev) => ({
+      ...prev,
+      rating: 5,
+      title: "",
+      comment: "",
+      variant: prodDetails.variants?.[0]?._id,
+      images: [],
+    }));
+    setPreviewImages([]);
+    // Hide success message after 3 seconds
+    setTimeout(() => setSubmitted(false), 3000);
   };
 
   return (
@@ -264,7 +264,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                                   key={index}
                                   src={img.url}
                                   alt={img.alt}
-                                  className="w-16 h-16 object-cover"
+                                  className="w-16 h-16 object-cover border-1 rounded-md p-2"
                                 />
                               ))}
                             </div>
@@ -310,11 +310,11 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block mb-1 font-medium">Title</label>
+                        {/* <label className="block mb-1 font-medium">Title</label> */}
                         <input
                           type="text"
-                          name="title"
                           placeholder="Title"
+                          value={reviewData.title}
                           className="w-full p-2 border border-gray-300 rounded-md"
                           onChange={(e) =>
                             setReviewData({
@@ -326,7 +326,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                       </div>
                     </div>
                     <div>
-                      <label className="block mb-1 font-medium">Message</label>
+                      {/* <label className="block mb-1 font-medium">Message</label> */}
                       <textarea
                         placeholder="Write your review..."
                         className="w-full p-2 border border-gray-300 rounded-md"
@@ -341,22 +341,33 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                       />
                     </div>
                     <div>
-                      <label className="block mb-1 font-medium">
+                      {/* <label className="block mb-1 font-medium">
                         Upload Images
-                      </label>
+                      </label> */}
                       <input
                         type="file"
                         multiple
-                        className="block w-full border p-2"
+                        id="fileInput"
+                        className="hidden"
                         onChange={handleImageUpload}
                       />
+
+                      {/* Custom Upload Button */}
+                      <label
+                        htmlFor="fileInput"
+                        className="w-full flex items-center justify-center gap-2 p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
+                      >
+                        <Upload className="w-5 h-5 text-purple-500" />
+                        <span className="text-gray-700">Upload Images</span>
+                      </label>
+
                       <div className="flex space-x-2 mt-2">
                         {previewImages.map((src, index) => (
                           <img
                             key={index}
                             src={src}
                             alt="Preview"
-                            className="w-16 h-16 object-cover"
+                            className="w-16 h-16 object-cover border rounded-md"
                           />
                         ))}
                       </div>
