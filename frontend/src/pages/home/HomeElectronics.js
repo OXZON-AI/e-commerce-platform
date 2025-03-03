@@ -339,7 +339,7 @@ const HomeElectronics = () => {
                         </h3>
                       </Link>
                       <p className="text-gray-600 text-md text-center">
-                        {product.defaultVariant?.price}
+                        {product.defaultVariant?.price || "N/A"} MVR
                       </p>
 
                       {/* Centered Add to Cart Button */}
@@ -397,11 +397,11 @@ const HomeElectronics = () => {
                                   <div className="h-48 w-48 bg-whhite rounded-lg flex items-center justify-center">
                                     <img
                                       src={
-                                        product.defaultVariant.image.url ||
+                                        product.defaultVariant?.image?.url ||
                                         placeholderImage
                                       }
                                       alt={
-                                        product.defaultVariant.image.alt ||
+                                        product.defaultVariant?.image?.alt ||
                                         "Recommen product image"
                                       }
                                       onError={(e) => {
@@ -420,7 +420,7 @@ const HomeElectronics = () => {
                                 </h3>
                               </Link>
                               <p className="text-gray-600 text-md text-center">
-                                {product.defaultVariant.price}
+                                {product.defaultVariant?.price || "N/A"} MVR
                               </p>
 
                               {/* Centered Add to Cart Button */}
