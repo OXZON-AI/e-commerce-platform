@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import { Link } from "react-router-dom";
 import { createReview, fetchReviews } from "../../store/slices/review-slice";
+import axios from "axios";
+import { fetchOrders } from "../../store/slices/order-slice";
 
 const ProductDetailSubComponent = ({ prodDetails }) => {
   const dispatch = useDispatch();
@@ -27,18 +29,10 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     comment: "",
     variant: prodDetails.variants?.[0]?._id,
     order: "",
-    images: [
-      {
-        url: "https://www.dummyimage.com/800x600/ddd/333",
-        alt: "Front view of the product",
-      },
-      {
-        url: "https://www.dummyimage.com/800x600/000/fff",
-        alt: "Side view of the product",
-      },
-    ],
+    images: [],
   });
   const [previewImages, setPreviewImages] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const tabs = [
@@ -47,36 +41,37 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     { id: "reviews", label: `Reviews (${counts.count})` },
   ];
 
+  // effect hook for fetch orders
+  useEffect(() => {
+    const filters = {
+      limit: 1000, // set limit higher ammount to go in all orders.
+    };
+    dispatch(fetchOrders(filters));
+  }, [dispatch, filters]);
+
   // effect hook for fetch product reviews
   useEffect(() => {
-    if (activeTab === "reviews") {
-      dispatch(fetchReviews(prodDetails.slug))
-        .unwrap()
-        .then(() => {
-          // Find the order ID where the product variant matches
-          if (orders?.length > 0) {
-            const matchedOrder = orders.find((order) =>
-              order.items.some(
-                (item) => item.variant._id === prodDetails.variants[0]._id
-              )
-            );
+    if (activeTab === "reviews" && orders?.length > 0) {
+      // Find the order ID where the product variant matches
+      const matchedOrder = orders.find((order) =>
+        order.items.some(
+          (item) => item.variant._id === prodDetails.variants[0]._id
+        )
+      );
 
-            // If matched order then set order id to order in reviewData
-            if (matchedOrder) {
-              setReviewData((prevData) => ({
-                ...prevData,
-                order: matchedOrder._id,
-              }));
-            }
-          }
-        })
-        .catch(() => {
-          toast.error("Error on fetching reviews");
-        });
+      // If matched order then set order id to order in reviewData
+      if (matchedOrder) {
+        setReviewData((prevData) => ({
+          ...prevData,
+          order: matchedOrder._id,
+        }));
+      }
+
+      dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
     }
   }, [dispatch, activeTab, prodDetails.slug, orders]);
 
-  // efect hook for fetch related products by category
+  // effect hook for fetch related products by category
   useEffect(() => {
     setRelatedProducts([]);
     dispatch(fetchRelatedProducts(filters))
@@ -98,13 +93,64 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     setReviewData((prev) => ({ ...prev, rating: index + 1 }));
   };
 
+  // Handler for multiple image upload to cloudinary
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files); // multiple images
+    setUploading(true);
+    // set local prev image url to prev images
+    setPreviewImages(files.map((file) => URL.createObjectURL(file)));
+
+    const uploadedImages = await Promise.all(
+      files.map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append(
+          "upload_preset",
+          process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+        ); // Set in Cloudinary settings
+
+        try {
+          const response = await axios.post(
+            `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+            formData
+          );
+          return {
+            url: response.data.secure_url,
+            alt: "Uploaded review image",
+          };
+        } catch (error) {
+          console.error("Image upload failed", error);
+          return null;
+        }
+      })
+    );
+
+    // set uploaded images to reviewData object
+    setReviewData((prev) => ({
+      ...prev,
+      images: uploadedImages.filter((img) => img !== null),
+    }));
+    setUploading(false);
+  };
+
   // Handler for submit reviews
   const handleReviewSubmit = (e) => {
     e.preventDefault();
+    console.log("review data : ", reviewData);
     dispatch(createReview(reviewData))
       .unwrap()
       .then(() => {
+        dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
         setSubmitted(true);
+        // Reset review data but not order id.
+        setReviewData((prev) => ({
+          ...prev,
+          rating: 5,
+          title: "",
+          comment: "",
+          variant: prodDetails.variants?.[0]?._id,
+          images: [],
+        }));
         setPreviewImages([]);
         // Hide success message after 3 seconds
         setTimeout(() => setSubmitted(false), 3000);
@@ -295,24 +341,32 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                       />
                     </div>
                     <div>
-                      <label className="block mb-1 font-medium">Images</label>
+                      <label className="block mb-1 font-medium">
+                        Upload Images
+                      </label>
                       <input
                         type="file"
                         multiple
-                        className="block w-full border rounded p-2"
-                        onChange={(e) =>
-                          setReviewData({
-                            ...reviewData,
-                            images: Array.from(e.target.files),
-                          })
-                        }
+                        className="block w-full border p-2"
+                        onChange={handleImageUpload}
                       />
+                      <div className="flex space-x-2 mt-2">
+                        {previewImages.map((src, index) => (
+                          <img
+                            key={index}
+                            src={src}
+                            alt="Preview"
+                            className="w-16 h-16 object-cover"
+                          />
+                        ))}
+                      </div>
                     </div>
                     <button
                       type="submit"
-                      className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-md transition"
+                      className="w-full py-2 bg-purple-600 text-white rounded-md"
+                      disabled={uploading}
                     >
-                      Submit Review
+                      {uploading ? "Uploading..." : "Submit Review"}
                     </button>
                   </form>
                 </>
