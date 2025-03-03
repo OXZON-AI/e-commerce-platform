@@ -63,7 +63,7 @@ const Sidebar = () => {
             className="flex items-center space-x-3 py-2 px-3 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
           >
             <EnvelopeIcon className="w-6 h-6 text-gray-400 hover:text-white" />
-            <span className="font-medium">Registered Emails</span>
+            <span className="font-medium">Subscribed Newsletters</span>
           </Link>
         </li>
       </ul>

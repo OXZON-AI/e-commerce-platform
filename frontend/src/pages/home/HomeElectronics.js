@@ -544,39 +544,6 @@ const HomeElectronics = () => {
               ))}
             </Slider>
           </div>
-
-          {/* Newsletter Subscription */}
-          <div className="bg-gradient-to-r from-purple-600 via-indigo-500 to-blue-500 py-12 text-center rounded-lg shadow-xl">
-            <h2 className="text-4xl font-extrabold mb-4 text-white">
-              Stay Updated
-            </h2>
-            <p className="text-lg text-white mb-6">
-              Subscribe to receive exclusive offers and the latest news!
-            </p>
-
-            <div className="flex justify-center items-center w-full max-w-lg mx-auto">
-              <form className="flex w-full space-x-4 max-w-md">
-                {/* Email Input Field */}
-                <input
-                  className="w-full px-4 py-2 text-lg rounded-md border-2 border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105"
-                  id="mce-EMAIL"
-                  placeholder="Enter your email"
-                  required
-                  type="email"
-                  value=""
-                  aria-required="true"
-                />
-
-                {/* Subscribe Button */}
-                <button
-                  className="w-full sm:w-auto px-4 py-2 text-lg font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-400 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 shadow-xl transform hover:scale-105 transition-all duration-300 ease-in-out"
-                  type="submit"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
-          </div>
         </div>
       </LayoutOne>
     </Fragment>
