@@ -27,6 +27,9 @@ const ProductDetailPage = lazy(() =>
 );
 const OrderHistory = lazy(() => import("./pages/products/OrderHistory"));
 
+const TrackOrderPage = lazy(() => import("./pages/products/TrackOrderPage"));
+const CancelOrderPage = lazy(() => import("./pages/products/CancelOrderPage"));
+
 //success_fail
 const PaymentSuccess = lazy(() => import("./pages/other/PaymentSuccess"));
 const PaymentFailure = lazy(() => import("./pages/other/PaymentFailure"));
@@ -113,6 +116,9 @@ const App = () => {
                 </ClientRouteProtector>
               }
             />
+
+            <Route path="/track-order" element={<TrackOrderPage />} />
+            <Route path="/cancel-order" element={<CancelOrderPage />} />
 
             <Route
               path={process.env.PUBLIC_URL + "/about"}
