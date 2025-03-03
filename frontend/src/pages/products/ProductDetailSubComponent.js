@@ -38,15 +38,8 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
       },
     ],
   });
-
+  const [previewImages, setPreviewImages] = useState([]);
   const [submitted, setSubmitted] = useState(false);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-
-    // Hide success message after 3 seconds
-    setTimeout(() => setSubmitted(false), 3000);
-  };
 
   const tabs = [
     { id: "specs", label: "Specifications" },
@@ -61,7 +54,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         .unwrap()
         .then(() => {
           // Find the order ID where the product variant matches
-          if (orders && orders.length > 0) {
+          if (orders?.length > 0) {
             const matchedOrder = orders.find((order) =>
               order.items.some(
                 (item) => item.variant._id === prodDetails.variants[0]._id
@@ -77,7 +70,9 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
             }
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          toast.error("Error on fetching reviews");
+        });
     }
   }, [dispatch, activeTab, prodDetails.slug, orders]);
 
@@ -98,13 +93,21 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
       }); // fetch products only realted category for productDetail page
   }, [dispatch]);
 
+  // Handler for star ratings to reviewData
+  const handleStarClick = (index) => {
+    setReviewData((prev) => ({ ...prev, rating: index + 1 }));
+  };
+
   // Handler for submit reviews
   const handleReviewSubmit = (e) => {
     e.preventDefault();
     dispatch(createReview(reviewData))
       .unwrap()
       .then(() => {
-        toast.info("Review Submitted!");
+        setSubmitted(true);
+        setPreviewImages([]);
+        // Hide success message after 3 seconds
+        setTimeout(() => setSubmitted(false), 3000);
       })
       .catch(() => {
         toast.error(" Review Submition Failed!");
@@ -193,7 +196,10 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                   <div className="space-y-4">
                     {reviews && reviews.length > 0 ? (
                       reviews.map((review) => (
-                        <div key={review._id} className="pb-3 border-b border-gray-200">
+                        <div
+                          key={review._id}
+                          className="pb-3 border-b border-gray-200"
+                        >
                           <p className="font-semibold">{review.user.name}</p>
                           <div className="flex text-yellow-500 text-lg">
                             {"★".repeat(review.rating)}
@@ -241,18 +247,19 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                         Your Rating:
                       </label>
                       <div className="flex space-x-1">
-                        {"★"
-                          .repeat(5)
-                          .split("")
-                          .map((_, index) => (
-                            <button
-                              key={index}
-                              className="text-yellow-500 text-2xl"
-                              type="button"
-                            >
-                              ★
-                            </button>
-                          ))}
+                        {[...Array(5)].map((_, index) => (
+                          <span
+                            key={index}
+                            className={`cursor-pointer text-2xl ${
+                              index < reviewData.rating
+                                ? "text-yellow-500"
+                                : "text-gray-400"
+                            }`}
+                            onClick={() => handleStarClick(index)}
+                          >
+                            ★
+                          </span>
+                        ))}
                       </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
