@@ -283,9 +283,9 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                                 ))}
                               </div>
                             )}
-                            <button className="text-blue-500 text-sm mt-2">
+                            {/* <button className="text-blue-500 text-sm mt-2">
                               Reply
-                            </button>
+                            </button> */}
                           </div>
                         ))
                       ) : (
