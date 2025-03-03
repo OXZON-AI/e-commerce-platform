@@ -10,9 +10,11 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const dispatch = useDispatch();
   const {
     reviews,
+    counts,
     loading: reviewsLoading,
     error: reviewsError,
   } = useSelector((state) => state.reviews);
+  const { orders } = useSelector((state) => state.orders);
   const [activeTab, setActiveTab] = useState("specs");
   const [filters, setFilters] = useState({
     cid: prodDetails.category._id,
@@ -24,8 +26,17 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     title: "",
     comment: "",
     variant: prodDetails.variants?.[0]?._id,
-    order: "order_id",
-    images: [],
+    order: "",
+    images: [
+      {
+        url: "https://www.dummyimage.com/800x600/ddd/333",
+        alt: "Front view of the product",
+      },
+      {
+        url: "https://www.dummyimage.com/800x600/000/fff",
+        alt: "Side view of the product",
+      },
+    ],
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -40,15 +51,35 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const tabs = [
     { id: "specs", label: "Specifications" },
     { id: "description", label: "Description" },
-    { id: "reviews", label: `Reviews (5)` },
+    { id: "reviews", label: `Reviews (${counts.count})` },
   ];
 
   // effect hook for fetch product reviews
   useEffect(() => {
     if (activeTab === "reviews") {
-      dispatch(fetchReviews(prodDetails.slug));
+      dispatch(fetchReviews(prodDetails.slug))
+        .unwrap()
+        .then(() => {
+          // Find the order ID where the product variant matches
+          if (orders && orders.length > 0) {
+            const matchedOrder = orders.find((order) =>
+              order.items.some(
+                (item) => item.variant._id === prodDetails.variants[0]._id
+              )
+            );
+
+            // If matched order then set order id to order in reviewData
+            if (matchedOrder) {
+              setReviewData((prevData) => ({
+                ...prevData,
+                order: matchedOrder._id,
+              }));
+            }
+          }
+        })
+        .catch(() => {});
     }
-  }, [dispatch, activeTab, prodDetails.slug]);
+  }, [dispatch, activeTab, prodDetails.slug, orders]);
 
   // efect hook for fetch related products by category
   useEffect(() => {
@@ -70,7 +101,14 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   // Handler for submit reviews
   const handleReviewSubmit = (e) => {
     e.preventDefault();
-    dispatch(createReview(reviewData));
+    dispatch(createReview(reviewData))
+      .unwrap()
+      .then(() => {
+        toast.info("Review Submitted!");
+      })
+      .catch(() => {
+        toast.error(" Review Submition Failed!");
+      });
   };
 
   return (
@@ -151,34 +189,42 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                   <h3 className="text-2xl font-semibold mb-4">
                     Customer Reviews
                   </h3>
+
                   <div className="space-y-4">
-                    <div className="pb-3 border-b border-gray-200">
-                      <p className="font-semibold">John Doe</p>
-                      <div className="flex text-yellow-500 text-lg">
-                        {"★".repeat(4)}
-                        {"☆".repeat(1)}
-                      </div>
-                      <p className="text-gray-700">
-                        Great laptop for gaming and productivity! Highly
-                        recommended.
-                      </p>
-                      <button className="text-blue-500 text-sm mt-2">
-                        Reply
-                      </button>
-                    </div>
-                    <div className="pb-3 border-b border-gray-200">
-                      <p className="font-semibold">Jane Smith</p>
-                      <div className="flex text-yellow-500 text-lg">
-                        {"★".repeat(5)}
-                      </div>
-                      <p className="text-gray-700">
-                        Excellent build quality and performance. Worth every
-                        penny!
-                      </p>
-                      <button className="text-blue-500 text-sm mt-2">
-                        Reply
-                      </button>
-                    </div>
+                    {reviews && reviews.length > 0 ? (
+                      reviews.map((review) => (
+                        <div key={review._id} className="pb-3 border-b border-gray-200">
+                          <p className="font-semibold">{review.user.name}</p>
+                          <div className="flex text-yellow-500 text-lg">
+                            {"★".repeat(review.rating)}
+                            {"☆".repeat(5 - review.rating)}
+                          </div>
+                          <h5 className="text-gray-700 font-semibold italic">
+                            "{review.title || "No Title!"}"
+                          </h5>
+                          <p className="text-gray-700 italic">
+                            {review.comment || "No comment!"}
+                          </p>
+                          {review.images.length > 0 && (
+                            <div className="flex space-x-2 mt-2">
+                              {review.images.map((img, index) => (
+                                <img
+                                  key={index}
+                                  src={img.url}
+                                  alt={img.alt}
+                                  className="w-16 h-16 object-cover"
+                                />
+                              ))}
+                            </div>
+                          )}
+                          <button className="text-blue-500 text-sm mt-2">
+                            Reply
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No reviews yet.</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -186,58 +232,88 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
 
             {/* Right Side: Add a Review (More Extended) */}
             <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
-              <h3 className="text-2xl font-semibold mb-4">Add a Review</h3>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block mb-2 font-medium">Your Rating:</label>
-                  <div className="flex space-x-1">
-                    {"★"
-                      .repeat(5)
-                      .split("")
-                      .map((_, index) => (
-                        <button
-                          key={index}
-                          className="text-yellow-500 text-2xl"
-                          type="button"
-                        >
-                          ★
-                        </button>
-                      ))}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block mb-1 font-medium">Name</label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block mb-1 font-medium">Email</label>
-                    <input
-                      type="email"
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                      placeholder="Enter your email"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block mb-1 font-medium">Message</label>
-                  <textarea
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                    rows="4"
-                    placeholder="Write your review"
-                  ></textarea>
-                </div>
-                <button
-                  type="submit"
-                  className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-md transition"
-                >
-                  Submit Review
-                </button>
-              </form>
+              {reviewData.order ? (
+                <>
+                  <h3 className="text-2xl font-semibold mb-4">Add a Review</h3>
+                  <form onSubmit={handleReviewSubmit} className="space-y-4">
+                    <div>
+                      <label className="block mb-2 font-medium">
+                        Your Rating:
+                      </label>
+                      <div className="flex space-x-1">
+                        {"★"
+                          .repeat(5)
+                          .split("")
+                          .map((_, index) => (
+                            <button
+                              key={index}
+                              className="text-yellow-500 text-2xl"
+                              type="button"
+                            >
+                              ★
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block mb-1 font-medium">Title</label>
+                        <input
+                          type="text"
+                          name="title"
+                          placeholder="Title"
+                          className="w-full p-2 border border-gray-300 rounded-md"
+                          onChange={(e) =>
+                            setReviewData({
+                              ...reviewData,
+                              title: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block mb-1 font-medium">Message</label>
+                      <textarea
+                        placeholder="Write your review..."
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        rows="4"
+                        value={reviewData.comment}
+                        onChange={(e) =>
+                          setReviewData({
+                            ...reviewData,
+                            comment: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-1 font-medium">Images</label>
+                      <input
+                        type="file"
+                        multiple
+                        className="block w-full border rounded p-2"
+                        onChange={(e) =>
+                          setReviewData({
+                            ...reviewData,
+                            images: Array.from(e.target.files),
+                          })
+                        }
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-md transition"
+                    >
+                      Submit Review
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <p className="text-gray-500 mt-4">
+                  You must have purchased this product to leave a review.
+                </p>
+              )}
             </div>
           </div>
         )}
