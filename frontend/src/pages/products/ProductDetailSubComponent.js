@@ -48,7 +48,9 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     dispatch(fetchRelatedProducts(filters))
       .unwrap()
       .then((products) => {
-        const filteredProducts = products.filter(product => product._id !== prodDetails._id);
+        const filteredProducts = products.filter(
+          (product) => product._id !== prodDetails._id
+        );
         setRelatedProducts(filteredProducts); // Set related products excluding the current product.
         console.log("related products - ", relatedProducts);
       })
@@ -77,88 +79,138 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
       {/* Tab Content */}
       <div className="p-4">
         {activeTab === "specs" && (
-          <div>
-            <p>
-              <strong>Brand</strong> &nbsp;&nbsp; : &nbsp;&nbsp;{" "}
-              {prodDetails.brand}
-            </p>
-            <p>
-              <strong>Category</strong> &nbsp;&nbsp; : &nbsp;&nbsp;{" "}
-              {prodDetails.category?.name}
-            </p>
+          // <div>
+          //   <p>
+          //     <strong>Brand</strong> &nbsp;&nbsp; : &nbsp;&nbsp;{" "}
+          //     {prodDetails.brand}
+          //   </p>
+          //   <p>
+          //     <strong>Category</strong> &nbsp;&nbsp; : &nbsp;&nbsp;{" "}
+          //     {prodDetails.category?.name}
+          //   </p>
 
-            {prodDetails &&
-              prodDetails.variants?.[0]?.attributes.map((attr) => (
-                <p key={attr.name}>
-                  <strong>
+          //   {prodDetails &&
+          //     prodDetails.variants?.[0]?.attributes.map((attr) => (
+          //       <p key={attr.name}>
+          //         <strong>
+          //           {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
+          //         </strong>
+          //         &nbsp;&nbsp; : &nbsp;&nbsp;
+          //         {attr.value}
+          //       </p>
+          //     ))}
+          // </div>
+          <table className="w-full border-collapse mt-2">
+            <tbody>
+              <tr>
+                <td className="border p-2 font-semibold">Brand</td>
+                <td className="border p-2">{prodDetails.brand}</td>
+              </tr>
+              <tr>
+                <td className="border p-2 font-semibold">Category</td>
+                <td className="border p-2">{prodDetails.category?.name}</td>
+              </tr>
+              {prodDetails?.variants?.[0]?.attributes.map((attr) => (
+                <tr key={attr.name}>
+                  <td className="border p-2 font-semibold">
                     {attr.name.charAt(0).toUpperCase() + attr.name.slice(1)}
-                  </strong>
-                  &nbsp;&nbsp; : &nbsp;&nbsp;
-                  {attr.value}
-                </p>
+                  </td>
+                  <td className="border p-2">{attr.value}</td>
+                </tr>
               ))}
-          </div>
+            </tbody>
+          </table>
         )}
         {activeTab === "description" && (
           <p>{prodDetails.description.detailed}</p>
         )}
         {activeTab === "reviews" && (
-        <div className="grid grid-cols-1 lg:grid-cols-[2.2fr_1.8fr] gap-4">
-        {/* Left Side: Customer Reviews */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
-          <h3 className="text-2xl font-semibold mb-4">Customer Reviews</h3>
-          <div className="space-y-4">
-            <div className="pb-3 border-b border-gray-200">
-              <p className="font-semibold">John Doe</p>
-              <div className="flex text-yellow-500 text-lg">
-                {"★".repeat(4)}{"☆".repeat(1)}
+          <div className="grid grid-cols-1 lg:grid-cols-[2.2fr_1.8fr] gap-4">
+            {/* Left Side: Customer Reviews */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
+              <h3 className="text-2xl font-semibold mb-4">Customer Reviews</h3>
+              <div className="space-y-4">
+                <div className="pb-3 border-b border-gray-200">
+                  <p className="font-semibold">John Doe</p>
+                  <div className="flex text-yellow-500 text-lg">
+                    {"★".repeat(4)}
+                    {"☆".repeat(1)}
+                  </div>
+                  <p className="text-gray-700">
+                    Great laptop for gaming and productivity! Highly
+                    recommended.
+                  </p>
+                  <button className="text-blue-500 text-sm mt-2">Reply</button>
+                </div>
+                <div className="pb-3 border-b border-gray-200">
+                  <p className="font-semibold">Jane Smith</p>
+                  <div className="flex text-yellow-500 text-lg">
+                    {"★".repeat(5)}
+                  </div>
+                  <p className="text-gray-700">
+                    Excellent build quality and performance. Worth every penny!
+                  </p>
+                  <button className="text-blue-500 text-sm mt-2">Reply</button>
+                </div>
               </div>
-              <p className="text-gray-700">Great laptop for gaming and productivity! Highly recommended.</p>
-              <button className="text-blue-500 text-sm mt-2">Reply</button>
             </div>
-            <div className="pb-3 border-b border-gray-200">
-              <p className="font-semibold">Jane Smith</p>
-              <div className="flex text-yellow-500 text-lg">{"★".repeat(5)}</div>
-              <p className="text-gray-700">Excellent build quality and performance. Worth every penny!</p>
-              <button className="text-blue-500 text-sm mt-2">Reply</button>
+
+            {/* Right Side: Add a Review (More Extended) */}
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
+              <h3 className="text-2xl font-semibold mb-4">Add a Review</h3>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block mb-2 font-medium">Your Rating:</label>
+                  <div className="flex space-x-1">
+                    {"★"
+                      .repeat(5)
+                      .split("")
+                      .map((_, index) => (
+                        <button
+                          key={index}
+                          className="text-yellow-500 text-2xl"
+                          type="button"
+                        >
+                          ★
+                        </button>
+                      ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block mb-1 font-medium">Name</label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                      placeholder="Enter your name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block mb-1 font-medium">Email</label>
+                    <input
+                      type="email"
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                      placeholder="Enter your email"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block mb-1 font-medium">Message</label>
+                  <textarea
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    rows="4"
+                    placeholder="Write your review"
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-md transition"
+                >
+                  Submit Review
+                </button>
+              </form>
             </div>
           </div>
-        </div>
-      
-        {/* Right Side: Add a Review (More Extended) */}
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
-          <h3 className="text-2xl font-semibold mb-4">Add a Review</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block mb-2 font-medium">Your Rating:</label>
-              <div className="flex space-x-1">
-                {"★".repeat(5).split("").map((_, index) => (
-                  <button key={index} className="text-yellow-500 text-2xl" type="button">
-                    ★
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-1 font-medium">Name</label>
-                <input type="text" className="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter your name" />
-              </div>
-              <div>
-                <label className="block mb-1 font-medium">Email</label>
-                <input type="email" className="w-full p-2 border border-gray-300 rounded-md" placeholder="Enter your email" />
-              </div>
-            </div>
-            <div>
-              <label className="block mb-1 font-medium">Message</label>
-              <textarea className="w-full p-2 border border-gray-300 rounded-md" rows="4" placeholder="Write your review"></textarea>
-            </div>
-            <button type="submit" className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-md transition">
-              Submit Review
-            </button>
-          </form>
-        </div>
-      </div>      
         )}
       </div>
       {/* Success Message */}
@@ -180,8 +232,12 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                 <div className="relative bg-white shadow-md rounded-2xl overflow-hidden p-5 transition-transform transform hover:scale-105 hover:shadow-2xl flex flex-col h-full">
                   <div className="w-full h-44 flex items-center justify-center rounded-lg">
                     <img
-                      src={product?.defaultVariant?.image?.url || placeholderImage}
-                      alt={product?.defaultVariant?.image?.alt || "Product Image"}
+                      src={
+                        product?.defaultVariant?.image?.url || placeholderImage
+                      }
+                      alt={
+                        product?.defaultVariant?.image?.alt || "Product Image"
+                      }
                       className="w-full h-full object-contain"
                     />
                   </div>
