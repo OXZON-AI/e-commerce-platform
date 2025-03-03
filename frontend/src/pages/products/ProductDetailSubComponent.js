@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { createReview, fetchReviews } from "../../store/slices/review-slice";
 import axios from "axios";
 import { fetchOrders } from "../../store/slices/order-slice";
+import { Upload } from "lucide-react";
 
 const ProductDetailSubComponent = ({ prodDetails }) => {
   const dispatch = useDispatch();
@@ -134,30 +135,33 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   };
 
   // Handler for submit reviews
-  const handleReviewSubmit = (e) => {
+  const handleReviewSubmit = async (e) => {
     e.preventDefault();
     console.log("review data : ", reviewData);
-    dispatch(createReview(reviewData))
-      .unwrap()
-      .then(() => {
-        dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
-        setSubmitted(true);
-        // Reset review data but not order id.
-        setReviewData((prev) => ({
-          ...prev,
-          rating: 5,
-          title: "",
-          comment: "",
-          variant: prodDetails.variants?.[0]?._id,
-          images: [],
-        }));
-        setPreviewImages([]);
-        // Hide success message after 3 seconds
-        setTimeout(() => setSubmitted(false), 3000);
-      })
-      .catch(() => {
-        toast.error(" Review Submition Failed!");
-      });
+
+    try {
+      await dispatch(createReview(reviewData)).unwrap();
+
+      await dispatch(fetchOrders({ limit: 1000 })).unwrap(); // Fetch orders again
+      await dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
+
+      setSubmitted(true);
+
+      // Reset review data but not order id.
+      setReviewData((prev) => ({
+        ...prev,
+        rating: 5,
+        title: "",
+        comment: "",
+        variant: prodDetails.variants?.[0]?._id,
+        images: [],
+      }));
+      setPreviewImages([]);
+      // Hide success message after 3 seconds
+      setTimeout(() => setSubmitted(false), 3000);
+    } catch (error) {
+      console.error("Error on review submit : ", error.message || error);
+    }
   };
 
   return (
@@ -226,165 +230,183 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
           <p>{prodDetails.description.detailed}</p>
         )}
         {activeTab === "reviews" && (
-          <div className="grid grid-cols-1 lg:grid-cols-[2.2fr_1.8fr] gap-4">
-            {/* Left Side: Customer Reviews */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
-              {reviewsLoading ? (
-                <p>Loading reviews...</p>
-              ) : reviewsError ? (
-                <p className="text-red-500">{reviewsError}</p>
-              ) : (
-                <div>
-                  <h3 className="text-2xl font-semibold mb-4">
-                    Customer Reviews
-                  </h3>
+          <>
+            {/* Success Message */}
+            {submitted && (
+              <div className="mb-4 p-3 text-green-700 bg-green-100 border-1 border-green-500 rounded-lg text-center transition-opacity duration-500">
+                ✅ Review submitted successfully!
+              </div>
+            )}
+            {reviewsError && (
+              <div className="mb-4 p-3 text-red-700 bg-red-100 border-1 border-red-500 rounded-lg text-center transition-opacity duration-500">
+                🤖 {reviewsError}
+              </div>
+            )}
+            <div className="grid grid-cols-1 lg:grid-cols-[2.2fr_1.8fr] gap-4">
+              {/* Left Side: Customer Reviews */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
+                {reviewsLoading ? (
+                  <p>Loading reviews...</p>
+                ) : (
+                  <div>
+                    <h3 className="text-2xl font-semibold mb-4">
+                      Customer Reviews
+                    </h3>
 
-                  <div className="space-y-4">
-                    {reviews && reviews.length > 0 ? (
-                      reviews.map((review) => (
-                        <div
-                          key={review._id}
-                          className="pb-3 border-b border-gray-200"
-                        >
-                          <p className="font-semibold">{review.user.name}</p>
-                          <div className="flex text-yellow-500 text-lg">
-                            {"★".repeat(review.rating)}
-                            {"☆".repeat(5 - review.rating)}
-                          </div>
-                          <h5 className="text-gray-700 font-semibold italic">
-                            "{review.title || "No Title!"}"
-                          </h5>
-                          <p className="text-gray-700 italic">
-                            {review.comment || "No comment!"}
-                          </p>
-                          {review.images.length > 0 && (
-                            <div className="flex space-x-2 mt-2">
-                              {review.images.map((img, index) => (
-                                <img
-                                  key={index}
-                                  src={img.url}
-                                  alt={img.alt}
-                                  className="w-16 h-16 object-cover"
-                                />
-                              ))}
-                            </div>
-                          )}
-                          <button className="text-blue-500 text-sm mt-2">
-                            Reply
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <p>No reviews yet.</p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Right Side: Add a Review (More Extended) */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
-              {reviewData.order ? (
-                <>
-                  <h3 className="text-2xl font-semibold mb-4">Add a Review</h3>
-                  <form onSubmit={handleReviewSubmit} className="space-y-4">
-                    <div>
-                      <label className="block mb-2 font-medium">
-                        Your Rating:
-                      </label>
-                      <div className="flex space-x-1">
-                        {[...Array(5)].map((_, index) => (
-                          <span
-                            key={index}
-                            className={`cursor-pointer text-2xl ${
-                              index < reviewData.rating
-                                ? "text-yellow-500"
-                                : "text-gray-400"
-                            }`}
-                            onClick={() => handleStarClick(index)}
+                    <div className="space-y-4">
+                      {reviews && reviews.length > 0 ? (
+                        reviews.map((review) => (
+                          <div
+                            key={review._id}
+                            className="pb-3 border-b border-gray-200"
                           >
-                            ★
-                          </span>
-                        ))}
-                      </div>
+                            <p className="font-semibold">{review.user.name}</p>
+                            <div className="flex text-yellow-500 text-lg">
+                              {"★".repeat(review.rating)}
+                              {"☆".repeat(5 - review.rating)}
+                            </div>
+                            <h5 className="text-gray-700 font-semibold italic">
+                              "{review.title || "No Title!"}"
+                            </h5>
+                            <p className="text-gray-700 italic">
+                              {review.comment || "No comment!"}
+                            </p>
+                            {review.images.length > 0 && (
+                              <div className="flex space-x-2 mt-2">
+                                {review.images.map((img, index) => (
+                                  <img
+                                    key={index}
+                                    src={img.url}
+                                    alt={img.alt}
+                                    className="w-16 h-16 object-cover border-1 rounded-md p-2"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                            {/* <button className="text-blue-500 text-sm mt-2">
+                              Reply
+                            </button> */}
+                          </div>
+                        ))
+                      ) : (
+                        <p>No reviews yet.</p>
+                      )}
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  </div>
+                )}
+              </div>
+
+              {/* Right Side: Add a Review (More Extended) */}
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
+                {reviewData.order ? (
+                  <>
+                    <h3 className="text-2xl font-semibold mb-4">
+                      Add a Review
+                    </h3>
+                    <form onSubmit={handleReviewSubmit} className="space-y-4">
                       <div>
-                        <label className="block mb-1 font-medium">Title</label>
-                        <input
-                          type="text"
-                          name="title"
-                          placeholder="Title"
+                        <label className="block mb-2 font-medium">
+                          Your Rating:
+                        </label>
+                        <div className="flex space-x-1">
+                          {[...Array(5)].map((_, index) => (
+                            <span
+                              key={index}
+                              className={`cursor-pointer text-2xl ${
+                                index < reviewData.rating
+                                  ? "text-yellow-500"
+                                  : "text-gray-400"
+                              }`}
+                              onClick={() => handleStarClick(index)}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          {/* <label className="block mb-1 font-medium">Title</label> */}
+                          <input
+                            type="text"
+                            placeholder="Title"
+                            value={reviewData.title}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                            onChange={(e) =>
+                              setReviewData({
+                                ...reviewData,
+                                title: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        {/* <label className="block mb-1 font-medium">Message</label> */}
+                        <textarea
+                          placeholder="Write your review..."
                           className="w-full p-2 border border-gray-300 rounded-md"
+                          rows="4"
+                          value={reviewData.comment}
                           onChange={(e) =>
                             setReviewData({
                               ...reviewData,
-                              title: e.target.value,
+                              comment: e.target.value,
                             })
                           }
                         />
                       </div>
-                    </div>
-                    <div>
-                      <label className="block mb-1 font-medium">Message</label>
-                      <textarea
-                        placeholder="Write your review..."
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                        rows="4"
-                        value={reviewData.comment}
-                        onChange={(e) =>
-                          setReviewData({
-                            ...reviewData,
-                            comment: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <div>
-                      <label className="block mb-1 font-medium">
+                      <div>
+                        {/* <label className="block mb-1 font-medium">
                         Upload Images
-                      </label>
-                      <input
-                        type="file"
-                        multiple
-                        className="block w-full border p-2"
-                        onChange={handleImageUpload}
-                      />
-                      <div className="flex space-x-2 mt-2">
-                        {previewImages.map((src, index) => (
-                          <img
-                            key={index}
-                            src={src}
-                            alt="Preview"
-                            className="w-16 h-16 object-cover"
-                          />
-                        ))}
+                      </label> */}
+                        <input
+                          type="file"
+                          multiple
+                          id="fileInput"
+                          className="hidden"
+                          onChange={handleImageUpload}
+                        />
+
+                        {/* Custom Upload Button */}
+                        <label
+                          htmlFor="fileInput"
+                          className="w-full flex items-center justify-center gap-2 p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
+                        >
+                          <Upload className="w-5 h-5 text-purple-500" />
+                          <span className="text-gray-700">Upload Images</span>
+                        </label>
+
+                        <div className="flex space-x-2 mt-2">
+                          {previewImages.map((src, index) => (
+                            <img
+                              key={index}
+                              src={src}
+                              alt="Preview"
+                              className="w-16 h-16 object-cover border rounded-md"
+                            />
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full py-2 bg-purple-600 text-white rounded-md"
-                      disabled={uploading}
-                    >
-                      {uploading ? "Uploading..." : "Submit Review"}
-                    </button>
-                  </form>
-                </>
-              ) : (
-                <p className="text-gray-500 mt-4">
-                  You must have purchased this product to leave a review.
-                </p>
-              )}
+                      <button
+                        type="submit"
+                        className="w-full py-2 bg-purple-600 text-white rounded-md"
+                        disabled={uploading}
+                      >
+                        {uploading ? "Uploading..." : "Submit Review"}
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <p className="text-gray-500 mt-4">
+                    You must have purchased this product to leave a review.
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
-      {/* Success Message */}
-      {submitted && (
-        <div className="mt-4 p-3 text-green-700 bg-green-100 border border-green-500 rounded-lg text-center transition-opacity duration-500">
-          ✅ Review submitted successfully!
-        </div>
-      )}
 
       {/* Related Products Section */}
       <div className="mt-12">
