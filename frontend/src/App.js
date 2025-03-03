@@ -10,6 +10,7 @@ import ClientRouteProtector from "./components/router-protector/ClientRouteProte
 import MenuCart from "./components/header/sub-components/MenuCart";
 import AdminOrderManagement from "./pages/admin/AdminOrderManagement";
 import AdminOrderDetail from "./pages/admin/AdminOrderDetail";
+import AdminNewsletter from "./pages/admin/AdminNewsletter";
 
 // import SampleProductDetail from "./pages/other/SampleProductDetail";
 import { ToastContainer } from "react-toastify";
@@ -262,6 +263,7 @@ const App = () => {
               }
             />
 
+            <Route path="/registered-emails" element={<AdminNewsletter />} />
             <Route path="/unauthorized-access" element={<UnauthorizedPage />} />
             <Route
               path="/unauthorized-admin-access"
