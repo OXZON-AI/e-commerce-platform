@@ -177,12 +177,12 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
           {relatedProducts &&
             relatedProducts.map((product) => (
               <Link key={product._id} to={`/product/${product.slug}`}>
-                <div className="relative bg-white shadow-md rounded-2xl overflow-hidden p-5 transition-transform transform hover:scale-100 hover:shadow-2xl">
+                <div className="relative bg-white shadow-md rounded-2xl overflow-hidden p-5 transition-transform transform hover:scale-105 hover:shadow-2xl flex flex-col h-full">
                   <div className="w-full h-44 flex items-center justify-center rounded-lg">
                     <img
                       src={product?.defaultVariant?.image?.url || placeholderImage}
-                      alt={product?.defaultVariant?.image?.alt || "product Image"}
-                      className="w-full"
+                      alt={product?.defaultVariant?.image?.alt || "Product Image"}
+                      className="w-full h-full object-contain"
                     />
                   </div>
                   {/* {product.discount && (
@@ -195,13 +195,19 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                   New
                 </span>
               )} */}
-                  <p className="mt-4 text-lg font-semibold text-gray-700">
+
+                  {/* Product Name */}
+                  <p className="mt-4 text-lg font-semibold text-gray-700 min-h-[3rem] text-center line-clamp-2">
                     {product.name}
                   </p>
-                  <p className="mt-4 text-lg font-semibold text-gray-700">
+
+                  {/* Product Price */}
+                  <p className="mt-2 text-base font-medium text-gray-700 text-center">
                     {product?.defaultVariant?.price || "N/A"} MVR
                   </p>
-                  <div className="flex justify-center mt-2 text-yellow-500">
+
+                  {/* Ratings */}
+                  <div className="flex justify-center mt-3 text-yellow-500">
                     {"★".repeat(Math.floor(product.ratings.average))}
                     {"☆".repeat(5 - Math.floor(product.ratings.average))}
                   </div>
