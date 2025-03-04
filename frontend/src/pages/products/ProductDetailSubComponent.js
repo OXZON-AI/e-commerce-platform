@@ -36,7 +36,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const [reviewsFilters, setReviewsFilters] = useState({
     rating: null,
     sortOrder: "desc",
-    limit: 2,
+    limit: 1,
     page: 1,
   });
   const [previewImages, setPreviewImages] = useState([]);
@@ -88,7 +88,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         fetchReviews({ productSlug: prodDetails.slug, filters: reviewsFilters })
       ).unwrap(); // fetch reviews
     }
-  }, [dispatch, prodDetails.slug, orders]);
+  }, [dispatch, prodDetails.slug, reviewsFilters, orders]);
 
   // effect hook for fetch related products by category
   useEffect(() => {
@@ -263,129 +263,139 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
             <div className="grid grid-cols-1 lg:grid-cols-[2.2fr_1.8fr] gap-4">
               {/* Left Side: Customer Reviews */}
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
-                {reviewsLoading ? (
-                  <p>Loading reviews...</p>
-                ) : (
-                  <div>
-                    <h3 className="text-2xl font-semibold mb-4">
-                      Customer Reviews
-                    </h3>
+                <div>
+                  <h3 className="text-2xl font-semibold mb-4">
+                    Customer Reviews
+                  </h3>
 
-                    <div className="space-y-4">
-                      {/* Filter Options */}
-                      <div className="mb-4 flex justify-between gap-4 items-center w-full">
-                        <select
-                          className="p-2 border border-gray-300 rounded-md"
-                          value={reviewsFilters.rating}
-                          onChange={(e) =>
-                            setReviewsFilters({
-                              ...reviewsFilters,
-                              rating: parseInt(e.target.value) || null,
-                            })
-                          }
-                        >
-                          <option value="">All Ratings</option>
-                          <option value="5">5 Stars</option>
-                          <option value="4">4 Stars</option>
-                          <option value="3">3 Stars</option>
-                          <option value="2">2 Stars</option>
-                          <option value="1">1 Star</option>
-                        </select>
-
-                        <select
-                          className="p-2 border border-gray-300 rounded-md"
-                          value={reviewsFilters.sortOrder}
-                          onChange={(e) =>
-                            setReviewsFilters({
-                              ...reviewsFilters,
-                              sortOrder: e.target.value,
-                            })
-                          }
-                        >
-                          <option value="desc">Highest Rating</option>
-                          <option value="asc">Lowest Rating</option>
-                        </select>
-                      </div>
-
-                      {/* Review cards */}
-                      {reviews && reviews.length > 0 ? (
-                        reviews.map((review) => (
-                          <div
-                            key={review._id}
-                            className="pb-3 border-b border-gray-200"
-                          >
-                            <p className="font-semibold">{review.user.name}</p>
-                            <div className="flex text-yellow-500 text-lg">
-                              {"★".repeat(review.rating)}
-                              {"☆".repeat(5 - review.rating)}
-                            </div>
-                            <h5 className="text-gray-700 font-semibold italic">
-                              "{review.title || "No Title!"}"
-                            </h5>
-                            <p className="text-gray-700 italic">
-                              {review.comment || "No comment!"}
-                            </p>
-                            {review.images.length > 0 && (
-                              <div className="flex space-x-2 mt-2">
-                                {review.images.map((img, index) => (
-                                  <img
-                                    key={index}
-                                    src={img.url}
-                                    alt={img.alt}
-                                    className="w-16 h-16 object-cover border-1 rounded-md p-2"
-                                  />
-                                ))}
-                              </div>
-                            )}
-                            {/* <button className="text-blue-500 text-sm mt-2">
-                              Reply
-                            </button> */}
-                          </div>
-                        ))
-                      ) : (
-                        <p>No reviews yet.</p>
-                      )}
-                    </div>
-
-                    {/* Pagination Buttons */}
-                    <div className="flex justify-end mt-4 space-x-2">
-                      <button
-                        className={`px-4 py-2 border rounded-md ${
-                          reviewsFilters.page === 1
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                        onClick={() =>
+                  <div className="space-y-4">
+                    {/* Filter Options */}
+                    <div className="mb-4 flex justify-between gap-4 items-center w-full">
+                      <select
+                        className="p-2 border border-gray-300 rounded-md"
+                        value={reviewsFilters.rating}
+                        onChange={(e) =>
                           setReviewsFilters({
                             ...reviewsFilters,
-                            page: Math.max(1, reviewsFilters.page - 1),
+                            rating: parseInt(e.target.value) || null,
                           })
                         }
-                        disabled={reviewsFilters.page === 1}
                       >
-                        Previous
-                      </button>
+                        <option value="">All Ratings</option>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
+                      </select>
 
-                      <span className="px-4 py-2 border rounded-md">
-                        Page {reviewsFilters.page} of {reviewsPaginationInfo.totalPages}
-                      </span>
-
-                      <button
-                        className={`px-4 py-2 border rounded-md ${
-                          reviewsPaginationInfo.totalPages <= reviewsFilters.page
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                        onClick={() =>
-                          setReviewsFilters({ ...reviewsFilters, page: reviewsFilters.page + 1 })
+                      <select
+                        className="p-2 border border-gray-300 rounded-md"
+                        value={reviewsFilters.sortOrder}
+                        onChange={(e) =>
+                          setReviewsFilters({
+                            ...reviewsFilters,
+                            sortOrder: e.target.value,
+                          })
                         }
-                        disabled={reviewsPaginationInfo.totalPages <= reviewsFilters.page}
                       >
-                        Next
-                      </button>
+                        <option value="desc">Highest Rating</option>
+                        <option value="asc">Lowest Rating</option>
+                      </select>
                     </div>
+
+                    {reviewsLoading ? (
+                      <p>Loading reviews...</p>
+                    ) : (
+                      <>
+                        {/* Review cards */}
+                        {reviews && reviews.length > 0 ? (
+                          reviews.map((review) => (
+                            <div
+                              key={review._id}
+                              className="pb-3 border-b border-gray-200"
+                            >
+                              <p className="font-semibold">
+                                {review.user.name}
+                              </p>
+                              <div className="flex text-yellow-500 text-lg">
+                                {"★".repeat(review.rating)}
+                                {"☆".repeat(5 - review.rating)}
+                              </div>
+                              <h5 className="text-gray-700 font-semibold italic">
+                                "{review.title || "No Title!"}"
+                              </h5>
+                              <p className="text-gray-700 italic">
+                                {review.comment || "No comment!"}
+                              </p>
+                              {review.images.length > 0 && (
+                                <div className="flex space-x-2 mt-2">
+                                  {review.images.map((img, index) => (
+                                    <img
+                                      key={index}
+                                      src={img.url}
+                                      alt={img.alt}
+                                      className="w-16 h-16 object-cover border-1 rounded-md p-2"
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                              {/* <button className="text-blue-500 text-sm mt-2">
+                              Reply
+                            </button> */}
+                            </div>
+                          ))
+                        ) : (
+                          <p>No reviews yet.</p>
+                        )}
+                      </>
+                    )}
                   </div>
-                )}
+
+                  {/* Pagination Buttons */}
+                  <div className="flex justify-end mt-4 space-x-2">
+                    <button
+                      className={`px-4 py-2 border rounded-md ${
+                        reviewsFilters.page === 1
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setReviewsFilters({
+                          ...reviewsFilters,
+                          page: Math.max(1, reviewsFilters.page - 1),
+                        })
+                      }
+                      disabled={reviewsFilters.page === 1}
+                    >
+                      Previous
+                    </button>
+
+                    <span className="px-4 py-2 border rounded-md">
+                      Page {reviewsFilters.page} of{" "}
+                      {reviewsPaginationInfo.totalPages}
+                    </span>
+
+                    <button
+                      className={`px-4 py-2 border rounded-md ${
+                        reviewsPaginationInfo.totalPages <= reviewsFilters.page
+                          ? "opacity-50 cursor-not-allowed"
+                          : ""
+                      }`}
+                      onClick={() =>
+                        setReviewsFilters({
+                          ...reviewsFilters,
+                          page: reviewsFilters.page + 1,
+                        })
+                      }
+                      disabled={
+                        reviewsPaginationInfo.totalPages <= reviewsFilters.page
+                      }
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Right Side: Add a Review (More Extended) */}
