@@ -57,6 +57,7 @@ export const cancelOrder = createAsyncThunk(
 
 const initialState = {
   orders: [],
+  paginationInfo: {},
   status: "idle",
   error: null,
 };
@@ -72,7 +73,8 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.status = "fetch-succeeded";
-        state.orders = action.payload;
+        state.orders = action.payload.orders;
+        state.paginationInfo = action.payload.paginationInfo;
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.status = "fetch-failed";
