@@ -357,6 +357,13 @@ const AdminProductManagement = () => {
     return true;
   };
 
+  // Add the useEffect to fetch products when filters change
+useEffect(() => {
+  const filterQuery = buildFilters(filters);
+  console.log("Fetching products with filters:", filters);
+  dispatch(fetchProducts(filterQuery));
+}, [filters, dispatch]);
+
   // Handler for create or update product
   const handleSave = async () => {
     console.log("handleSave called");
@@ -562,7 +569,6 @@ const AdminProductManagement = () => {
       console.error("Error saving product : ", err);
     }
   };
-
   const openDeleteModal = (productId) => {
     setDeleteProductId(productId);
     setDeleteModalOpen(true);
@@ -842,7 +848,7 @@ const AdminProductManagement = () => {
                     {items.map((product, index) => (
                       <tr key={product._id} className="border-t">
                         <td className="px-6 py-4 text-sm text-gray-700">
-                          {index + 1}
+                        {(filters.page - 1) * filters.limit + index + 1}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
                           <img
