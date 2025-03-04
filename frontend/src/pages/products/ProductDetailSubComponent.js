@@ -14,10 +14,11 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const {
     reviews,
     counts,
+    reviewsPaginationInfo,
     loading: reviewsLoading,
     error: reviewsError,
   } = useSelector((state) => state.reviews);
-  const { orders } = useSelector((state) => state.orders);
+  const { orders, status: orderStatus } = useSelector((state) => state.orders);
   const [activeTab, setActiveTab] = useState("specs");
   const [filters, setFilters] = useState({
     cid: prodDetails.category._id,
@@ -39,7 +40,16 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const tabs = [
     { id: "specs", label: "Specifications" },
     { id: "description", label: "Description" },
-    { id: "reviews", label: `Reviews (${counts.count})` },
+    {
+      id: "reviews",
+      label: `Reviews ${
+        reviewsLoading || orderStatus === "fetch-loading"
+          ? ""
+          : reviews.length <= 0 && orderStatus === "fetch-succeeded"
+          ? "(No Reviews)"
+          : `(${reviewsPaginationInfo.totalCount})`
+      }`,
+    },
   ];
 
   // effect hook for fetch orders
@@ -52,7 +62,9 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
 
   // effect hook for fetch product reviews
   useEffect(() => {
-    if (activeTab === "reviews" && orders?.length > 0) {
+    if (orders?.length > 0) {
+      console.log("Fetching reviews for slug:", prodDetails.slug);
+
       // Find the order ID where the product variant matches
       const matchedOrder = orders.find((order) =>
         order.items.some(
@@ -70,7 +82,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
 
       dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
     }
-  }, [dispatch, activeTab, prodDetails.slug, orders]);
+  }, [dispatch, prodDetails.slug, orders]);
 
   // effect hook for fetch related products by category
   useEffect(() => {
@@ -82,7 +94,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
           (product) => product._id !== prodDetails._id
         );
         setRelatedProducts(filteredProducts); // Set related products excluding the current product.
-        console.log("related products - ", relatedProducts);
+        console.log("related products - ", filteredProducts);
       })
       .catch(() => {
         toast.error("Faield to fetch related products!");

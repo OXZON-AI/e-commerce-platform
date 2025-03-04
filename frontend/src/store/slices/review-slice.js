@@ -24,7 +24,7 @@ export const createReview = createAsyncThunk(
     try {
       const response = await axiosInstance.post(`/v1/reviews/`, reviewData);
       console.log("Post-review-slice : ", response.data);
-      
+
       dispatch(fetchReviews(reviewData.slug)); // Refetch reviews to update.
     } catch (error) {
       return rejectWithValue(
@@ -39,6 +39,7 @@ const reviewSlice = createSlice({
   initialState: {
     reviews: [],
     counts: {},
+    reviewsPaginationInfo: {},
     loading: false,
     error: null,
   },
@@ -54,6 +55,7 @@ const reviewSlice = createSlice({
         state.loading = false;
         state.reviews = action.payload.reviews;
         state.counts = action.payload.counts;
+        state.reviewsPaginationInfo = action.payload.paginationInfo;
       })
       .addCase(fetchReviews.rejected, (state, action) => {
         state.loading = false;
