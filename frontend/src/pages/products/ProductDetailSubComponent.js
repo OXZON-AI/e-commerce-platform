@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchRelatedProducts } from "../../store/slices/product-slice";
 import { toast } from "react-toastify";
 import placeholderImage from "../../assets/images/placeholder_image.png";
+import add_reviews_negativeImg from "../../assets/images/add_reviews_negative.svg";
 import { Link } from "react-router-dom";
 import { createReview, fetchReviews } from "../../store/slices/review-slice";
 import axios from "axios";
@@ -73,21 +74,26 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
       // Find the order ID where the product variant matches
       const matchedOrder = orders.find((order) =>
         order.items.some(
-          (item) => item.variant._id === prodDetails.variants[0]._id
+          (item) => item.variant?._id === prodDetails.variants?.[0]?._id
         )
       );
+
+      console.log("Order ID : ", matchedOrder?._id);
 
       // If matched order then set order id to order in reviewData
       if (matchedOrder) {
         setReviewData((prevData) => ({
           ...prevData,
-          order: matchedOrder._id,
+          order: matchedOrder?._id,
         }));
+      } else {
+        console.error("No matching order found for this variant.");
       }
 
+      // fetch reviews
       dispatch(
         fetchReviews({ productSlug: prodDetails.slug, filters: reviewsFilters })
-      ).unwrap(); // fetch reviews
+      ).unwrap();
     }
   }, [dispatch, prodDetails.slug, reviewsFilters, orders]);
 
@@ -507,9 +513,16 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                     </form>
                   </>
                 ) : (
-                  <p className="text-gray-500 mt-4">
-                    You must have purchased this product to leave a review.
-                  </p>
+                  <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
+                    <img
+                      src={add_reviews_negativeImg}
+                      alt="purchasse-to-add-review-image"
+                      className="w-[100px]"
+                    />
+                    <p className="text-purple-500 text-center">
+                      You must have purchased this product to leave a review.
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
