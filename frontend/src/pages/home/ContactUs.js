@@ -69,7 +69,7 @@ const ContactUs = () => {
     }
 
     try {
-      await axiosInstance.post("http://localhost:3000/v1/contact", formData);
+      await axiosInstance.post("/v1/contact", formData);
       alert("Message sent successfully!");
       setFormData({
         name: "",
