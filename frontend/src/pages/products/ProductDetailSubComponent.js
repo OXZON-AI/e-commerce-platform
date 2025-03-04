@@ -20,7 +20,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   } = useSelector((state) => state.reviews);
   const { orders, status: orderStatus } = useSelector((state) => state.orders);
   const [activeTab, setActiveTab] = useState("specs");
-  const [filters, setFilters] = useState({
+  const [relatedProdFilters, setRelatedProdFilters] = useState({
     cid: prodDetails.category._id,
     limit: 5,
   });
@@ -32,6 +32,12 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     variant: prodDetails.variants?.[0]?._id,
     order: "",
     images: [],
+  });
+  const [reviewsFilters, setReviewsFilters] = useState({
+    rating: null,
+    sortOrder: "desc",
+    limit: 2,
+    page: 1,
   });
   const [previewImages, setPreviewImages] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -54,17 +60,15 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
 
   // effect hook for fetch orders
   useEffect(() => {
-    const filters = {
+    const orderFilters = {
       limit: 1000, // set limit higher ammount to go in all orders.
     };
-    dispatch(fetchOrders(filters));
-  }, [dispatch, filters]);
+    dispatch(fetchOrders(orderFilters));
+  }, [dispatch]);
 
   // effect hook for fetch product reviews
   useEffect(() => {
     if (orders?.length > 0) {
-      console.log("Fetching reviews for slug:", prodDetails.slug);
-
       // Find the order ID where the product variant matches
       const matchedOrder = orders.find((order) =>
         order.items.some(
@@ -80,14 +84,16 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         }));
       }
 
-      dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
+      dispatch(
+        fetchReviews({ productSlug: prodDetails.slug, filters: reviewsFilters })
+      ).unwrap(); // fetch reviews
     }
   }, [dispatch, prodDetails.slug, orders]);
 
   // effect hook for fetch related products by category
   useEffect(() => {
     setRelatedProducts([]);
-    dispatch(fetchRelatedProducts(filters))
+    dispatch(fetchRelatedProducts(relatedProdFilters))
       .unwrap()
       .then((products) => {
         const filteredProducts = products.filter(
@@ -266,6 +272,42 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                     </h3>
 
                     <div className="space-y-4">
+                      {/* Filter Options */}
+                      <div className="mb-4 flex justify-between gap-4 items-center w-full">
+                        <select
+                          className="p-2 border border-gray-300 rounded-md"
+                          value={reviewsFilters.rating}
+                          onChange={(e) =>
+                            setReviewsFilters({
+                              ...reviewsFilters,
+                              rating: parseInt(e.target.value) || null,
+                            })
+                          }
+                        >
+                          <option value="">All Ratings</option>
+                          <option value="5">5 Stars</option>
+                          <option value="4">4 Stars</option>
+                          <option value="3">3 Stars</option>
+                          <option value="2">2 Stars</option>
+                          <option value="1">1 Star</option>
+                        </select>
+
+                        <select
+                          className="p-2 border border-gray-300 rounded-md"
+                          value={reviewsFilters.sortOrder}
+                          onChange={(e) =>
+                            setReviewsFilters({
+                              ...reviewsFilters,
+                              sortOrder: e.target.value,
+                            })
+                          }
+                        >
+                          <option value="desc">Highest Rating</option>
+                          <option value="asc">Lowest Rating</option>
+                        </select>
+                      </div>
+
+                      {/* Review cards */}
                       {reviews && reviews.length > 0 ? (
                         reviews.map((review) => (
                           <div
@@ -303,6 +345,44 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                       ) : (
                         <p>No reviews yet.</p>
                       )}
+                    </div>
+
+                    {/* Pagination Buttons */}
+                    <div className="flex justify-end mt-4 space-x-2">
+                      <button
+                        className={`px-4 py-2 border rounded-md ${
+                          reviewsFilters.page === 1
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          setReviewsFilters({
+                            ...reviewsFilters,
+                            page: Math.max(1, reviewsFilters.page - 1),
+                          })
+                        }
+                        disabled={reviewsFilters.page === 1}
+                      >
+                        Previous
+                      </button>
+
+                      <span className="px-4 py-2 border rounded-md">
+                        Page {reviewsFilters.page} of {reviewsPaginationInfo.totalPages}
+                      </span>
+
+                      <button
+                        className={`px-4 py-2 border rounded-md ${
+                          reviewsPaginationInfo.totalPages <= reviewsFilters.page
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          setReviewsFilters({ ...reviewsFilters, page: reviewsFilters.page + 1 })
+                        }
+                        disabled={reviewsPaginationInfo.totalPages <= reviewsFilters.page}
+                      >
+                        Next
+                      </button>
                     </div>
                   </div>
                 )}

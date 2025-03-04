@@ -4,9 +4,11 @@ import axiosInstance from "../../axiosConfig";
 // Async thunk for fetching reviews
 export const fetchReviews = createAsyncThunk(
   "reviews/fetchReviews",
-  async (productSlug, { rejectWithValue }) => {
+  async ({ productSlug, filters = {} }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`/v1/reviews/${productSlug}`);
+      const response = await axiosInstance.get(`/v1/reviews/${productSlug}`, {
+        params: filters,
+      });
       console.log("Fetch-reviews-slice : ", response.data);
       return response.data;
     } catch (error) {
