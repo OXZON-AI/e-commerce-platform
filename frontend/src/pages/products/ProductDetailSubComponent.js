@@ -413,11 +413,9 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
 
               {/* Right Side: Add a Review (More Extended) */}
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
-                {reviewData.order ? (
-                  <>
-                    <h3 className="text-2xl font-semibold mb-4">
-                      Add a Review
-                    </h3>
+                <>
+                  <h3 className="text-2xl font-semibold mb-4">Add a Review</h3>
+                  {reviewData.order ? (
                     <form onSubmit={handleReviewSubmit} className="space-y-4">
                       <div>
                         <label className="block mb-2 font-medium">
@@ -511,19 +509,19 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                         {uploading ? "Uploading..." : "Submit Review"}
                       </button>
                     </form>
-                  </>
-                ) : (
-                  <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
-                    <img
-                      src={add_reviews_negativeImg}
-                      alt="purchasse-to-add-review-image"
-                      className="w-[100px]"
-                    />
-                    <p className="text-purple-500 text-center">
-                      You must have purchased this product to leave a review.
-                    </p>
-                  </div>
-                )}
+                  ) : (
+                    <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
+                      <img
+                        src={add_reviews_negativeImg}
+                        alt="purchasse-to-add-review-image"
+                        className="w-[100px]"
+                      />
+                      <p className="text-purple-500 text-center">
+                        You must have purchased this product to leave a review.
+                      </p>
+                    </div>
+                  )}
+                </>
               </div>
             </div>
           </>
