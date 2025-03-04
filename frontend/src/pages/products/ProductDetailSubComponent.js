@@ -7,7 +7,8 @@ import { Link } from "react-router-dom";
 import { createReview, fetchReviews } from "../../store/slices/review-slice";
 import axios from "axios";
 import { fetchOrders } from "../../store/slices/order-slice";
-import { Upload } from "lucide-react";
+import { Info, Upload } from "lucide-react";
+import { HashLoader } from "react-spinners";
 
 const ProductDetailSubComponent = ({ prodDetails }) => {
   const dispatch = useDispatch();
@@ -36,7 +37,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const [reviewsFilters, setReviewsFilters] = useState({
     rating: null,
     sortOrder: "desc",
-    limit: 1,
+    limit: 2,
     page: 1,
   });
   const [previewImages, setPreviewImages] = useState([]);
@@ -305,7 +306,10 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                     </div>
 
                     {reviewsLoading ? (
-                      <p>Loading reviews...</p>
+                      <div className="flex justify-center items-center gap-2">
+                        <HashLoader size={18} color="#a749ff" />
+                        <p className="text-purple-500">Loading reviews...</p>
+                      </div>
                     ) : (
                       <>
                         {/* Review cards */}
@@ -346,7 +350,10 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                             </div>
                           ))
                         ) : (
-                          <p>No reviews yet.</p>
+                          <div className="mb-4 p-3 text-violet-700 bg-violet-100 border-1 border-violet-500 rounded-sm flex text-center justify-center gap-2 transition-opacity duration-500">
+                            <Info className="w-5 h-5" />
+                            <span>No reviews yet.</span>
+                          </div>
                         )}
                       </>
                     )}
