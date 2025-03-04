@@ -31,6 +31,7 @@ export const getOrders = async (req, res, next) => {
   }
 
   const pipeline = [];
+  const ordersPipeline = [];
 
   pipeline.push({
     $match: {
@@ -42,7 +43,7 @@ export const getOrders = async (req, res, next) => {
     },
   });
 
-  pipeline.push(
+  ordersPipeline.push(
     {
       $skip: skip,
     },
@@ -51,7 +52,7 @@ export const getOrders = async (req, res, next) => {
     }
   );
 
-  pipeline.push(
+  ordersPipeline.push(
     {
       $lookup: {
         from: "variants",
@@ -67,114 +68,144 @@ export const getOrders = async (req, res, next) => {
         foreignField: "_id",
         as: "products",
       },
-    },
-    {
-      $project: {
-        user: 1,
-        isGuest: 1,
-        email: 1,
-        payment: 1,
-        billing: 1,
-        shipping: 1,
-        status: 1,
-        createdAt: 1,
-        earnedPoints: 1,
-        items: {
-          $map: {
-            input: "$items",
-            as: "item",
-            in: {
-              quantity: "$$item.quantity",
-              subTotal: "$$item.subTotal",
-              variant: {
-                $arrayElemAt: [
-                  {
-                    $map: {
-                      input: {
-                        $filter: {
-                          input: "$variants",
-                          as: "variant",
-                          cond: {
-                            $eq: ["$$variant._id", "$$item.variant"],
-                          },
-                        },
-                      },
-                      as: "variant",
-                      in: {
-                        _id: "$$variant._id",
-                        sku: "$$variant.sku",
-                        attributes: "$$variant.attributes",
-                        product: {
-                          $arrayElemAt: [
-                            {
-                              $map: {
-                                input: {
-                                  $filter: {
-                                    input: "$products",
-                                    as: "product",
-                                    cond: {
-                                      $eq: [
-                                        "$$variant.product",
-                                        "$$product._id",
-                                      ],
-                                    },
-                                  },
-                                },
-                                as: "product",
-                                in: {
-                                  _id: "$$product._id",
-                                  name: "$$product.name",
-                                  slug: "$$product.slug",
-                                  description: "$$product.description",
-                                  ratings: "$$product.ratings",
-                                  brand: "$$product.brand",
-                                },
-                              },
-                            },
-                            0,
-                          ],
-                        },
-                        image: {
-                          $arrayElemAt: [
-                            {
-                              $filter: {
-                                input: "$$variant.images",
-                                as: "image",
-                                cond: {
-                                  $eq: ["$$image.isDefault", true],
-                                },
-                              },
-                            },
-                            0,
-                          ],
+    }
+  );
+
+  ordersPipeline.push({
+    $project: {
+      user: 1,
+      isGuest: 1,
+      email: 1,
+      payment: 1,
+      billing: 1,
+      shipping: 1,
+      status: 1,
+      createdAt: 1,
+      earnedPoints: 1,
+      items: {
+        $map: {
+          input: "$items",
+          as: "item",
+          in: {
+            quantity: "$$item.quantity",
+            subTotal: "$$item.subTotal",
+            variant: {
+              $arrayElemAt: [
+                {
+                  $map: {
+                    input: {
+                      $filter: {
+                        input: "$variants",
+                        as: "variant",
+                        cond: {
+                          $eq: ["$$variant._id", "$$item.variant"],
                         },
                       },
                     },
+                    as: "variant",
+                    in: {
+                      _id: "$$variant._id",
+                      sku: "$$variant.sku",
+                      attributes: "$$variant.attributes",
+                      product: {
+                        $arrayElemAt: [
+                          {
+                            $map: {
+                              input: {
+                                $filter: {
+                                  input: "$products",
+                                  as: "product",
+                                  cond: {
+                                    $eq: ["$$variant.product", "$$product._id"],
+                                  },
+                                },
+                              },
+                              as: "product",
+                              in: {
+                                _id: "$$product._id",
+                                name: "$$product.name",
+                                slug: "$$product.slug",
+                                description: "$$product.description",
+                                ratings: "$$product.ratings",
+                                brand: "$$product.brand",
+                              },
+                            },
+                          },
+                          0,
+                        ],
+                      },
+                      image: {
+                        $arrayElemAt: [
+                          {
+                            $filter: {
+                              input: "$$variant.images",
+                              as: "image",
+                              cond: {
+                                $eq: ["$$image.isDefault", true],
+                              },
+                            },
+                          },
+                          0,
+                        ],
+                      },
+                    },
                   },
-                  0,
-                ],
-              },
+                },
+                0,
+              ],
             },
           },
         },
       },
-    }
-  );
+    },
+  });
 
   if (sortBy) {
     const sortByField = sortBy === "total" ? "payment.amount" : "createdAt";
-    pipeline.push({
+    ordersPipeline.push({
       $sort: {
         [sortByField]: sortOrder === "asc" ? 1 : -1,
       },
     });
   }
 
+  pipeline.push({
+    $facet: {
+      orders: ordersPipeline,
+      count: [
+        {
+          $count: "totalCount",
+        },
+      ],
+    },
+  });
+
+  pipeline.push({
+    $project: {
+      orders: 1,
+      paginationInfo: {
+        totalCount: {
+          $ifNull: [{ $first: "$count.totalCount" }, 0],
+        },
+        totalPages: {
+          $ceil: {
+            $divide: [
+              {
+                $ifNull: [{ $first: "$count.totalCount" }, 0],
+              },
+              limit,
+            ],
+          },
+        },
+      },
+    },
+  });
+
   try {
-    const orders = await Order.aggregate(pipeline);
+    const [{ orders, paginationInfo }] = await Order.aggregate(pipeline);
 
     logger.info("Orders fetched successfully.");
-    return res.status(200).json(orders);
+    return res.status(200).json({ orders, paginationInfo });
   } catch (error) {
     logger.error(`Error fetching orders for user ${id}: `, error);
     return next(error);
