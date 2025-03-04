@@ -25,10 +25,11 @@ export const createReview = async (req, res, next) => {
       _id: order,
       "items.variant": vid,
       user: id,
+      status: "delivered",
     }).session(session);
 
     if (!exist) {
-      const error = customError(404, "Order not found");
+      const error = customError(400, "Invalid order");
       logger.error("Error: ", error);
       return next(error);
     }
@@ -176,23 +177,52 @@ export const getReviews = async (req, res, next) => {
         comment: 1,
         images: 1,
       },
-    },
-    {
-      $skip: skip,
-    },
-    {
-      $limit: limit,
     }
   );
 
+  reviewsPipeline.push({
+    $facet: {
+      reviews: [
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
+        },
+      ],
+      count: [{ $count: "totalCount" }],
+    },
+  });
+
+  reviewsPipeline.push({
+    $project: {
+      reviews: 1,
+      paginationInfo: {
+        totalCount: {
+          $ifNull: [{ $first: "$count.totalCount" }, 0],
+        },
+        totalPages: {
+          $ceil: {
+            $divide: [
+              {
+                $ifNull: [{ $first: "$count.totalCount" }, 0],
+              },
+              limit,
+            ],
+          },
+        },
+      },
+    },
+  });
+
   try {
-    const [counts, reviews] = await Promise.all([
+    const [counts, [{ reviews, paginationInfo }]] = await Promise.all([
       Review.aggregate(countsPipeline),
       Review.aggregate(reviewsPipeline),
     ]);
 
     logger.info(`Fetched reviews for ${slug}.`);
-    return res.status(200).json({ counts, reviews });
+    return res.status(200).json({ counts, reviews, paginationInfo });
   } catch (error) {
     logger.error(`Error getting the review for product ${slug}: `, error);
     return next(error);

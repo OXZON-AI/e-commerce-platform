@@ -13,6 +13,7 @@ import {
   fetchProductDetails,
 } from "../../store/slices/product-slice";
 import { addToCart, fetchCart } from "../../store/slices/cart-slice";
+import { toast } from "react-toastify";
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -34,18 +35,6 @@ const ProductDetailPage = () => {
     };
   }, [slug, dispatch]);
 
-  const increaseQuantity = () => {
-    if (quantity < productDetail.variants[0]?.stock) {
-      setQuantity(quantity + 1);
-    }
-  };
-
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
-
   const addToCartHandler = async () => {
     if (productDetail.variants[0]?.stock > 0) {
       try {
@@ -56,27 +45,23 @@ const ProductDetailPage = () => {
           })
         ).unwrap(); // Ensures we get the resolved response of the async thunk
 
-        setNotification({
-          type: "success",
-          message: `${quantity} item(s) added to cart!`,
-        });
+        toast.success(`${quantity} item(s) added to cart!`);
 
-        await dispatch(fetchCart()); // Wait for addToCart to complete, then fetch the latest cart
+        await dispatch(fetchCart()).unwrap(); // Wait for addToCart to complete, then fetch the latest cart
       } catch (error) {
         setNotification({ type: "error", message: "Something went wrong!" });
       }
     } else {
-      setNotification({ type: "error", message: "Out of stock!" });
+      toast.error("Out of stock!");
     }
-    setTimeout(() => setNotification(null), 3000);
   };
 
   const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
+    dots: true, // Show dots for navigation
+    infinite: true, // Infinite scrolling
+    speed: 500, // Transition speed
+    slidesToShow: 3, // Number of images visible at a time
+    slidesToScroll: 1, // Number of images to scroll per click
   };
 
   const calculateOverallRating = (reviews) => {
@@ -160,43 +145,30 @@ const ProductDetailPage = () => {
                 ) : (
                   <p className="text-red-500 font-medium mb-4">Out of Stock</p>
                 )}
-                <div className="flex items-center gap-4 mb-4">
-                  <button
-                    className="px-3 py-1 border rounded-md"
-                    onClick={decreaseQuantity}
-                    disabled={quantity === 1}
-                  >
-                    -
-                  </button>
-                  <span className="text-lg font-medium">{quantity}</span>
-                  <button
-                    className="px-3 py-1 border rounded-md"
-                    onClick={increaseQuantity}
-                    disabled={quantity >= productDetail.variants?.[0]?.stock}
-                  >
-                    +
-                  </button>
 
-                  <button
-                    className={`px-4 py-2 rounded-none text-white font-medium ${
-                      productDetail.variants?.[0]?.stock > 0
-                        ? "bg-purple-600 hover:bg-purple-700"
-                        : "bg-gray-400 cursor-not-allowed"
-                    }`}
-                    disabled={
-                      productDetail.variants?.[0]?.stock === 0 ||
-                      cartStatus === "loading-add-to-cart"
-                    }
-                    onClick={addToCartHandler}
-                  >
-                    {cartStatus === "loading-add-to-cart" ? (
-                      <PuffLoader size={20} color="#fff" />
-                    ) : productDetail.variants?.[0]?.stock > 0 ? (
-                      `Add ${quantity} to Cart`
-                    ) : (
-                      "Unavailable"
-                    )}
-                  </button>
+                <div className="flex items-center gap-4 mb-4">
+                  <div style={{ marginLeft: "200px" }}>
+                    <button
+                      className={`px-4 py-2 rounded-none text-white font-medium ${
+                        productDetail.variants?.[0]?.stock > 0
+                          ? "bg-purple-600 hover:bg-purple-700"
+                          : "bg-gray-400 cursor-not-allowed"
+                      }`}
+                      disabled={
+                        productDetail.variants?.[0]?.stock === 0 ||
+                        cartStatus === "loading-add-to-cart"
+                      }
+                      onClick={addToCartHandler}
+                    >
+                      {cartStatus === "loading-add-to-cart" ? (
+                        <PuffLoader size={20} color="#fff" />
+                      ) : productDetail.variants?.[0]?.stock > 0 ? (
+                        "Add to Cart"
+                      ) : (
+                        "Unavailable"
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

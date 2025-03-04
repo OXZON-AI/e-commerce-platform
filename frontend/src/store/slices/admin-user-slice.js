@@ -4,9 +4,11 @@ import axiosInstance from "../../axiosConfig";
 // Thunks
 export const fetchUsers = createAsyncThunk(
   "users/fetchUsers",
-  async (_, thunkAPI) => {
+  async (filters = {}, thunkAPI) => {
     try {
-      const response = await axiosInstance.get("/v1/users");
+      const response = await axiosInstance.get("/v1/users", {
+        params: filters,
+      });
       console.log("users: ", response.data);
       return response.data;
     } catch (error) {

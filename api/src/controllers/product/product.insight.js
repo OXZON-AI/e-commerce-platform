@@ -114,7 +114,7 @@ export const productRecommendations = async (req, res, next) => {
           level: 1,
           slug: 1,
         },
-        prdoducts: {
+        products: {
           $map: {
             input: "$products",
             as: "product",

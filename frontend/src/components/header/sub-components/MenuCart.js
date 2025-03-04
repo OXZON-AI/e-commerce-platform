@@ -1,14 +1,12 @@
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 // import { getDiscountPrice } from "../../../helpers/product";
-import {
-  fetchCart,
-  removeFromCart,
-} from "../../../store/slices/cart-slice";
-import {
-  clearCheckoutError,
-} from "../../../store/slices/checkout-slice";
+import { fetchCart, removeFromCart } from "../../../store/slices/cart-slice";
+import { clearCheckoutError } from "../../../store/slices/checkout-slice";
+import emptyCartImg from "../../../assets/images/emptyCart.svg";
+import errorImg from "../../../assets/images/error.svg";
+import { toast } from "react-toastify";
 
 const MenuCart = () => {
   const dispatch = useDispatch();
@@ -19,6 +17,7 @@ const MenuCart = () => {
     status: cartStatus,
     error: cartError,
   } = useSelector((state) => state.cart);
+  const [variantIdToBeDeleted, setVariantIdToBeDeleted] = useState(null);
   // const { loading: checkoutLoading, error: checkoutError } = useSelector(
   //   (state) => state.checkout
   // );
@@ -35,7 +34,39 @@ const MenuCart = () => {
 
   // cart item remove handler
   const cartItemDeleteHandler = (variantId) => {
-    dispatch(removeFromCart(variantId));
+    dispatch(removeFromCart(variantId))
+      .unwrap()
+      .then(() => {
+        toast.success("Item Removed!");
+      })
+      .catch(() => {
+        toast.error("Failed to remove!");
+      });
+
+    setVariantIdToBeDeleted(variantId); // taking variant id to local state for re-try option
+  };
+
+  // cart re-try handler
+  const cartReTry = () => {
+    if (cartStatus === "failed-fetch-cart") {
+      dispatch(fetchCart())
+        .unwrap()
+        .then(() => {
+          toast.info("Cart Re Fetched!");
+        })
+        .catch(() => {
+          toast.error("Cart Re Fetch Failed!");
+        });
+    } else if (cartStatus === "failed-remove-item-cart") {
+      dispatch(removeFromCart(variantIdToBeDeleted))
+      .unwrap()
+      .then(() => {
+        toast.success("Item Removed!");
+      })
+      .catch(() => {
+        toast.error("Failed to remove!");
+      });
+    }
   };
 
   // Checkout button handler - Payment Integration - Stripe Payment Gateway
@@ -55,8 +86,17 @@ const MenuCart = () => {
   return (
     <div className="shopping-cart-content">
       {cartError && cartError ? (
-        <div className="w-full bg-red-100 border border-red-500 text-red-700 p-4 rounded-md mb-4">
-          <p className="text-sm font-medium text-red-700">{cartError}</p>
+        <div className="flex flex-col items-center w-full bg-white text-center p-4 rounded-md mb-4">
+          <img src={errorImg} alt="error image" className="w-[120px]" />
+          <p className="mt-4 text-xs font-medium text-gray-500">
+            Error : {cartError}
+          </p>
+          <button
+            className="border bg-white text-gray-500 text-sm font-medium px-4 py-2 rounded-md mt-2 hover: !important"
+            onClick={() => cartReTry()}
+          >
+            <p className="text-sm font-medium text-gray-500">Re-Try!</p>
+          </button>
         </div>
       ) : (
         <div>
@@ -154,7 +194,14 @@ const MenuCart = () => {
               </div>
             </Fragment>
           ) : (
-            <p className="text-center">No items in the cart.</p>
+            <div className="flex flex-col items-center text-center py-6">
+              <img
+                src={emptyCartImg}
+                alt="empty cart image"
+                className="w-[100px]"
+              />
+              <p className="mt-4 text-center">No items in the cart.</p>
+            </div>
           )}
         </div>
       )}
