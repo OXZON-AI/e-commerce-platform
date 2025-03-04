@@ -29,6 +29,7 @@ const IconGroup = ({ iconWhiteClass }) => {
 
   const { items: cartItems } = useSelector((state) => state.cart);
 
+  // Handler for log out
   const logoutHandler = async (e) => {
     e.preventDefault();
 
@@ -47,8 +48,28 @@ const IconGroup = ({ iconWhiteClass }) => {
     }
   };
 
+  // function for getting date and return greeting base on time
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Morning";
+    if (hour < 18) return "Afternoon";
+    return "Evening";
+  };
+
   return (
     <div className={clsx("header-right-wrap", iconWhiteClass)}>
+      <div className="w-auto flex items-center justify-center font-semibold">
+        {userInfo ? (
+          <Link to="/my-account">
+            {`Good ${getGreeting()}, `}
+            <span className="text-blue-700">{userInfo.name.split(" ")[0]}</span>
+            !
+          </Link>
+        ) : (
+          <Link to="/login-register">Login</Link>
+        )}
+      </div>
+
       <div className="same-style account-setting d-none d-lg-block">
         <button
           className="account-setting-active"
@@ -71,6 +92,11 @@ const IconGroup = ({ iconWhiteClass }) => {
               <li>
                 <Link to={process.env.PUBLIC_URL + "/my-account"}>
                   my account
+                </Link>
+              </li>
+              <li>
+                <Link to={process.env.PUBLIC_URL + "/order-history"}>
+                  My Orders
                 </Link>
               </li>
               <Link to="#" onClick={logoutHandler}>

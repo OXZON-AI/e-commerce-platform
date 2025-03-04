@@ -66,6 +66,7 @@ const AdminProductManagement = () => {
     images: [{ url: "", alt: "", isDefault: true }],
     attributes: [{ name: "color", value: "" }],
     isDefault: true,
+    isActive: false,
   });
   const [filters, setFilters] = useState({
     search: "",
@@ -170,6 +171,7 @@ const AdminProductManagement = () => {
         images: productDetail?.variants[0]?.images || [],
         attributes: productDetail?.variants[0]?.attributes || [],
         isDefault: productDetail?.variants[0]?.isDefault,
+        isActive: productDetail?.isActive,
       });
     } else {
       setFormData({
@@ -252,6 +254,7 @@ const AdminProductManagement = () => {
       images: [{ url: "", alt: "", isDefault: true }],
       attributes: [{ name: "color", value: "" }],
       isDefault: true,
+      isActive: false,
     });
 
     setErrorValidation("");
@@ -303,6 +306,23 @@ const AdminProductManagement = () => {
         ],
       },
     });
+  };
+
+  // Handler for product active status toggle button
+  const handleToggle = (categoryStatus) => {
+    if (categoryStatus === false) {
+      setFormData({
+        ...formData,
+        isActive: true,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        isActive: false,
+      });
+    }
+
+    console.log("Toggled product active status : ", formData.isActive);
   };
 
   const validateCreateForm = (formData) => {
@@ -456,6 +476,7 @@ useEffect(() => {
           },
           category: formData.category,
           brand: formData.brand,
+          isActive: formData.isActive,
         };
 
         // update product
@@ -965,6 +986,7 @@ useEffect(() => {
                 handleImageUpload={handleImageUpload}
                 selectedImage={selectedImage}
                 imageUrl={imageUrl}
+                handleToggle={handleToggle}
               />
             )}
 

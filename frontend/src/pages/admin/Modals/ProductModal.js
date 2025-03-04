@@ -23,6 +23,7 @@ const ProductModal = ({
   handleImageUpload,
   selectedImage,
   imageUrl,
+  handleToggle,
 }) => {
   if (!isOpen) return null;
 
@@ -159,23 +160,27 @@ const ProductModal = ({
 
             {/* Right Side - Remaining Inputs */}
             <div className="flex flex-col gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Stock
-                </label>
-                <input
-                  type="number"
-                  name="stock"
-                  value={formData.stock}
-                  onChange={handleChange}
-                  disabled={!productDetail} // if create form disable stock
-                  className={`w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 ${
-                    !productDetail
-                      ? "bg-gray-100 border-gray-100 text-gray-500 cursor-not-allowed"
-                      : ""
-                  }`}
-                />
-              </div>
+              {/* if update form load show stock otherwise  dont show */}
+              {formData.name ? (
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    Stock
+                  </label>
+                  <input
+                    type="number"
+                    name="stock"
+                    value={formData.stock}
+                    onChange={handleChange}
+                    disabled={!productDetail} // if create form disable stock
+                    className={`w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 ${
+                      !productDetail
+                        ? "bg-gray-100 border-gray-100 text-gray-500 cursor-not-allowed"
+                        : ""
+                    }`}
+                  />
+                </div>
+              ) : null}
+
               <div>
                 <label className="text-sm font-medium text-gray-700">
                   Category
@@ -279,6 +284,29 @@ const ProductModal = ({
                   + Add Attribute
                 </button>
               </div>
+              {/* if update form load show active status otherwise  dont show */}
+              {formData.name ? (
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700 ">
+                    Active Status
+                  </label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.isActive}
+                      onChange={() => handleToggle(formData.isActive)}
+                      className="sr-only peer"
+                    />
+                    <div
+                      className={`w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer
+                                  peer-checked:bg-green-500 peer-checked:after:translate-x-5
+                                  after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white
+                                  after:border after:rounded-full after:h-4 after:w-4 after:transition-all`}
+                    ></div>
+                  </label>
+                </div>
+              ) : null}
+
               {/* <div className="flex items-center space-x-2 mt-4">
                 <input
                   type="checkbox"

@@ -62,8 +62,8 @@ const HeaderOne = ({
       >
         <div className={layout === "container-fluid" ? layout : "container"}>
           <div className="row">
+            
             <div className="col-xl-2 col-lg-2 col-md-6 col-4 d-flex align-items-center">
-
               {/* header logo */} 
               <Logo imageUrl="/assets/img/logo/logo1.png" logoClass="logo"   />
             </div>
@@ -77,6 +77,7 @@ const HeaderOne = ({
               {/* Icon group */}
               <IconGroup />
             </div>
+
           </div>
         </div>
         {/* mobile menu */}

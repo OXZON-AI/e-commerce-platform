@@ -6,3 +6,7 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
     display: none;
 }
+
+.text-shadow-md {
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.6);
+}

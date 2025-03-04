@@ -29,8 +29,8 @@ export const createReviewSchema = Joi.object({
 
 export const getReviewsSchema = Joi.object({
   slug: Joi.string().trim().required(),
-  rating: Joi.number().min(1).max(5),
+  rating: Joi.number().integer().min(1).max(5),
   sortOrder: Joi.string().trim().valid("asc", "desc"),
-  page: Joi.number().min(1).default(1),
-  limit: Joi.number().min(1).default(10),
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).default(10),
 });

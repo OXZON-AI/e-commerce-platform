@@ -20,6 +20,8 @@ import adminUserReducer from "./slices/admin-user-slice";
 import categoryReducer from "./slices/category-slice";
 import variantReducer from "./slices/variant-slice";
 import checkoutReducer from "./slices/checkout-slice";
+import orderReducer from "./slices/order-slice";
+import reviewReducer from "./slices/review-slice";
 
 const persistConfig = {
   key: "frontend",
@@ -39,6 +41,8 @@ export const rootReducer = combineReducers({
   categories: categoryReducer,
   variant: variantReducer,
   checkout: checkoutReducer,
+  orders: orderReducer,
+  reviews: reviewReducer,
 });
 
 

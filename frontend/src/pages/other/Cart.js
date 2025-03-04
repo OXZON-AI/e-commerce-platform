@@ -134,7 +134,7 @@ const Cart = () => {
                           <div className="flex items-center justify-evenly">
                             {/* Quantity Selector on the left side */}
                             {cartStatus === "loading-update-cart" ? (
-                              <PuffLoader size={30} color="#9333ea"/>
+                              <PuffLoader size={30} color="#9333ea" />
                             ) : null}
                             <div className="flex items-center">
                               <button
@@ -219,31 +219,14 @@ const Cart = () => {
             </span>
           </div>
 
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-40 p-4">
-            {/* Use Coupon Code */}
-            <div className="p-6 bg-gray-100 rounded-lg shadow-md">
-              <h4 className="font-semibold text-lg text-gray-800">
-                Use Coupon Code
-              </h4>
-
-              <input
-                type="text"
-                placeholder="Enter Coupon"
-                className="w-full p-2 mt-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-
-              <button className="w-full mt-4 bg-purple-500 text-white font-medium p-2 rounded-md hover:bg-purple-600 transition">
-                Apply Coupon
-              </button>
-            </div>
-
+          <div className="mt-8 p-1">
             {/* Cart Total */}
-            <div className="p-6 bg-gray-100 rounded-lg shadow-md">
+            <div className="ml-auto p-6 bg-gray-100 rounded-lg shadow-md w-full md:w-1/2 lg:w-1/2">
               <h4 className="font-semibold text-lg text-gray-800 border-b pb-3">
                 Cart Total
               </h4>
 
-              <h5 className="text-md text-gray-700 mt-3 flex justify-between">
+              <h5 className="text-base text-gray-700 mt-3 flex justify-between">
                 Total Products:
                 <span className="font-semibold text-gray-900">
                   {total.toFixed(2)} MVR
@@ -270,15 +253,23 @@ const Cart = () => {
                   ? "Try Again"
                   : "Proceed to Checkout"}
               </Link>
+
+              {checkoutError && (
+                <div className="mt-4 w-full bg-red-100 border-1 border-red-500 text-red-700 p-4 rounded-md mb-4">
+                  <p className="text-sm font-medium text-red-700">
+                    {checkoutError}
+                  </p>
+                </div>
+              )}
               {/* <Link
                 to={process.env.PUBLIC_URL + "/checkout"}
                 className="mt-5 block text-center bg-purple-500 text-white font-medium px-6 py-2 rounded-md hover:bg-purple-600 transition"
               >
                 Proceed to Checkout
               </Link> */}
+              </div>
             </div>
           </div>
-        </div>
       </LayoutOne>
     </Fragment>
   );

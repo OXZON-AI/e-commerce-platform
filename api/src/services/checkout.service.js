@@ -7,12 +7,24 @@ export const convertToPoints = (amount) => {
 
 export const getDiscount = (points, amount) => {
   switch (true) {
-    case points >= 1000 && amount >= 50:
-      return { code: process.env.DISCOUNT_10, usedPoints: 1000 };
-    case points >= 500 && amount >= 25:
-      return { code: process.env.DISCOUNT_5, usedPoints: 500 };
-    case points >= 200 && amount >= 10:
-      return { code: process.env.DISCOUNT_2, usedPoints: 200 };
+    case points >= process.env.CASE1_POINTS &&
+      amount >= process.env.CASE1_AMOUNT:
+      return {
+        code: process.env.DISCOUNT_10,
+        usedPoints: process.env.CASE1_POINTS,
+      };
+    case points >= process.env.CASE2_POINTS &&
+      amount >= process.env.CASE2_AMOUNT:
+      return {
+        code: process.env.DISCOUNT_5,
+        usedPoints: process.env.CASE2_POINTS,
+      };
+    case points >= process.env.CASE3_POINTS &&
+      amount >= process.env.CASE3_AMOUNT:
+      return {
+        code: process.env.DISCOUNT_2,
+        usedPoints: process.env.CASE3_POINTS,
+      };
     default:
       return { code: undefined, usedPoints: 0 };
   }
