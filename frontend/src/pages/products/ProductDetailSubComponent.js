@@ -4,6 +4,8 @@ import { fetchRelatedProducts } from "../../store/slices/product-slice";
 import { toast } from "react-toastify";
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import add_reviews_negativeImg from "../../assets/images/add_reviews_negative.svg";
+import thankyouImg from "../../assets/images/thankyou.svg";
+import deliveringImg from "../../assets/images/delivering.svg";
 import { Link } from "react-router-dom";
 import { createReview, fetchReviews } from "../../store/slices/review-slice";
 import axios from "axios";
@@ -21,6 +23,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
     error: reviewsError,
   } = useSelector((state) => state.reviews);
   const { orders, status: orderStatus } = useSelector((state) => state.orders);
+  const { userInfo } = useSelector((state) => state.user);
   const [activeTab, setActiveTab] = useState("specs");
   const [relatedProdFilters, setRelatedProdFilters] = useState({
     cid: prodDetails.category._id,
@@ -44,6 +47,8 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const [previewImages, setPreviewImages] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [matchedOrder, setMatchedOrder] = useState(null);
+  const [isUserReviewd, setIsUserReviewd] = useState(false);
 
   const tabs = [
     { id: "specs", label: "Specifications" },
@@ -70,32 +75,54 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
 
   // effect hook for fetch product reviews
   useEffect(() => {
+    // Clear matchedOrder from local state first
+    setMatchedOrder(null);
+
+    // If there is orders, then check matched order and fetch reviews
     if (orders?.length > 0) {
       // Find the order ID where the product variant matches
-      const matchedOrder = orders.find((order) =>
+      const matched_Order = orders.find((order) =>
+        // The .some() method in JavaScript is used to check if at least one element in an array satisfies a given condition. It returns a boolean (true or false).
         order.items.some(
           (item) => item.variant?._id === prodDetails.variants?.[0]?._id
         )
       );
 
-      console.log("Order ID : ", matchedOrder?._id);
+      console.log("Order ID : ", matched_Order?._id);
 
       // If matched order then set order id to order in reviewData
-      if (matchedOrder) {
+      if (matched_Order) {
+        setMatchedOrder(matched_Order); // setting matched order to local state
         setReviewData((prevData) => ({
           ...prevData,
-          order: matchedOrder?._id,
+          order: matched_Order?._id,
         }));
       } else {
+        setMatchedOrder(null);
         console.error("No matching order found for this variant.");
       }
-
-      // fetch reviews
-      dispatch(
-        fetchReviews({ productSlug: prodDetails.slug, filters: reviewsFilters })
-      ).unwrap();
     }
+
+    // fetch reviews
+    dispatch(
+      fetchReviews({ productSlug: prodDetails.slug, filters: reviewsFilters })
+    ).unwrap();
+
+    console.log("Order : ", matchedOrder);
   }, [dispatch, prodDetails.slug, reviewsFilters, orders]);
+
+  // effect hook for check user reviewd or not
+  useEffect(() => {
+    if (userInfo) {
+      const userHasReviewed = reviews?.some(
+        (review) => review.user.name === userInfo.name
+      );
+      setIsUserReviewd(userHasReviewed);
+      console.log("is user reviewed ? ", isUserReviewd);
+    } else {
+      console.error("user not found to check review or not!");
+    }
+  }, [userInfo, reviews]);
 
   // effect hook for fetch related products by category
   useEffect(() => {
@@ -168,7 +195,9 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
       await dispatch(createReview(reviewData)).unwrap();
 
       await dispatch(fetchOrders({ limit: 1000 })).unwrap(); // Fetch orders again
-      await dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
+      await dispatch(
+        fetchReviews({ productSlug: prodDetails.slug, filters: reviewsFilters })
+      ).unwrap(); // fetch reviews
 
       setSubmitted(true);
 
@@ -280,7 +309,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                     <div className="mb-4 flex justify-between gap-4 items-center w-full">
                       <select
                         className="p-2 border border-gray-300 rounded-md"
-                        value={reviewsFilters.rating}
+                        value={reviewsFilters.rating || ""}
                         onChange={(e) =>
                           setReviewsFilters({
                             ...reviewsFilters,
@@ -415,7 +444,9 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-300">
                 <>
                   <h3 className="text-2xl font-semibold mb-4">Add a Review</h3>
-                  {reviewData.order ? (
+                  {reviewData.order &&
+                  matchedOrder.status === "delivered" &&
+                  !isUserReviewd ? (
                     <form onSubmit={handleReviewSubmit} className="space-y-4">
                       <div>
                         <label className="block mb-2 font-medium">
@@ -509,6 +540,39 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                         {uploading ? "Uploading..." : "Submit Review"}
                       </button>
                     </form>
+                  ) : matchedOrder && isUserReviewd ? (
+                    <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
+                      <img
+                        src={thankyouImg}
+                        alt="purchasse-to-add-review-image"
+                        className="w-[150px]"
+                      />
+                      <div className="flex flex-col items-center">
+                        <p className="text-purple-500 text-center">
+                          Thank you for your feedback!
+                        </p>
+                        <p className="text-gray-500 text-center">
+                          You have already submitted a review.
+                        </p>
+                      </div>
+                    </div>
+                  ) : matchedOrder && matchedOrder.status !== "delivered" ? (
+                    <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
+                      <img
+                        src={deliveringImg}
+                        alt="purchasse-to-add-review-image"
+                        className="w-[100px]"
+                      />
+                      <div className="flex flex-col items-center gap-1">
+                        <p className="text-purple-500 text-center">
+                          Wait until delivery to add a review!
+                        </p>
+                        <p className="text-gray-400 text-center text-xs">
+                          Please wait until your order is delivered before
+                          adding a review!
+                        </p>
+                      </div>
+                    </div>
                   ) : (
                     <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
                       <img
@@ -516,9 +580,14 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                         alt="purchasse-to-add-review-image"
                         className="w-[100px]"
                       />
-                      <p className="text-purple-500 text-center">
-                        You must have purchased this product to leave a review.
-                      </p>
+                      <div className="flex flex-col items-center gap-1">
+                        <p className="text-purple-500 text-center">
+                          Purchase Required
+                        </p>
+                        <p className="text-gray-400 text-center text-xs">
+                          You need to buy this product to leave a review.
+                        </p>
+                      </div>
                     </div>
                   )}
                 </>
