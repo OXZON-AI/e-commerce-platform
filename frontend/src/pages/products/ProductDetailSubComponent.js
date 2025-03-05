@@ -4,6 +4,8 @@ import { fetchRelatedProducts } from "../../store/slices/product-slice";
 import { toast } from "react-toastify";
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import add_reviews_negativeImg from "../../assets/images/add_reviews_negative.svg";
+import thankyouImg from "../../assets/images/thankyou.svg";
+import deliveringImg from "../../assets/images/delivering.svg";
 import { Link } from "react-router-dom";
 import { createReview, fetchReviews } from "../../store/slices/review-slice";
 import axios from "axios";
@@ -45,7 +47,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const [previewImages, setPreviewImages] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [matchedOrder, setMatchedOrder] = useState({});
+  const [matchedOrder, setMatchedOrder] = useState(null);
   const [isUserReviewd, setIsUserReviewd] = useState(false);
 
   const tabs = [
@@ -74,7 +76,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   // effect hook for fetch product reviews
   useEffect(() => {
     // Clear matchedOrder from local state first
-    setMatchedOrder({});
+    setMatchedOrder(null);
 
     // If there is orders, then check matched order and fetch reviews
     if (orders?.length > 0) {
@@ -93,18 +95,20 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         setMatchedOrder(matched_Order); // setting matched order to local state
         setReviewData((prevData) => ({
           ...prevData,
-          order: matchedOrder?._id,
+          order: matched_Order?._id,
         }));
       } else {
-        setMatchedOrder({});
+        setMatchedOrder(null);
         console.error("No matching order found for this variant.");
       }
-
-      // fetch reviews
-      dispatch(
-        fetchReviews({ productSlug: prodDetails.slug, filters: reviewsFilters })
-      ).unwrap();
     }
+
+    // fetch reviews
+    dispatch(
+      fetchReviews({ productSlug: prodDetails.slug, filters: reviewsFilters })
+    ).unwrap();
+
+    console.log("Order : ", matchedOrder);
   }, [dispatch, prodDetails.slug, reviewsFilters, orders]);
 
   // effect hook for check user reviewd or not
@@ -191,7 +195,9 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
       await dispatch(createReview(reviewData)).unwrap();
 
       await dispatch(fetchOrders({ limit: 1000 })).unwrap(); // Fetch orders again
-      await dispatch(fetchReviews(prodDetails.slug)).unwrap(); // fetch reviews
+      await dispatch(
+        fetchReviews({ productSlug: prodDetails.slug, filters: reviewsFilters })
+      ).unwrap(); // fetch reviews
 
       setSubmitted(true);
 
@@ -303,7 +309,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                     <div className="mb-4 flex justify-between gap-4 items-center w-full">
                       <select
                         className="p-2 border border-gray-300 rounded-md"
-                        value={reviewsFilters.rating}
+                        value={reviewsFilters.rating || ""}
                         onChange={(e) =>
                           setReviewsFilters({
                             ...reviewsFilters,
@@ -537,24 +543,35 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                   ) : matchedOrder && isUserReviewd ? (
                     <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
                       <img
-                        src={add_reviews_negativeImg}
+                        src={thankyouImg}
                         alt="purchasse-to-add-review-image"
-                        className="w-[100px]"
+                        className="w-[150px]"
                       />
-                      <p className="text-purple-500 text-center">
-                        You have already made a review!
-                      </p>
+                      <div className="flex flex-col items-center">
+                        <p className="text-purple-500 text-center">
+                          Thank you for your feedback!
+                        </p>
+                        <p className="text-gray-500 text-center">
+                          You have already submitted a review.
+                        </p>
+                      </div>
                     </div>
-                  ) : matchedOrder?.status !== "delivered" ? (
+                  ) : matchedOrder && matchedOrder.status !== "delivered" ? (
                     <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
                       <img
-                        src={add_reviews_negativeImg}
+                        src={deliveringImg}
                         alt="purchasse-to-add-review-image"
                         className="w-[100px]"
                       />
-                      <p className="text-purple-500 text-center">
-                        Wait until order delivered to you to add review!
-                      </p>
+                      <div className="flex flex-col items-center gap-1">
+                        <p className="text-purple-500 text-center">
+                          Wait until delivery to add a review!
+                        </p>
+                        <p className="text-gray-400 text-center text-xs">
+                          Please wait until your order is delivered before
+                          adding a review!
+                        </p>
+                      </div>
                     </div>
                   ) : (
                     <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
@@ -563,9 +580,14 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                         alt="purchasse-to-add-review-image"
                         className="w-[100px]"
                       />
-                      <p className="text-purple-500 text-center">
-                        You must have purchased this product to leave a review.
-                      </p>
+                      <div className="flex flex-col items-center gap-1">
+                        <p className="text-purple-500 text-center">
+                          Purchase Required
+                        </p>
+                        <p className="text-gray-400 text-center text-xs">
+                          You need to buy this product to leave a review.
+                        </p>
+                      </div>
                     </div>
                   )}
                 </>
