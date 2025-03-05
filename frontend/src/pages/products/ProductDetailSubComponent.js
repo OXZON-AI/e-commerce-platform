@@ -6,7 +6,8 @@ import placeholderImage from "../../assets/images/placeholder_image.png";
 import add_reviews_negativeImg from "../../assets/images/add_reviews_negative.svg";
 import thankyouImg from "../../assets/images/thankyou.svg";
 import deliveringImg from "../../assets/images/delivering.svg";
-import { Link } from "react-router-dom";
+import loginRequiredImg from "../../assets/images/login-required.svg";
+import { Link, useNavigate } from "react-router-dom";
 import { createReview, fetchReviews } from "../../store/slices/review-slice";
 import axios from "axios";
 import { fetchOrders } from "../../store/slices/order-slice";
@@ -15,6 +16,7 @@ import { HashLoader } from "react-spinners";
 
 const ProductDetailSubComponent = ({ prodDetails }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const {
     reviews,
     counts,
@@ -554,6 +556,28 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                         <p className="text-gray-500 text-center">
                           You have already submitted a review.
                         </p>
+                      </div>
+                    </div>
+                  ) : !userInfo ? (
+                    <div className="mt-2 border-none p-2 rounded-sm flex flex-col items-center justify-center gap-4">
+                      <img
+                        src={loginRequiredImg}
+                        alt="login-to-add-review-image"
+                        className="w-[100px]"
+                      />
+                      <div className="flex flex-col items-center">
+                        <p className="text-purple-500 text-center">
+                          Login Required!
+                        </p>
+                        <p className="text-gray-500 text-center">
+                          You must log in to add a review.
+                        </p>
+                        <button
+                          className="mt-4 px-6 py-2 border-1 border-purple-500 bg-purple-100 font-medium text-purple-600 rounded-lg hover:bg-purple-600 hover:text-white transition"
+                          onClick={() => navigate("/login-register")}
+                        >
+                          Login Now
+                        </button>
                       </div>
                     </div>
                   ) : matchedOrder && matchedOrder.status !== "delivered" ? (
