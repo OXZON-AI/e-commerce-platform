@@ -50,9 +50,9 @@ const AdminProductManagement = () => {
   const [serverError, setServerError] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
   const [deleteProductId, setDeleteProductId] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState("");
-  const [imageLocalPreview, setImageLocalPreview] = useState("");
+  const [isImageSelected, setIsImageSelected] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewImages, setPreviewImages] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     shortDescription: "",
@@ -62,7 +62,7 @@ const AdminProductManagement = () => {
     cost: "",
     category: "",
     brand: "",
-    images: [{ url: "", alt: "", isDefault: true }],
+    images: [],
     attributes: [{ name: "color", value: "" }],
     isDefault: true,
     isActive: false,
@@ -109,32 +109,50 @@ const AdminProductManagement = () => {
 
   // Image Upload Handler
   const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
+    const files = Array.from(event.target.files); // taking multiple images
 
-    // set selected image to local state
-    setSelectedImage(file);
+    // if at least a image select then set isImageSelected to true.
+    setIsImageSelected(files.length > 0);
+    setIsUploading(true);
 
-    // Show local preview before upload
-    const previewUrl = URL.createObjectURL(file);
-    setImageLocalPreview(previewUrl); // Temporarily show preview image
+    // set local images to local state to preview
+    setPreviewImages(files.map((file) => URL.createObjectURL(file))); // Temporarily show preview image
 
-    const imgFormData = new FormData();
-    imgFormData.append("file", file);
-    imgFormData.append(
-      "upload_preset",
-      process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
-    ); // Set in Cloudinary settings
+    const uploadedImages = await Promise.all(
+      files.map(async (file, index) => {
+        const imgFormData = new FormData();
+        imgFormData.append("file", file);
+        imgFormData.append(
+          "upload_preset",
+          process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+        ); // Set in Cloudinary settings
+        try {
+          const response = await axios.post(
+            `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+            imgFormData
+          );
 
-    try {
-      const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        imgFormData
-      );
+          return {
+            url: response.data.secure_url,
+            alt: "Uploaded product image",
+            isDefault: index === 0, // First image is default image
+          };
+        } catch (error) {
+          console.error("Image upload failed", error);
+          return null;
+        }
+      })
+    );
 
-      setImageUrl(response.data.secure_url); // take saved image url in Cloudinary
-    } catch (error) {
-      console.error("Image upload failed", error);
-    }
+    // Filter out faield uploads
+    const validImages = uploadedImages.filter((img) => img !== null);
+
+    // Update product formData with new images
+    setFormData((prevData) => ({
+      ...prevData,
+      images: [...prevData.images, ...validImages], // add new images
+    }));
+    setIsUploading(false);
   };
 
   // effect hook for asign error in state to servererror local state
@@ -182,7 +200,7 @@ const AdminProductManagement = () => {
         stock: null,
         category: "",
         brand: "",
-        images: [{ url: "", alt: "", isDefault: true }],
+        images: [],
         attributes: [{ name: "color", value: "" }],
         isDefault: true,
       });
@@ -213,12 +231,12 @@ const AdminProductManagement = () => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
-  const openModal = (productSlug = null) => {
+  const openModal = async (productSlug = null) => {
     dispatch(clearProductDetail()); // Always clear previous data first
 
     // get selected product details fom product details endpoint for update form input details only
     if (productSlug) {
-      dispatch(fetchProductDetails(productSlug)); // // If editing a product, fetch its details
+      await dispatch(fetchProductDetails(productSlug)).unwrap(); // // If editing a product, fetch its details
       console.log("select-prod-detail :::: ", productDetail);
     }
 
@@ -232,9 +250,8 @@ const AdminProductManagement = () => {
 
     // clear server error
     setServerError("");
-    setSelectedImage(null);
-    setImageUrl("");
-    setImageLocalPreview("");
+    setIsImageSelected(false);
+    setPreviewImages([]);
 
     // clear the form
     setFormData({
@@ -247,7 +264,7 @@ const AdminProductManagement = () => {
       stock: null,
       category: "",
       brand: "",
-      images: [{ url: "", alt: "", isDefault: true }],
+      images: [],
       attributes: [{ name: "color", value: "" }],
       isDefault: true,
       isActive: false,
@@ -349,10 +366,10 @@ const AdminProductManagement = () => {
       return false;
     }
 
-    if (!imageUrl) {
-      alert("Product Image Required!");
-      return false;
-    }
+    // if (!imageUrl) {
+    //   alert("Product Image Required!");
+    //   return false;
+    // }
 
     return true;
   };
@@ -374,19 +391,19 @@ const AdminProductManagement = () => {
   };
 
   // Add the useEffect to fetch products when filters change
-useEffect(() => {
-  const filterQuery = buildFilters(filters);
-  console.log("Fetching products with filters:", filters);
-  dispatch(fetchProducts(filterQuery));
-}, [filters, dispatch]);
+  useEffect(() => {
+    const filterQuery = buildFilters(filters);
+    console.log("Fetching products with filters:", filters);
+    dispatch(fetchProducts(filterQuery));
+  }, [filters, dispatch]);
 
-  // Handler for create or update product
+  // Handler for create or update product ----------------------------------
   const handleSave = async () => {
     console.log("handleSave called");
     console.log("Form Data:", formData);
 
     // Clear local image preview state
-    setImageLocalPreview("");
+    setPreviewImages([]);
 
     // update or not
     const isUpdating = !!productDetail;
@@ -425,24 +442,7 @@ useEffect(() => {
                 ? parseFloat(formData.compareAtPrice)
                 : undefined,
               cost: formData.cost ? parseFloat(formData.cost) : undefined,
-              images: imageUrl
-                ? [
-                    {
-                      url: imageUrl,
-                      alt: "Product Image",
-                      isDefault: true,
-                    },
-                  ]
-                : [],
-              // images: formData.image
-              //   ? [
-              //       {
-              //         url: formData.image,
-              //         alt: "Product Image",
-              //         isDefault: true,
-              //       },
-              //     ]
-              //   : [],
+              images: formData.images,
               attributes: formData.attributes.filter(
                 (attr) => attr.name && attr.value
               ),
@@ -494,8 +494,8 @@ useEffect(() => {
           const newAttributes =
             formData.attributes?.filter((attr) => !attr._id) || [];
 
-          // Get default image id
-          const imgId = productDetail.variants[0].images[0]._id;
+          // Separate new images by checking there is id or not
+          const newImages = formData.images.filter((img) => !img._id);
 
           // format selected product variant for backend
           const updatedVariant = {
@@ -516,9 +516,7 @@ useEffect(() => {
                     value: attr.value,
                   }))
                 : undefined,
-              images: formData.toAdd?.images?.length
-                ? formData.toAdd.images
-                : [],
+              images: newImages.length ? newImages : [],
             },
             // Only send existing attributes to `toChange`
             toChange: {
@@ -529,19 +527,6 @@ useEffect(() => {
                     value: attr.value,
                   }))
                 : undefined,
-              images: imageUrl
-                ? [
-                    {
-                      id: imgId,
-                      url: imageUrl,
-                      alt: "Product Image",
-                      isDefault: true,
-                    },
-                  ]
-                : [],
-              // images: formData.toChange?.images?.length
-              //   ? formData.toChange.images
-              //   : [],
             },
             toRemove: {
               // Remove empty or null attributes from `toRemove`
@@ -576,9 +561,8 @@ useEffect(() => {
       }
 
       const filterQuery = buildFilters(filters);
-      setSelectedImage(null);
-      setImageUrl("");
-      setImageLocalPreview("");
+      setIsImageSelected(false);
+      setPreviewImages([]);
       await dispatch(fetchProducts(filterQuery));
       closeModal();
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -586,16 +570,20 @@ useEffect(() => {
       console.error("Error saving product : ", err);
     }
   };
+
+  // handler for open delete model
   const openDeleteModal = (productId) => {
     setDeleteProductId(productId);
     setDeleteModalOpen(true);
   };
 
+  // handler for close delete model
   const closeDeleteModal = () => {
     setServerError(""); // clear server errors when modal close
     setDeleteModalOpen(false);
   };
 
+  // handler for delete product
   const handleDelete = async (productId) => {
     try {
       await dispatch(deleteProduct(productId)).unwrap();
@@ -610,6 +598,7 @@ useEffect(() => {
     }
   };
 
+  // handler for naviagate to category section
   const openCategoryModal = () => {
     // Navigate to the category management page
     navigate("/manage-categories");
@@ -865,7 +854,7 @@ useEffect(() => {
                     {items.map((product, index) => (
                       <tr key={product._id} className="border-t">
                         <td className="px-6 py-4 text-sm text-gray-700">
-                        {(filters.page - 1) * filters.limit + index + 1}
+                          {(filters.page - 1) * filters.limit + index + 1}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
                           <img
@@ -978,10 +967,10 @@ useEffect(() => {
                 setFormData={setFormData}
                 addAttributeField={addAttributeField}
                 removeAttributeField={removeAttributeField}
-                imageLocalPreview={imageLocalPreview}
+                previewImages={previewImages}
                 handleImageUpload={handleImageUpload}
-                selectedImage={selectedImage}
-                imageUrl={imageUrl}
+                isImageSelected={isImageSelected}
+                isUploading={isUploading}
                 handleToggle={handleToggle}
               />
             )}
