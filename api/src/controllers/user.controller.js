@@ -76,8 +76,10 @@ export const getUsers = async (req, res, next) => {
       },
     },
     {
-      $unwind: {
-        path: "$cart",
+      $addFields: {
+        cart: {
+          $first: "$cart",
+        },
       },
     },
     {
