@@ -9,7 +9,7 @@ export const fetchUsers = createAsyncThunk(
       const response = await axiosInstance.get("/v1/users", {
         params: filters,
       });
-      console.log("users: ", response.data);
+      console.log("users-slice: ", response.data);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(

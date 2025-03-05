@@ -55,7 +55,6 @@ const AdminProductManagement = () => {
   const [imageLocalPreview, setImageLocalPreview] = useState("");
   const [formData, setFormData] = useState({
     name: "",
-    slug: "",
     shortDescription: "",
     detailedDescription: "",
     price: "",
@@ -159,7 +158,6 @@ const AdminProductManagement = () => {
     if (productDetail) {
       setFormData({
         name: productDetail?.name || "",
-        slug: productDetail?.slug || "",
         shortDescription: productDetail?.description?.short || "",
         detailedDescription: productDetail?.description?.detailed || "",
         price: productDetail?.variants[0]?.price || null,
@@ -176,7 +174,6 @@ const AdminProductManagement = () => {
     } else {
       setFormData({
         name: "",
-        slug: "",
         shortDescription: "",
         detailedDescription: "",
         price: null,
@@ -242,7 +239,6 @@ const AdminProductManagement = () => {
     // clear the form
     setFormData({
       name: "",
-      slug: "",
       shortDescription: "",
       detailedDescription: "",
       price: null,
