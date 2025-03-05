@@ -87,18 +87,6 @@ const ProductModal = ({
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-700">
-                  Slug
-                </label>
-                <input
-                  type="text"
-                  name="slug"
-                  value={formData.slug}
-                  onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">
                   Short Description
                 </label>
                 <input
