@@ -103,8 +103,8 @@ const MenuCart = () => {
           {cartItems && cartItems.length > 0 ? (
             <Fragment>
               <ul>
-                {cartItems.map((cartItem) => (
-                  <li key={cartItem._id} className="single-shopping-cart">
+                {cartItems.map((cartItem, index) => (
+                  <li key={cartItem._id || index} className="single-shopping-cart">
                     <div className="shopping-cart-img">
                       <img
                         alt={cartItem.variant?.images?.[0].alt}
