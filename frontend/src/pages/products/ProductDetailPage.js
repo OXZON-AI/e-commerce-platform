@@ -105,18 +105,20 @@ const ProductDetailPage = () => {
                 />
                 {productDetail.variants?.[0]?.images?.length > 0 ? (
                   <Slider {...sliderSettings}>
-                    {productDetail.variants[0].images.map((img, index) => (
+                  {productDetail.variants[0].images.map((img, index) => (
+                    <div key={index} className="p-2"> {/* Adds padding between slides */}
                       <img
-                        key={index}
                         src={img.url || placeholderImage}
                         alt={`${productDetail.name} ${index + 1}`}
-                        className="w-full rounded-lg shadow-lg my-2"
+                        className="w-full rounded-lg shadow-sm"
                         onError={(e) => {
                           e.target.src = placeholderImage;
                         }}
                       />
-                    ))}
-                  </Slider>
+                    </div>
+                  ))}
+                </Slider>
+                
                 ) : (
                   <p className="text-gray-500">
                     No more images available for this product.
