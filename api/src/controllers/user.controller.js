@@ -76,8 +76,10 @@ export const getUsers = async (req, res, next) => {
       },
     },
     {
-      $unwind: {
-        path: "$cart",
+      $addFields: {
+        cart: {
+          $first: "$cart",
+        },
       },
     },
     {
@@ -103,18 +105,55 @@ export const getUsers = async (req, res, next) => {
   });
 
   pipeline.push({
-    $skip: skip,
+    $facet: {
+      users: [
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
+        },
+      ],
+      count: [{ $count: "totalCount" }],
+    },
   });
 
   pipeline.push({
-    $limit: limit,
+    $project: {
+      users: 1,
+      paginationInfo: {
+        totalCount: {
+          $ifNull: [
+            {
+              $first: "$count.totalCount",
+            },
+            0,
+          ],
+        },
+        totalPages: {
+          $ceil: {
+            $divide: [
+              {
+                $ifNull: [
+                  {
+                    $first: "$count.totalCount",
+                  },
+                  0,
+                ],
+              },
+              limit,
+            ],
+          },
+        },
+      },
+    },
   });
 
   try {
-    const users = await User.aggregate(pipeline);
+    const [{ users, paginationInfo }] = await User.aggregate(pipeline);
 
     logger.info(`Users fetched successfully.`);
-    return res.status(200).json(users);
+    return res.status(200).json({ users, paginationInfo });
   } catch (error) {
     logger.error(`Couldn't fetch users: `, error);
     return next(error);

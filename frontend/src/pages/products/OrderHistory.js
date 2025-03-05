@@ -17,6 +17,7 @@ const OrderHistory = () => {
   const navigate = useNavigate();
   const {
     orders,
+    paginationInfo,
     status: orderStatus,
     error: orderError,
   } = useSelector((state) => state.orders);
@@ -329,7 +330,7 @@ const OrderHistory = () => {
                   >
                     Previous
                   </button>
-                  <span className="px-4 py-2">Page {filters.page}</span>
+                  <span className="px-4 py-2">Page {filters.page} of {paginationInfo.totalPages}</span>
                   <button
                     className="px-4 py-2 bg-gray-500 text-white rounded disabled:opacity-50"
                     disabled={orders.length < 10}
