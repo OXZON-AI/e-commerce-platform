@@ -149,7 +149,7 @@ const ProductModal = ({
             {/* Right Side - Remaining Inputs */}
             <div className="flex flex-col gap-4">
               {/* if update form load show stock otherwise  dont show */}
-              {formData.name ? (
+              {productDetail ? (
                 <div>
                   <label className="text-sm font-medium text-gray-700">
                     Stock
@@ -273,7 +273,7 @@ const ProductModal = ({
                 </button>
               </div>
               {/* if update form load show active status otherwise  dont show */}
-              {formData.name ? (
+              {productDetail ? (
                 <div className="flex items-center gap-2">
                   <label className="text-sm font-medium text-gray-700 ">
                     Active Status
