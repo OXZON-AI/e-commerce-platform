@@ -19,10 +19,10 @@ const ProductModal = ({
   setFormData,
   addAttributeField,
   removeAttributeField,
-  imageLocalPreview,
+  previewImages,
   handleImageUpload,
-  selectedImage,
-  imageUrl,
+  isImageSelected,
+  isUploading,
   handleToggle,
 }) => {
   if (!isOpen) return null;
@@ -203,6 +203,7 @@ const ProductModal = ({
                 {/* Hidden File Input */}
                 <input
                   type="file"
+                  multiple
                   id="fileInput"
                   onChange={handleImageUpload}
                   className="hidden" // Hide the default file input
@@ -218,15 +219,26 @@ const ProductModal = ({
                 </label>
 
                 {/* Show preview near input */}
-                {(imageLocalPreview || formData.images[0].url) && (
-                  <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-                    <img
-                      src={imageLocalPreview || formData.images[0].url}
-                      alt={"Selected" || formData.images[0].alt}
-                      className="w-10 h-10 rounded-full border border-gray-400 object-cover"
-                    />
+                {previewImages.length > 0 ||
+                formData.images.some((image) => image.url) ? (
+                  <div className="flex space-x-2 mt-2">
+                    {(previewImages.length > 0
+                      ? previewImages
+                      : formData.images.filter((image) => image.url)
+                    ).map((image, index) => (
+                      <img
+                        key={index}
+                        src={
+                          previewImages.length > 0
+                            ? previewImages[index]
+                            : image.url
+                        }
+                        alt="Preview"
+                        className="w-16 h-16 object-cover border rounded-md"
+                      />
+                    ))}
                   </div>
-                )}
+                ) : null}
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-gray-700">
@@ -329,14 +341,14 @@ const ProductModal = ({
                 </div>
               )}
 
-              {/* Save button (appears above the loader) */}
-              {selectedImage && !imageUrl ? (
+              {/* Save button (loadder apears if images uploading to cloudinary) */}
+              {isUploading ? (
                 <PuffLoader size={30} color="#9333ea" />
               ) : (
                 <button
                   type="button"
                   onClick={handleSave}
-                  disabled={loading}
+                  disabled={loading || isUploading}
                   className={`relative bg-purple-500 text-white px-5 py-3 rounded-lg hover:bg-purple-600 transition ${
                     loading ? "opacity-50 cursor-not-allowed" : ""
                   } z-10`}
