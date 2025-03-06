@@ -68,9 +68,7 @@ const AdminProductManagement = () => {
     isActive: false,
     toAdd: {},
     toChange: {},
-    toRemove: {
-      images: [],
-    },
+    toRemove: {},
   });
   const [filters, setFilters] = useState({
     search: "",
@@ -135,7 +133,6 @@ const AdminProductManagement = () => {
           );
 
           return {
-            _id: null, // Newly uploaded images won't have an ID yet
             url: response.data.secure_url,
             alt: "Uploaded product image",
             isDefault: index === 0, // First image is default image
@@ -153,8 +150,11 @@ const AdminProductManagement = () => {
     // set local images to local state to preview
     setPreviewImages((prevImages) => [
       ...prevImages,
-      validImages, // store upload image objects
+      ...validImages, // store upload image objects
     ]);
+
+    console.log("valid-Images : ", validImages);
+    console.log("Preview-Images : ", previewImages);
 
     // Update product formData with new images
     setFormData((prevData) => ({
@@ -185,7 +185,12 @@ const AdminProductManagement = () => {
   useEffect(() => {
     if (productDetail) {
       setPreviewImages(
-        productDetail?.variants[0]?.images.map((image) => image.url) ?? []
+        productDetail?.variants[0]?.images.map((image) => ({
+          _id: image._id,
+          url: image.url,
+          alt: image.alt || "Product image",
+          isDefault: image.isDefault || false,
+        })) || []
       );
       setFormData({
         name: productDetail?.name || "",
@@ -201,8 +206,12 @@ const AdminProductManagement = () => {
         attributes: productDetail?.variants[0]?.attributes || [],
         isDefault: productDetail?.variants[0]?.isDefault,
         isActive: productDetail?.isActive,
+        toAdd: {},
+        toChange: {},
+        toRemove: {},
       });
     } else {
+      setPreviewImages([]);
       setFormData({
         name: "",
         shortDescription: "",
@@ -216,6 +225,9 @@ const AdminProductManagement = () => {
         images: [],
         attributes: [{ name: "color", value: "" }],
         isDefault: true,
+        toAdd: {},
+        toChange: {},
+        toRemove: {},
       });
     }
   }, [productDetail]);
@@ -281,6 +293,9 @@ const AdminProductManagement = () => {
       attributes: [{ name: "color", value: "" }],
       isDefault: true,
       isActive: false,
+      toAdd: {},
+      toChange: {},
+      toRemove: {},
     });
 
     setErrorValidation("");
@@ -415,9 +430,6 @@ const AdminProductManagement = () => {
     console.log("handleSave called");
     console.log("Form Data:", formData);
 
-    // Clear local image preview state
-    setPreviewImages([]);
-
     // update or not
     const isUpdating = !!productDetail;
     console.log("isUpdating : ", isUpdating);
@@ -546,7 +558,9 @@ const AdminProductManagement = () => {
               attributes:
                 formData.toRemove?.attributes?.filter((attr) => attr) ||
                 undefined,
-              images: formData.toRemove?.images ? formData.toRemove.images : [],
+              images: formData.toRemove?.images
+                ? formData.toRemove.images
+                : undefined,
             },
             // image: formData.image
             //   ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
@@ -617,24 +631,24 @@ const AdminProductManagement = () => {
   };
 
   // handler for remove image
-  const handleRemoveImage = (imageURL, e) => {
+  const handleRemoveImage = (image, e) => {
     e.preventDefault();
     e.stopPropagation(); // Stops event from affecting parent elements
 
-    console.log("Removing image:", imageURL);
+    console.log("Removing image:", image);
 
     console.log("Form-Data (removeImageHandler) top:", formData);
 
     setFormData((prevData) => {
       // filter removed image from formData to upload other images
       const updatedImages = prevData.images?.filter(
-        (img) => img.url !== imageURL
+        (img) => img.url !== image.url
       );
 
-      // Ensure toRemove exists and add the removed image
-      const updatedToRemove = prevData.toRemove?.images
-        ? [...prevData.toRemove.images, imageURL]
-        : [imageURL];
+      // If the image has an `_id`, send it to `toRemove.images`, else ignore
+      const updatedToRemove = image._id
+        ? [...(prevData.toRemove?.images || []), image._id]
+        : prevData.toRemove.images;
 
       console.log("Updated images after removal:", updatedImages);
       console.log("Updated toRemove list:", updatedToRemove);
@@ -653,7 +667,7 @@ const AdminProductManagement = () => {
     console.log("Form-Data (removeImageHandler) bottom:", formData);
 
     // Remove preview images
-    setPreviewImages((prev) => prev.filter((img) => img !== imageURL));
+    setPreviewImages((prev) => prev.filter((img) => img.url !== image.url));
   };
 
   return (

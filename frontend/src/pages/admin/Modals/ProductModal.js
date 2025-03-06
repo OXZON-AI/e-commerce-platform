@@ -234,13 +234,9 @@ const ProductModal = ({
                 </label>
 
                 {/* Show preview near input */}
-                {previewImages.length > 0 ||
-                formData.images.some((image) => image.url) ? (
+                {previewImages.length > 0 ? (
                   <div className="flex space-x-2 mt-2">
-                    {(previewImages.length > 0
-                      ? previewImages
-                      : formData.images.filter((image) => image.url)
-                    ).map((image, index) => (
+                    {previewImages.map((image, index) => (
                       <div key={index} className="relative">
                         {/* Remove Button */}
                         <button
@@ -253,12 +249,8 @@ const ProductModal = ({
 
                         {/* Image Preview */}
                         <img
-                          src={
-                            previewImages.length > 0
-                              ? previewImages[index]
-                              : image.url
-                          }
-                          alt="Preview"
+                          src={image.url}
+                          alt={image.alt || "Product image"}
                           className="w-16 h-16 object-cover border rounded-md"
                         />
                       </div>
