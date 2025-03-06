@@ -24,6 +24,7 @@ const ProductModal = ({
   isImageSelected,
   isUploading,
   handleToggle,
+  handleRemoveImage,
 }) => {
   if (!isOpen) return null;
 
@@ -220,7 +221,9 @@ const ProductModal = ({
                   {isUploading ? (
                     <>
                       <ClockArrowUp className="w-5 h-5 text-purple-500" />
-                      <span className="text-gray-700 opacity-100">Uploading...</span>
+                      <span className="text-gray-700 opacity-100">
+                        Uploading...
+                      </span>
                     </>
                   ) : (
                     <>
@@ -238,16 +241,27 @@ const ProductModal = ({
                       ? previewImages
                       : formData.images.filter((image) => image.url)
                     ).map((image, index) => (
-                      <img
-                        key={index}
-                        src={
-                          previewImages.length > 0
-                            ? previewImages[index]
-                            : image.url
-                        }
-                        alt="Preview"
-                        className="w-16 h-16 object-cover border rounded-md"
-                      />
+                      <div key={index} className="relative">
+                        {/* Remove Button */}
+                        <button
+                          onClick={(e) => handleRemoveImage(image, e)}
+                          type="button"
+                          className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full text-xs"
+                        >
+                          ✖
+                        </button>
+
+                        {/* Image Preview */}
+                        <img
+                          src={
+                            previewImages.length > 0
+                              ? previewImages[index]
+                              : image.url
+                          }
+                          alt="Preview"
+                          className="w-16 h-16 object-cover border rounded-md"
+                        />
+                      </div>
                     ))}
                   </div>
                 ) : null}
