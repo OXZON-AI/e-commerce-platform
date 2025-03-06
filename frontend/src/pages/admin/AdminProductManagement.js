@@ -116,7 +116,10 @@ const AdminProductManagement = () => {
     setIsUploading(true);
 
     // set local images to local state to preview
-    setPreviewImages(files.map((file) => URL.createObjectURL(file))); // Temporarily show preview image
+    setPreviewImages((prevImages) => [
+      ...prevImages,
+      files.map((file) => URL.createObjectURL(file)),
+    ]); // Temporarily show preview image
 
     const uploadedImages = await Promise.all(
       files.map(async (file, index) => {
@@ -174,6 +177,10 @@ const AdminProductManagement = () => {
   // Effect hook to fetch selected product details and set form data if update. if create formdata empty
   useEffect(() => {
     if (productDetail) {
+      setPreviewImages(
+        productDetail?.variants[0]?.images.map((image) => image.url) ?? []
+      );
+      console.log("Preview Images : ", previewImages);
       setFormData({
         name: productDetail?.name || "",
         shortDescription: productDetail?.description?.short || "",
