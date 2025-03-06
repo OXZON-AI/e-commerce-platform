@@ -287,7 +287,7 @@ const ProductModal = ({
                     />
                     <button
                       type="button"
-                      onClick={() => removeAttributeField(index)}
+                      onClick={() => removeAttributeField(index, attr)}
                       className="bg-red-500 text-white px-3 py-2 rounded"
                     >
                       ✕

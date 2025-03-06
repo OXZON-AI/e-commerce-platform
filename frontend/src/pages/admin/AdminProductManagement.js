@@ -335,17 +335,31 @@ const AdminProductManagement = () => {
   };
 
   // Let users remove an attribute if necessary
-  const removeAttributeField = (index) => {
-    const updatedAttributes = formData.attributes.filter((_, i) => i !== index);
-    setFormData({
-      ...formData,
-      attributes: updatedAttributes,
-      toRemove: {
-        attributes: [
-          ...(formData.toRemove?.attributes || []),
-          formData.attributes[index]._id,
-        ],
-      },
+  const removeAttributeField = (index, attribute) => {
+    console.log("Removing attribute:", attribute);
+
+    setFormData((prevData) => {
+      // Remove attribute from `attributes` array
+      const updatedAttributes = prevData.attributes.filter(
+        (_, i) => i !== index
+      );
+
+      // If the attribute has an `_id`, add it to `toRemove.attributes`
+      const updatedToRemove = attribute._id
+        ? [...(prevData.toRemove?.attributes || []), attribute._id] // Store only `_id`
+        : prevData.toRemove?.attributes || [];
+
+      console.log("Updated attributes after removal:", updatedAttributes);
+      console.log("Updated toRemove list:", updatedToRemove);
+
+      return {
+        ...prevData,
+        attributes: updatedAttributes, // Remove from attributes
+        toRemove: {
+          ...prevData.toRemove,
+          attributes: updatedToRemove, // Send only `_id`s in `toRemove`
+        },
+      };
     });
   };
 
@@ -553,22 +567,25 @@ const AdminProductManagement = () => {
                   }))
                 : undefined,
             },
-            toRemove: {
-              // Remove empty or null attributes from `toRemove`
-              attributes:
-                formData.toRemove?.attributes?.filter((attr) => attr) ||
-                undefined,
-              images: formData.toRemove?.images
-                ? formData.toRemove.images
-                : undefined,
-            },
-            // image: formData.image
-            //   ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
-            //   : [],
-            // attributes: formData.attributes.filter(
-            //   (attr) => attr.name && attr.value
-            // ),
+            // toRemove: {
+            //   // Remove empty or null attributes from `toRemove`
+            //   attributes:
+            //     formData.toRemove?.attributes?.filter((attr) => attr) ||
+            //     undefined,
+            //   images: formData.toRemove?.images
+            //     ? formData.toRemove.images
+            //     : undefined,
+            // },
           };
+
+          // Only include `toRemove` if it contains values
+          updatedVariant.toRemove = {};
+          if (formData.toRemove?.attributes?.length > 0) {
+            updatedVariant.toRemove.attributes = formData.toRemove.attributes; // Send only if not empty
+          }
+          if (formData.toRemove?.images?.length > 0) {
+            updatedVariant.toRemove.images = formData.toRemove.images; // Send only if not empty
+          }
 
           console.log("updatd variant details : ", updatedVariant);
 
