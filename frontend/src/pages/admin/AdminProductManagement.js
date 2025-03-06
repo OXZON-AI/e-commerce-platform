@@ -66,6 +66,11 @@ const AdminProductManagement = () => {
     attributes: [{ name: "color", value: "" }],
     isDefault: true,
     isActive: false,
+    toAdd: {},
+    toChange: {},
+    toRemove: {
+      images: [],
+    },
   });
   const [filters, setFilters] = useState({
     search: "",
@@ -115,12 +120,6 @@ const AdminProductManagement = () => {
     setIsImageSelected(files.length > 0);
     setIsUploading(true);
 
-    // set local images to local state to preview
-    setPreviewImages((prevImages) => [
-      ...prevImages,
-      files.map((file) => URL.createObjectURL(file)),
-    ]); // Temporarily show preview image
-
     const uploadedImages = await Promise.all(
       files.map(async (file, index) => {
         const imgFormData = new FormData();
@@ -136,6 +135,7 @@ const AdminProductManagement = () => {
           );
 
           return {
+            _id: null, // Newly uploaded images won't have an ID yet
             url: response.data.secure_url,
             alt: "Uploaded product image",
             isDefault: index === 0, // First image is default image
@@ -150,11 +150,18 @@ const AdminProductManagement = () => {
     // Filter out faield uploads
     const validImages = uploadedImages.filter((img) => img !== null);
 
+    // set local images to local state to preview
+    setPreviewImages((prevImages) => [
+      ...prevImages,
+      validImages, // store upload image objects
+    ]);
+
     // Update product formData with new images
     setFormData((prevData) => ({
       ...prevData,
       images: [...prevData.images, ...validImages], // add new images
     }));
+
     setIsUploading(false);
   };
 
@@ -180,7 +187,6 @@ const AdminProductManagement = () => {
       setPreviewImages(
         productDetail?.variants[0]?.images.map((image) => image.url) ?? []
       );
-      console.log("Preview Images : ", previewImages);
       setFormData({
         name: productDetail?.name || "",
         shortDescription: productDetail?.description?.short || "",
@@ -540,8 +546,7 @@ const AdminProductManagement = () => {
               attributes:
                 formData.toRemove?.attributes?.filter((attr) => attr) ||
                 undefined,
-              images:
-                formData.toRemove?.images?.filter((img) => img) || undefined,
+              images: formData.toRemove?.images ? formData.toRemove.images : [],
             },
             // image: formData.image
             //   ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
@@ -609,6 +614,46 @@ const AdminProductManagement = () => {
   const openCategoryModal = () => {
     // Navigate to the category management page
     navigate("/manage-categories");
+  };
+
+  // handler for remove image
+  const handleRemoveImage = (imageURL, e) => {
+    e.preventDefault();
+    e.stopPropagation(); // Stops event from affecting parent elements
+
+    console.log("Removing image:", imageURL);
+
+    console.log("Form-Data (removeImageHandler) top:", formData);
+
+    setFormData((prevData) => {
+      // filter removed image from formData to upload other images
+      const updatedImages = prevData.images?.filter(
+        (img) => img.url !== imageURL
+      );
+
+      // Ensure toRemove exists and add the removed image
+      const updatedToRemove = prevData.toRemove?.images
+        ? [...prevData.toRemove.images, imageURL]
+        : [imageURL];
+
+      console.log("Updated images after removal:", updatedImages);
+      console.log("Updated toRemove list:", updatedToRemove);
+
+      // update formData
+      return {
+        ...prevData,
+        images: updatedImages,
+        toRemove: {
+          ...prevData.toRemove,
+          images: updatedToRemove, // Add to 'toRemove' for remove from db when handleSave triggered click
+        },
+      };
+    });
+
+    console.log("Form-Data (removeImageHandler) bottom:", formData);
+
+    // Remove preview images
+    setPreviewImages((prev) => prev.filter((img) => img !== imageURL));
   };
 
   return (
@@ -979,6 +1024,7 @@ const AdminProductManagement = () => {
                 isImageSelected={isImageSelected}
                 isUploading={isUploading}
                 handleToggle={handleToggle}
+                handleRemoveImage={handleRemoveImage}
               />
             )}
 
