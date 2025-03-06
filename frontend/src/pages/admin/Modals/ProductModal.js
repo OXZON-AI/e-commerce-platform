@@ -2,7 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import PuffLoader from "react-spinners/PuffLoader";
-import { Upload } from "lucide-react"; // Import Upload icon
+import { ClockArrowUp, Upload } from "lucide-react"; // Import Upload icon
 
 const ProductModal = ({
   loading,
@@ -24,6 +24,7 @@ const ProductModal = ({
   isImageSelected,
   isUploading,
   handleToggle,
+  handleRemoveImage,
 }) => {
   if (!isOpen) return null;
 
@@ -207,35 +208,52 @@ const ProductModal = ({
                   id="fileInput"
                   onChange={handleImageUpload}
                   className="hidden" // Hide the default file input
+                  disabled={isUploading}
                 />
 
                 {/* Custom Upload Button */}
                 <label
                   htmlFor="fileInput"
-                  className="w-full flex items-center justify-center gap-2 p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
+                  className={`w-full flex items-center justify-center gap-2 p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 cursor-pointer bg-gray-100 hover:bg-gray-200 transition ${
+                    isUploading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
-                  <Upload className="w-5 h-5 text-purple-500" />
-                  <span className="text-gray-700">Upload Image</span>
+                  {isUploading ? (
+                    <>
+                      <ClockArrowUp className="w-5 h-5 text-purple-500" />
+                      <span className="text-gray-700 opacity-100">
+                        Uploading...
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-5 h-5 text-purple-500" />
+                      <span className="text-gray-700">Upload Image</span>
+                    </>
+                  )}
                 </label>
 
                 {/* Show preview near input */}
-                {previewImages.length > 0 ||
-                formData.images.some((image) => image.url) ? (
+                {previewImages.length > 0 ? (
                   <div className="flex space-x-2 mt-2">
-                    {(previewImages.length > 0
-                      ? previewImages
-                      : formData.images.filter((image) => image.url)
-                    ).map((image, index) => (
-                      <img
-                        key={index}
-                        src={
-                          previewImages.length > 0
-                            ? previewImages[index]
-                            : image.url
-                        }
-                        alt="Preview"
-                        className="w-16 h-16 object-cover border rounded-md"
-                      />
+                    {previewImages.map((image, index) => (
+                      <div key={index} className="relative">
+                        {/* Remove Button */}
+                        <button
+                          onClick={(e) => handleRemoveImage(image, e)}
+                          type="button"
+                          className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full text-xs"
+                        >
+                          ✖
+                        </button>
+
+                        {/* Image Preview */}
+                        <img
+                          src={image.url}
+                          alt={image.alt || "Product image"}
+                          className="w-16 h-16 object-cover border rounded-md"
+                        />
+                      </div>
                     ))}
                   </div>
                 ) : null}
@@ -269,7 +287,7 @@ const ProductModal = ({
                     />
                     <button
                       type="button"
-                      onClick={() => removeAttributeField(index)}
+                      onClick={() => removeAttributeField(index, attr)}
                       className="bg-red-500 text-white px-3 py-2 rounded"
                     >
                       ✕

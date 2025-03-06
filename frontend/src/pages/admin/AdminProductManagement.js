@@ -66,6 +66,9 @@ const AdminProductManagement = () => {
     attributes: [{ name: "color", value: "" }],
     isDefault: true,
     isActive: false,
+    toAdd: {},
+    toChange: {},
+    toRemove: {},
   });
   const [filters, setFilters] = useState({
     search: "",
@@ -115,9 +118,6 @@ const AdminProductManagement = () => {
     setIsImageSelected(files.length > 0);
     setIsUploading(true);
 
-    // set local images to local state to preview
-    setPreviewImages(files.map((file) => URL.createObjectURL(file))); // Temporarily show preview image
-
     const uploadedImages = await Promise.all(
       files.map(async (file, index) => {
         const imgFormData = new FormData();
@@ -147,11 +147,21 @@ const AdminProductManagement = () => {
     // Filter out faield uploads
     const validImages = uploadedImages.filter((img) => img !== null);
 
+    // set local images to local state to preview
+    setPreviewImages((prevImages) => [
+      ...prevImages,
+      ...validImages, // store upload image objects
+    ]);
+
+    console.log("valid-Images : ", validImages);
+    console.log("Preview-Images : ", previewImages);
+
     // Update product formData with new images
     setFormData((prevData) => ({
       ...prevData,
       images: [...prevData.images, ...validImages], // add new images
     }));
+
     setIsUploading(false);
   };
 
@@ -174,6 +184,14 @@ const AdminProductManagement = () => {
   // Effect hook to fetch selected product details and set form data if update. if create formdata empty
   useEffect(() => {
     if (productDetail) {
+      setPreviewImages(
+        productDetail?.variants[0]?.images.map((image) => ({
+          _id: image._id,
+          url: image.url,
+          alt: image.alt || "Product image",
+          isDefault: image.isDefault || false,
+        })) || []
+      );
       setFormData({
         name: productDetail?.name || "",
         shortDescription: productDetail?.description?.short || "",
@@ -188,8 +206,12 @@ const AdminProductManagement = () => {
         attributes: productDetail?.variants[0]?.attributes || [],
         isDefault: productDetail?.variants[0]?.isDefault,
         isActive: productDetail?.isActive,
+        toAdd: {},
+        toChange: {},
+        toRemove: {},
       });
     } else {
+      setPreviewImages([]);
       setFormData({
         name: "",
         shortDescription: "",
@@ -203,6 +225,9 @@ const AdminProductManagement = () => {
         images: [],
         attributes: [{ name: "color", value: "" }],
         isDefault: true,
+        toAdd: {},
+        toChange: {},
+        toRemove: {},
       });
     }
   }, [productDetail]);
@@ -268,6 +293,9 @@ const AdminProductManagement = () => {
       attributes: [{ name: "color", value: "" }],
       isDefault: true,
       isActive: false,
+      toAdd: {},
+      toChange: {},
+      toRemove: {},
     });
 
     setErrorValidation("");
@@ -307,17 +335,31 @@ const AdminProductManagement = () => {
   };
 
   // Let users remove an attribute if necessary
-  const removeAttributeField = (index) => {
-    const updatedAttributes = formData.attributes.filter((_, i) => i !== index);
-    setFormData({
-      ...formData,
-      attributes: updatedAttributes,
-      toRemove: {
-        attributes: [
-          ...(formData.toRemove?.attributes || []),
-          formData.attributes[index]._id,
-        ],
-      },
+  const removeAttributeField = (index, attribute) => {
+    console.log("Removing attribute:", attribute);
+
+    setFormData((prevData) => {
+      // Remove attribute from `attributes` array
+      const updatedAttributes = prevData.attributes.filter(
+        (_, i) => i !== index
+      );
+
+      // If the attribute has an `_id`, add it to `toRemove.attributes`
+      const updatedToRemove = attribute._id
+        ? [...(prevData.toRemove?.attributes || []), attribute._id] // Store only `_id`
+        : prevData.toRemove?.attributes || [];
+
+      console.log("Updated attributes after removal:", updatedAttributes);
+      console.log("Updated toRemove list:", updatedToRemove);
+
+      return {
+        ...prevData,
+        attributes: updatedAttributes, // Remove from attributes
+        toRemove: {
+          ...prevData.toRemove,
+          attributes: updatedToRemove, // Send only `_id`s in `toRemove`
+        },
+      };
     });
   };
 
@@ -401,9 +443,6 @@ const AdminProductManagement = () => {
   const handleSave = async () => {
     console.log("handleSave called");
     console.log("Form Data:", formData);
-
-    // Clear local image preview state
-    setPreviewImages([]);
 
     // update or not
     const isUpdating = !!productDetail;
@@ -528,21 +567,25 @@ const AdminProductManagement = () => {
                   }))
                 : undefined,
             },
-            toRemove: {
-              // Remove empty or null attributes from `toRemove`
-              attributes:
-                formData.toRemove?.attributes?.filter((attr) => attr) ||
-                undefined,
-              images:
-                formData.toRemove?.images?.filter((img) => img) || undefined,
-            },
-            // image: formData.image
-            //   ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
-            //   : [],
-            // attributes: formData.attributes.filter(
-            //   (attr) => attr.name && attr.value
-            // ),
+            // toRemove: {
+            //   // Remove empty or null attributes from `toRemove`
+            //   attributes:
+            //     formData.toRemove?.attributes?.filter((attr) => attr) ||
+            //     undefined,
+            //   images: formData.toRemove?.images
+            //     ? formData.toRemove.images
+            //     : undefined,
+            // },
           };
+
+          // Only include `toRemove` if it contains values
+          updatedVariant.toRemove = {};
+          if (formData.toRemove?.attributes?.length > 0) {
+            updatedVariant.toRemove.attributes = formData.toRemove.attributes; // Send only if not empty
+          }
+          if (formData.toRemove?.images?.length > 0) {
+            updatedVariant.toRemove.images = formData.toRemove.images; // Send only if not empty
+          }
 
           console.log("updatd variant details : ", updatedVariant);
 
@@ -602,6 +645,46 @@ const AdminProductManagement = () => {
   const openCategoryModal = () => {
     // Navigate to the category management page
     navigate("/manage-categories");
+  };
+
+  // handler for remove image
+  const handleRemoveImage = (image, e) => {
+    e.preventDefault();
+    e.stopPropagation(); // Stops event from affecting parent elements
+
+    console.log("Removing image:", image);
+
+    console.log("Form-Data (removeImageHandler) top:", formData);
+
+    setFormData((prevData) => {
+      // filter removed image from formData to upload other images
+      const updatedImages = prevData.images?.filter(
+        (img) => img.url !== image.url
+      );
+
+      // If the image has an `_id`, send it to `toRemove.images`, else ignore
+      const updatedToRemove = image._id
+        ? [...(prevData.toRemove?.images || []), image._id]
+        : prevData.toRemove.images;
+
+      console.log("Updated images after removal:", updatedImages);
+      console.log("Updated toRemove list:", updatedToRemove);
+
+      // update formData
+      return {
+        ...prevData,
+        images: updatedImages,
+        toRemove: {
+          ...prevData.toRemove,
+          images: updatedToRemove, // Add to 'toRemove' for remove from db when handleSave triggered click
+        },
+      };
+    });
+
+    console.log("Form-Data (removeImageHandler) bottom:", formData);
+
+    // Remove preview images
+    setPreviewImages((prev) => prev.filter((img) => img.url !== image.url));
   };
 
   return (
@@ -972,6 +1055,7 @@ const AdminProductManagement = () => {
                 isImageSelected={isImageSelected}
                 isUploading={isUploading}
                 handleToggle={handleToggle}
+                handleRemoveImage={handleRemoveImage}
               />
             )}
 
