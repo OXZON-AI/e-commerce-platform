@@ -134,6 +134,7 @@ const AdminProductManagement = () => {
 
           return {
             url: response.data.secure_url,
+            // public_id: response.data.public_id, // Store public_id for deletion from cloudinary
             alt: "Uploaded product image",
             isDefault: index === 0, // First image is default image
           };
