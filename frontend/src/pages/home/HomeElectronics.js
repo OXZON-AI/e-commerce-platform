@@ -531,19 +531,34 @@ const HomeElectronics = () => {
 
           {/* Brand Logos */}
           <div className="container mx-auto py-12 text-center">
-            <h2 className="text-3xl font-bold mb-6">Our Trusted Brands</h2>
-            <Slider {...brandSliderSettings}>
-              {[1, 2, 3, 4, 5, 6].map((brand) => (
-                <div key={brand}>
-                  <img
-                    src="https://dummyimage.com/150x150/9678b6/fff"
-                    alt="Brand"
-                    className="mx-auto transition-transform transform hover:scale-110 duration-300 ease-in-out"
-                  />
-                </div>
-              ))}
-            </Slider>
-          </div>
+  <h2 className="text-3xl font-bold mb-6">Our Trusted Brands</h2>
+  <Slider {...brandSliderSettings}>
+    {[
+      { name: 'Apple', logo: 'https://dummyimage.com/150x150/000000/ffffff&text=Apple' },
+      { name: 'Samsung', logo: 'https://dummyimage.com/150x150/1428a0/ffffff&text=Samsung' },
+      { name: 'Sony', logo: 'https://dummyimage.com/150x150/333333/ffffff&text=Sony' },
+      { name: 'LG', logo: 'https://dummyimage.com/150x150/a50034/ffffff&text=LG' },
+      { name: 'Dell', logo: 'https://dummyimage.com/150x150/007db8/ffffff&text=Dell' },
+      { name: 'HP', logo: 'https://dummyimage.com/150x150/0096d6/ffffff&text=HP' },
+      { name: 'Lenovo', logo: 'https://dummyimage.com/150x150/e2231a/ffffff&text=Lenovo' },
+      { name: 'Asus', logo: 'https://dummyimage.com/150x150/0033a0/ffffff&text=Asus' },
+      { name: 'OnePlus', logo: 'https://dummyimage.com/150x150/c20e1a/ffffff&text=OnePlus' },
+      { name: 'Xiaomi', logo: 'https://dummyimage.com/150x150/fa6700/ffffff&text=Xiaomi' },
+      { name: 'Garmin', logo: 'https://dummyimage.com/150x150/007cc3/ffffff&text=Garmin' },
+      { name: 'Fitbit', logo: 'https://dummyimage.com/150x150/00b0b9/ffffff&text=Fitbit' },
+    ].map((brand, index) => (
+      <div key={index}>
+        <img
+          src={brand.logo}
+          alt={brand.name}
+          className="mx-auto w-32 h-32 object-contain rounded-full transition-transform transform hover:scale-110 duration-300 ease-in-out"
+        />
+      </div>
+    ))}
+  </Slider>
+</div>
+
+
         </div>
       </LayoutOne>
     </Fragment>
