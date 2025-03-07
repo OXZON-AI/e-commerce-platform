@@ -29,3 +29,17 @@ export const salesPerformanceSchema = Joi.object({
     otherwise: Joi.forbidden(),
   }),
 });
+
+export const categoryPerformanceSchema = Joi.object({
+  userType: Joi.string().trim().valid("customer", "guest"),
+  interval: Joi.string()
+    .trim()
+    .valid("year", "month", "week", "day")
+    .default("month"),
+  startDate: Joi.date(),
+  endDate: Joi.when("startDate", {
+    is: Joi.exist(),
+    then: Joi.date().min(Joi.ref("startDate")),
+    otherwise: Joi.forbidden(),
+  }),
+});
