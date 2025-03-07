@@ -1,12 +1,11 @@
 import React from "react";
-
 import Sidebar from "./components/Sidebar";
 import AdminNavbar from "./components/AdminNavbar";
 import SalesSummaryChart from "./components/DashbardAnalytics/SalesSummaryChart";
 import SalesPerformanceChart from "./components/DashbardAnalytics/SalesPerformanceChart";
-import ProductsExportChart from "./components/DashbardAnalytics/ProductsExportChart";
-import SalesExportChart from "./components/DashbardAnalytics/SalesExportChart";
 import { Stats } from "./components/DashbardAnalytics/stats";
+import CategoryChart from "./components/DashbardAnalytics/CategoryComparisonChart";
+import SalesComparisonChart from "./components/DashbardAnalytics/SalesComparisonChart";
 
 const Dashboard = () => {
   return (
@@ -37,12 +36,12 @@ const Dashboard = () => {
               {/* Middle Section */}
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                 <SalesPerformanceChart />
-                <ProductsExportChart />
+                <CategoryChart />
               </div>
 
               {/* Bottom Section */}
               <div className="lg:col-span-1">
-                <SalesExportChart />
+                <SalesComparisonChart />
               </div>
             </div>
           </div>
