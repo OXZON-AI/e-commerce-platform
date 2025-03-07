@@ -176,13 +176,10 @@ const AdminOrderManagement = () => {
                   <tr>
                     <th className="p-4 text-left">Index</th>
                     <th className="p-4 text-left">Order ID</th>
-                    <th className="p-4 text-left">Payment Status</th>
-                    <th className="p-4 text-left">Time Slot</th>
+                    <th className="p-4 text-left">Payment Staus</th>
                     <th className="p-4 text-left">Customer Name</th>
-                    <th className="p-4 text-left">Branch</th>
                     <th className="p-4 text-left">Total Amount</th>
                     <th className="p-4 text-left">Order Status</th>
-                    <th className="p-4 text-left">Order Type</th>
                     <th className="p-4 text-left">Actions</th>
                   </tr>
                 </thead>
@@ -202,17 +199,25 @@ const AdminOrderManagement = () => {
                             {currentIndex}
                           </td>
                           <td className="p-4">{order._id}</td>
-                          <td className="p-4">{order.payment ? "Payment Success!" : "Payment Failed!"}</td>
-                          <td className="p-4">{order.timeSlot}</td>
+                          <td
+                            className={`p-4 ${
+                              order.payment?.refundId
+                                ? "text-red-500"
+                                : "text-green-500"
+                            }`}
+                          >
+                            {order.payment?.refundId ? "Refunded" : "Success"}
+                          </td>
                           <td className="p-4">{order.user.name}</td>
-                          <td className="p-4">{order.branch}</td>
-                          <td className="p-4">{order.payment.amount}</td>
+                          <td className="p-4">
+                            {order.payment.amount}{" "}
+                            <span className="text-lime-500">MVR</span>
+                          </td>
                           <td className="p-3">
                             {getStatusBadge(order.status)}
                           </td>
-                          <td className="p-4">{order.orderType}</td>
                           <td className="p-4">
-                            <Link to="/manage-order-details">
+                            <Link to="/manage-order-details/">
                               <button className="text-blue-500 hover:underline mr-4">
                                 <FaEye className="mr-2" size={24} />
                               </button>
@@ -241,7 +246,9 @@ const AdminOrderManagement = () => {
                 </button>
 
                 {/* Page Indicator */}
-                <span className="text-gray-700">Page {filters.page} of {paginationInfo.totalPages}</span>
+                <span className="text-gray-700">
+                  Page {filters.page} of {paginationInfo.totalPages}
+                </span>
 
                 {/* Next Button */}
                 <button
