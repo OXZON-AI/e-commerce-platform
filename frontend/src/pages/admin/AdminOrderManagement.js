@@ -14,6 +14,7 @@ const AdminOrderManagement = () => {
   const navigate = useNavigate();
   const {
     orders,
+    paginationInfo,
     status: orderStatus,
     error: orderError,
   } = useSelector((state) => state.orders);
@@ -37,7 +38,7 @@ const AdminOrderManagement = () => {
 
   // Filtering orders based on search input
   const filteredOrders = orders.filter((order) =>
-    order.items[0].variant.product.name
+    order.items[0]?.variant?.product?.name
       .toLowerCase()
       .includes(search.toLowerCase())
   );
@@ -240,7 +241,7 @@ const AdminOrderManagement = () => {
                 </button>
 
                 {/* Page Indicator */}
-                <span className="text-gray-700">Page {filters.page}</span>
+                <span className="text-gray-700">Page {filters.page} of {paginationInfo.totalPages}</span>
 
                 {/* Next Button */}
                 <button
