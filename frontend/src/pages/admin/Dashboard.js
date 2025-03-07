@@ -10,13 +10,12 @@ import CategoryChart from "./components/DashbardAnalytics/CategoryComparisonChar
 import SalesComparisonChart from "./components/DashbardAnalytics/SalesComparisonChart";
 
 const Dashboard = () => {
-
-   const handleExcelExport = () => {
-    alert('Excel export triggered');
+  const handleExcelExport = () => {
+    alert("Excel export triggered");
   };
 
   const handleCSVExport = () => {
-    alert('CSV export triggered');
+    alert("CSV export triggered");
   };
 
   return (
@@ -30,7 +29,7 @@ const Dashboard = () => {
               <h2 className="text-3xl font-semibold text-gray-800">
                 Genuine Electronics Dash Board
               </h2>
-              
+
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <button
                   onClick={handleExcelExport}
@@ -57,12 +56,12 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-1">
               {/* Top Section */}
               <div className="lg:col-span-1">
-                <SalesSummaryChart/>
+                <SalesSummaryChart />
               </div>
 
               {/* Middle Section */}
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <OrderCountStatusChart/>
+                <OrderCountStatusChart />
                 <SalesPerformanceChart />
                 <CategoryChart />
               </div>
@@ -80,5 +79,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
