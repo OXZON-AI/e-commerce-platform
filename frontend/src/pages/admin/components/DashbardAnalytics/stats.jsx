@@ -73,7 +73,7 @@ export const Stats = () => {
         color="#EC4899"
       />
       <StatCard
-        name="Conversion Rate"
+        name="Total Orders /Average Order Value /Refund Requests"
         icon={BarChart2}
         value="12.5%"
         color="#10B981"
