@@ -176,7 +176,7 @@ const AdminOrderManagement = () => {
                   <tr>
                     <th className="p-4 text-left">Index</th>
                     <th className="p-4 text-left">Order ID</th>
-                    <th className="p-4 text-left">Delivery Date</th>
+                    <th className="p-4 text-left">Payment Status</th>
                     <th className="p-4 text-left">Time Slot</th>
                     <th className="p-4 text-left">Customer Name</th>
                     <th className="p-4 text-left">Branch</th>
@@ -202,9 +202,9 @@ const AdminOrderManagement = () => {
                             {currentIndex}
                           </td>
                           <td className="p-4">{order._id}</td>
-                          <td className="p-4">{order.deliveryDate}</td>
+                          <td className="p-4">{order.payment ? "Payment Success!" : "Payment Failed!"}</td>
                           <td className="p-4">{order.timeSlot}</td>
-                          <td className="p-4">{order.user}</td>
+                          <td className="p-4">{order.user.name}</td>
                           <td className="p-4">{order.branch}</td>
                           <td className="p-4">{order.payment.amount}</td>
                           <td className="p-3">
