@@ -18,6 +18,7 @@ const AdminOrderDetail = () => {
 
   const [orderStatus, setOrderStatus] = useState(order?.status || "pending");
 
+  // handler for order status change
   const handleOrderStatusChange = (e) => {
     const newStatus = e.target.value;
     setOrderStatus(newStatus);
@@ -36,6 +37,27 @@ const AdminOrderDetail = () => {
       .catch(() => {
         toast.error("Failed to update order status.");
       });
+  };
+
+  // function for change distinct colors for diffrent order status
+  const getStatusBadge = (status) => {
+    const statusStyles = {
+      pending: "border-amber-500 bg-amber-50 text-amber-600",
+      cancelled: "border-red-500 bg-red-100 text-red-600",
+      shipped: "border-blue-500 bg-blue-100 text-blue-600",
+      delivered: "border-green-500 bg-green-100 text-green-600",
+      processing: "border-purple-500 bg-purple-100 text-purple-600",
+    };
+
+    return (
+      <span
+        className={`border-1 px-2 py-px rounded-[4px] font-normal ${
+          statusStyles[status] || "border-gray-500 bg-gray-100 text-gray-600"
+        }`}
+      >
+        {status}
+      </span>
+    );
   };
 
   return (
@@ -78,7 +100,7 @@ const AdminOrderDetail = () => {
                   <div className="mt-4 bg-gray-100 p-4 rounded-lg">
                     <p>
                       <span className="font-semibold">Status:</span>{" "}
-                      <span className="text-green-600">{order.status}</span>
+                      {getStatusBadge(order.status)}
                     </p>
                     <p>
                       <span className="font-semibold">Payment Method:</span>{" "}
@@ -291,7 +313,7 @@ const AdminOrderDetail = () => {
                   </p>
                   <button
                     className="px-6 py-2 border-1 border-purple-500 bg-purple-100 font-medium text-purple-600 rounded-lg hover:bg-purple-600 hover:text-white transition"
-                    onClick={() => navigate("/admin-product")}
+                    onClick={() => navigate("/manage-orders")}
                   >
                     Back To Order Management
                   </button>
