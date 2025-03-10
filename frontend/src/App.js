@@ -236,7 +236,6 @@ const App = () => {
             />
 
             {/* Admin Order Management */}
-            <Route path="/manage-orders" element={<AdminOrderManagement />} />
             <Route
               path={process.env.PUBLIC_URL + "/manage-orders"}
               element={
@@ -248,7 +247,11 @@ const App = () => {
 
             <Route
               path="/manage-order-details"
-              element={<AdminOrderDetail />}
+              element={
+                <AdminRouteProtector>
+                  <AdminOrderDetail />
+                </AdminRouteProtector>
+              }
             />
             <Route
               path={process.env.PUBLIC_URL + "/manage-order-details"}

@@ -25,8 +25,6 @@ export const updateOrderStatus = createAsyncThunk(
   "orders/updateOrderStatus",
   async ({ oid, status, isGuest, userId }, { rejectWithValue }) => {
     try {
-      console.log("oid-update-order-status : ", oid);
-      console.log("status-update-order-status : ", status);
       const response = await axiosInstance.patch(`/v1/orders/${oid}`, {
         status,
         isGuest,
@@ -75,6 +73,10 @@ const orderSlice = createSlice({
     setSelectedOrder: (state, action) => {
       state.selectedOrder = action.payload; // Store selected order in Redux
     },
+    // Reset orders state to initial state
+    resetOrders: (state) => {
+      return initialState; // Reset state to initial state
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -95,8 +97,24 @@ const orderSlice = createSlice({
       })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
         state.status = "update-succeeded";
+
+        // Update selectedOrder status when status is changed
+        if (
+          state.selectedOrder &&
+          state.selectedOrder._id === action.payload._id
+        ) {
+          state.selectedOrder.status = action.payload.status; // Update only the status field
+        }
+
+        // Update order in the orders list
         state.orders = state.orders.map((order) =>
-          order._id === action.payload._id ? action.payload : order
+          order._id === action.payload._id
+            ? {
+                ...order,
+                status: action.payload.status,
+                updatedAt: action.payload.updatedAt,
+              }
+            : order
         );
       })
       .addCase(updateOrderStatus.rejected, (state, action) => {
@@ -119,6 +137,6 @@ const orderSlice = createSlice({
   },
 });
 
-export const { setSelectedOrder } = orderSlice.actions; // export action
+export const { setSelectedOrder, resetOrders } = orderSlice.actions; // export action
 
 export default orderSlice.reducer;

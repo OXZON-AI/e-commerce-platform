@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../axiosConfig";
 import Cookie from "js-cookie";
+import { resetOrders } from "./order-slice";
 
 // Async thunk for user login
 export const loginUser = createAsyncThunk(
@@ -79,6 +80,7 @@ export const signoutUser = createAsyncThunk(
       );
     } finally {
       dispatch(clearUser()); // Explicitly reset Redux state
+      dispatch(resetOrders()); // reset order Redux state
       Cookie.remove("token"); // Remove token from cookies
       localStorage.removeItem("persist:frontend"); // Remove Redux persist
     }

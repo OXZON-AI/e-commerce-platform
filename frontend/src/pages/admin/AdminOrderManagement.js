@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
 import dropArrowIcon from "../../assets/icons/dropArrow.svg";
 import { FaSearch, FaDownload, FaEye, FaEdit } from "react-icons/fa";
+import { HashLoader } from "react-spinners";
 
 const AdminOrderManagement = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,8 @@ const AdminOrderManagement = () => {
   const [dateSort, setDateSort] = useState("newest");
 
   const [filters, setFilters] = useState({
+    customer: undefined,
+    guestOnly: false,
     status: undefined,
     sortBy: "date",
     sortOrder: "desc",
@@ -41,29 +44,16 @@ const AdminOrderManagement = () => {
   }, [dispatch, filters]);
 
   // Filtering orders based on search input
-  const filteredOrders = orders.filter((order) =>
-    order.items[0]?.variant?.product?.name
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
-
-  // Handler for cancel order
-  const handleCancelOrder = (oid) => {
-    console.log("order-id : ", oid);
-
-    dispatch(cancelOrder(oid))
-      .unwrap()
-      .then(() => {
-        toast.success("Order cancelled successfully.");
-        dispatch(fetchOrders(filters))
-          .unwrap()
-          .then(() => {
-            console.log("🔰 Orders are re-fetched!");
-          });
-      })
-      .catch(() => {
-        toast.error("Failed to cancel order.");
-      });
+  const handleSearch = () => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      customer: filters.guestOnly
+        ? undefined // Ignore customer filter if guestOnly is true
+        : /^[0-9a-fA-F]{24}$/.test(search) // Validate MongoDB ObjectId
+        ? search
+        : undefined,
+      page: 1, // Reset pagination when searching
+    }));
   };
 
   // handler for filterChange
@@ -135,26 +125,48 @@ const AdminOrderManagement = () => {
                 <div className="flex items-center gap-4 flex-1">
                   <input
                     type="text"
-                    placeholder="Search orders..."
+                    placeholder="Search by Customer ID..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full max-w-md p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
                   />
-                  <button className="flex items-center justify-center w-36 px-5 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition">
+                  <button
+                    onClick={handleSearch}
+                    className="flex items-center justify-center w-36 px-5 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+                  >
                     <FaSearch className="mr-2" />
                     <span>Search</span>
                   </button>
                 </div>
 
+                {/* Guest Only Filter */}
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={filters.guestOnly}
+                    onChange={(e) =>
+                      setFilters((prevFilters) => ({
+                        ...prevFilters,
+                        guestOnly: e.target.checked,
+                        customer: undefined, // Remove customer filter when guestOnly is enabled
+                        page: 1,
+                      }))
+                    }
+                    className="h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                  />
+                  <span className="text-gray-700">Guest Orders Only</span>
+                </label>
+
                 {/* Filters and Export Section */}
                 <div className="flex items-center gap-4">
                   {/* Status Filter Dropdown */}
                   <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
+                    name="status"
+                    value={filters.status || ""}
+                    onChange={handleFilterChange}
                     className="w-52 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
                   >
-                    <option value="all">All Status</option>
+                    <option value="">All Status</option>
                     <option value="pending">Pending</option>
                     <option value="processing">Processing</option>
                     <option value="shipped">Shipped</option>
@@ -164,8 +176,15 @@ const AdminOrderManagement = () => {
 
                   {/* Date Sort Dropdown */}
                   <select
-                    value={dateSort}
-                    onChange={(e) => setDateSort(e.target.value)}
+                    name="sortOrder"
+                    value={filters.sortOrder === "desc" ? "newest" : "oldest"}
+                    onChange={(e) =>
+                      setFilters((prevFilters) => ({
+                        ...prevFilters,
+                        sortOrder: e.target.value === "newest" ? "desc" : "asc",
+                        page: 1,
+                      }))
+                    }
                     className="w-52 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
                   >
                     <option value="newest">Newest First</option>
@@ -180,96 +199,129 @@ const AdminOrderManagement = () => {
                 </div>
               </div>
 
-              {/* Orders Table */}
-              <table className="min-w-full table-auto bg-white border border-gray-200 rounded-lg shadow-sm mt-6">
-                <thead className="bg-gray-100 text-base">
-                  <tr>
-                    <th className="p-4 text-left">Index</th>
-                    <th className="p-4 text-left">Order ID</th>
-                    <th className="p-4 text-left">Payment Staus</th>
-                    <th className="p-4 text-left">Customer Name</th>
-                    <th className="p-4 text-left">Total Amount</th>
-                    <th className="p-4 text-left">Order Status</th>
-                    <th className="p-4 text-left">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders &&
-                    orders.map((order, index) => {
-                      // Calculate the starting index based on the current page
-                      const currentIndex =
-                        (filters.page - 1) * filters.limit + index + 1;
+              {orderStatus === "fetch-loading" ? (
+                // Show Loading State with Centered HashLoader
+                <div className="flex flex-col justify-center items-center py-[50px] mx-auto text-gray-700 font-semibold">
+                  <HashLoader color="#a855f7" size={50} />
+                  <span className="mt-3">Loading Orders...</span>
+                </div>
+              ) : orderStatus === "fetch-failed" ? (
+                // Show Error Message Instead of Table
+                <div className="my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
+                  <span className="mt-3">{orderError}</span>
+                </div>
+              ) : orders.length === 0 ? (
+                // Show no orders available
+                <div className="flex flex-col items-center text-center py-6">
+                  <img
+                    src={emptyOrdersImg}
+                    alt="empty order image"
+                    className="w-[100px]"
+                  />
+                  <p className="text-center text-gray-700 font-semibold py-6">
+                    No{" "}
+                    <span className="text-purple-600">
+                      {filters.status ? filters.status + " " : ""}
+                    </span>
+                    orders found.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {/* Orders Table */}
+                  <table className="min-w-full table-auto bg-white border border-gray-200 rounded-lg shadow-sm mt-6">
+                    <thead className="bg-gray-100 text-base">
+                      <tr>
+                        <th className="p-4 text-left">Index</th>
+                        <th className="p-4 text-left">Order ID</th>
+                        <th className="p-4 text-left">Payment Staus</th>
+                        <th className="p-4 text-left">Customer Name</th>
+                        <th className="p-4 text-left">Total Amount</th>
+                        <th className="p-4 text-left">Order Status</th>
+                        <th className="p-4 text-left">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {orders &&
+                        orders.map((order, index) => {
+                          // Calculate the starting index based on the current page
+                          const currentIndex =
+                            (filters.page - 1) * filters.limit + index + 1;
 
-                      return (
-                        <tr
-                          key={order.orderId}
-                          className="border-b hover:bg-gray-50"
-                        >
-                          <td className="py-4 px-6 text-gray-800">
-                            {currentIndex}
-                          </td>
-                          <td className="p-4">{order._id}</td>
-                          <td
-                            className={`p-4 ${
-                              order.payment?.refundId
-                                ? "text-red-500"
-                                : "text-green-500"
-                            }`}
-                          >
-                            {order.payment?.refundId ? "Refunded" : "Success"}
-                          </td>
-                          <td className="p-4">{order.user.name}</td>
-                          <td className="p-4">
-                            {order.payment.amount}{" "}
-                            <span className="text-lime-500">MVR</span>
-                          </td>
-                          <td className="p-3">
-                            {getStatusBadge(order.status)}
-                          </td>
-                          <td className="p-4">
-                            <button
-                              onClick={() => handleViewOrder(order)}
-                              className="text-blue-500 hover:underline mr-4"
+                          return (
+                            <tr
+                              key={order.orderId}
+                              className="border-b hover:bg-gray-50"
                             >
-                              <FaEye className="mr-2" size={24} />
-                            </button>
-                            {/* <button className="text-yellow-500 hover:underline">
+                              <td className="py-4 px-6 text-gray-800">
+                                {currentIndex}
+                              </td>
+                              <td className="p-4">{order._id}</td>
+                              <td
+                                className={`p-4 ${
+                                  order.payment?.refundId
+                                    ? "text-red-500"
+                                    : "text-green-500"
+                                }`}
+                              >
+                                {order.payment?.refundId
+                                  ? "Refunded"
+                                  : "Success"}
+                              </td>
+                              <td className="p-4">{order.user?.name}</td>
+                              <td className="p-4">
+                                {order.payment.amount}{" "}
+                                <span className="text-lime-500">MVR</span>
+                              </td>
+                              <td className="p-3">
+                                {getStatusBadge(order.status)}
+                              </td>
+                              <td className="p-4">
+                                <button
+                                  onClick={() => handleViewOrder(order)}
+                                  className="text-blue-500 hover:underline mr-4"
+                                >
+                                  <FaEye className="mr-2" size={24} />
+                                </button>
+                                {/* <button className="text-yellow-500 hover:underline">
                               <FaEdit className="mr-2" size={24} />
                             </button> */}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
 
-              {/* ------------Pagination--------------- */}
-              <div className="flex justify-end items-center mt-4 space-x-4">
-                {/* Previous Button */}
-                <button
-                  onClick={() => handlePagination("prev")}
-                  disabled={filters.page === 1}
-                  className={
-                    "px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
-                  }
-                >
-                  Previous
-                </button>
+                  {/* ------------Pagination--------------- */}
+                  <div className="flex justify-end items-center mt-4 space-x-4">
+                    {/* Previous Button */}
+                    <button
+                      onClick={() => handlePagination("prev")}
+                      disabled={filters.page === 1}
+                      className={
+                        "px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                      }
+                    >
+                      Previous
+                    </button>
 
-                {/* Page Indicator */}
-                <span className="text-gray-700">
-                  Page {filters.page} of {paginationInfo.totalPages}
-                </span>
+                    {/* Page Indicator */}
+                    <span className="text-gray-700">
+                      Page {filters.page} of {paginationInfo.totalPages}
+                    </span>
 
-                {/* Next Button */}
-                <button
-                  onClick={() => handlePagination("next")}
-                  disabled={orders.length < 10}
-                  className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
+                    {/* Next Button */}
+                    <button
+                      onClick={() => handlePagination("next")}
+                      disabled={orders.length < 10}
+                      className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
