@@ -5,7 +5,10 @@ import Sidebar from "./components/Sidebar";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { updateOrderStatus } from "../../store/slices/order-slice";
+import {
+  setSelectedOrder,
+  updateOrderStatus,
+} from "../../store/slices/order-slice";
 import { toast } from "react-toastify";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
 
@@ -31,7 +34,13 @@ const AdminOrderDetail = () => {
       })
     )
       .unwrap()
-      .then(() => {
+      .then((updatedOrder) => {
+        dispatch(
+          setSelectedOrder({
+            ...order, // Keep existing order details
+            status: updatedOrder.status, // update only status
+          })
+        ); // Update Redux immediately
         toast.success("Order status updated successfully.");
       })
       .catch(() => {
@@ -147,27 +156,27 @@ const AdminOrderDetail = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {order.items.map((item, idx) => (
+                          {order?.items?.map((item, idx) => (
                             <tr key={idx} className="border-t border-gray-300">
                               <td className="py-3 px-4 flex items-center">
                                 <img
                                   src={
-                                    item.variant.image.url ||
+                                    item?.variant?.image?.url ||
                                     "https://via.placeholder.com/50"
                                   }
-                                  alt={item.variant.image.alt}
+                                  alt={item?.variant?.image?.alt}
                                   className="w-12 h-12 rounded mr-3"
                                 />
-                                {item.variant.product.name}
+                                {item?.variant?.product?.name}
                               </td>
                               <td className="py-3 px-4">
                                 {(
-                                  item.subTotal / item.quantity
+                                  item?.subTotal / item?.quantity
                                 ).toLocaleString()}{" "}
                               </td>
-                              <td className="py-3 px-4">{item.quantity}</td>
+                              <td className="py-3 px-4">{item?.quantity}</td>
                               <td className="py-3 px-4 font-semibold">
-                                {item.subTotal.toLocaleString()}
+                                {item?.subTotal.toLocaleString()}
                               </td>
                             </tr>
                           ))}
@@ -202,9 +211,14 @@ const AdminOrderDetail = () => {
                         Change Order Status:
                       </label>
                       <select
-                        className="border p-2 w-full rounded"
+                        className={`border p-2 w-full rounded ${
+                          order.status === "cancelled"
+                            ? "opacity-50 cursor-not-allowed"
+                            : null
+                        }`}
                         value={orderStatus}
                         onChange={handleOrderStatusChange}
+                        disabled={order.status === "cancelled"} // Disable dropdown if cancelled
                       >
                         <option>pending</option>
                         <option>processing</option>
@@ -212,6 +226,12 @@ const AdminOrderDetail = () => {
                         <option>delivered</option>
                         <option>cancelled</option>
                       </select>
+                      {order.status === "cancelled" ? (
+                        <p className="text-xs text-gray-500 py-2 italic">
+                          {" "}
+                          *Note: cancelled order status cant update
+                        </p>
+                      ) : null}
                     </div>
                   </div>
 
@@ -309,7 +329,7 @@ const AdminOrderDetail = () => {
                 />
                 <div className="flex flex-col items-start justify-center">
                   <p className="text-center text-gray-700 font-semibold py-1">
-                    Something Went Wrong!
+                    Order Not Selected!
                   </p>
                   <button
                     className="px-6 py-2 border-1 border-purple-500 bg-purple-100 font-medium text-purple-600 rounded-lg hover:bg-purple-600 hover:text-white transition"
