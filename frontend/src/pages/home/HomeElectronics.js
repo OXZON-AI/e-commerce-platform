@@ -503,7 +503,7 @@ const HomeElectronics = () => {
             </div>
           </div> */}
 
-          <div className="container mx-auto px-4 py-8">
+          {/* <div className="container mx-auto px-4 py-8">
             <h2 className="text-3xl font-bold text-center mb-6">
               Ongoing Offers
             </h2>
@@ -527,38 +527,38 @@ const HomeElectronics = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Brand Logos */}
           <div className="container mx-auto py-12 text-center">
-  <h2 className="text-3xl font-bold mb-6">Our Trusted Brands</h2>
-  <Slider {...brandSliderSettings}>
-    {[
-      { name: 'Apple', logo: 'https://dummyimage.com/150x150/000000/ffffff&text=Apple' },
-      { name: 'Samsung', logo: 'https://dummyimage.com/150x150/1428a0/ffffff&text=Samsung' },
-      { name: 'Sony', logo: 'https://dummyimage.com/150x150/333333/ffffff&text=Sony' },
-      { name: 'LG', logo: 'https://dummyimage.com/150x150/a50034/ffffff&text=LG' },
-      { name: 'Dell', logo: 'https://dummyimage.com/150x150/007db8/ffffff&text=Dell' },
-      { name: 'HP', logo: 'https://dummyimage.com/150x150/0096d6/ffffff&text=HP' },
-      { name: 'Lenovo', logo: 'https://dummyimage.com/150x150/e2231a/ffffff&text=Lenovo' },
-      { name: 'Asus', logo: 'https://dummyimage.com/150x150/0033a0/ffffff&text=Asus' },
-      { name: 'OnePlus', logo: 'https://dummyimage.com/150x150/c20e1a/ffffff&text=OnePlus' },
-      { name: 'Xiaomi', logo: 'https://dummyimage.com/150x150/fa6700/ffffff&text=Xiaomi' },
-      { name: 'Garmin', logo: 'https://dummyimage.com/150x150/007cc3/ffffff&text=Garmin' },
-      { name: 'Fitbit', logo: 'https://dummyimage.com/150x150/00b0b9/ffffff&text=Fitbit' },
-    ].map((brand, index) => (
-      <div key={index}>
-        <img
-          src={brand.logo}
-          alt={brand.name}
-          className="mx-auto w-32 h-32 object-contain rounded-full transition-transform transform hover:scale-110 duration-300 ease-in-out"
-        />
-      </div>
-    ))}
-  </Slider>
-</div>
-
-
+            <h2 className="text-3xl font-bold mb-6">Our Trusted Brands</h2>
+            <Slider {...brandSliderSettings}>
+              {[
+                { name: 'Apple', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg' },
+                { name: 'Samsung', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg' },
+                { name: 'Sony', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png' },
+                { name: 'LG', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/LG_symbol.svg' },
+                { name: 'Dell', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg' },
+                { name: 'HP', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/HP_logo_2012.svg/1024px-HP_logo_2012.svg.png' },
+                { name: 'Lenovo', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Lenovo_%282015%29.svg/1920px-Lenovo_%282015%29.svg.png' },
+                { name: 'Asus', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/ASUS_Logo.svg/1920px-ASUS_Logo.svg.png' },
+                { name: 'OnePlus', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/OP_LU_Reg_1L_RGB_red_copy-01.svg/1920px-OP_LU_Reg_1L_RGB_red_copy-01.svg.png' },
+                { name: 'Xiaomi', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Xiaomi_logo.svg' },
+                { name: 'Garmin', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/1/1d/Garmin_2024_logo.svg/1920px-Garmin_2024_logo.svg.png' },
+                { name: 'Fitbit', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Fitbit_logo16.svg/1920px-Fitbit_logo16.svg.png' },
+              ].map((brand, index) => (
+                <div key={index} className="flex items-center justify-center px-6">
+                  <div className="w-40 h-28 flex items-center justify-center bg-gray-100 p-2 rounded-lg">
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="max-w-full max-h-full object-contain transition-transform duration-300 ease-in-out hover:scale-105"
+                    />
+                  </div>
+                </div>
+              ))}
+            </Slider>
+          </div>
         </div>
       </LayoutOne>
     </Fragment>
