@@ -58,6 +58,7 @@ export const cancelOrder = createAsyncThunk(
 const initialState = {
   orders: [],
   paginationInfo: {},
+  selectedOrder: null, // this is for store selected order details
   status: "idle",
   error: null,
 };
@@ -65,7 +66,11 @@ const initialState = {
 const orderSlice = createSlice({
   name: "orders",
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedOrder: (state, action) => {
+      state.selectedOrder = action.payload; // Store selected order in Redux
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchOrders.pending, (state) => {
@@ -108,5 +113,7 @@ const orderSlice = createSlice({
       });
   },
 });
+
+export const { setSelectedOrder } = orderSlice.actions; // export action
 
 export default orderSlice.reducer;
