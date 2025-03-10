@@ -314,7 +314,7 @@ const AdminOrderManagement = () => {
                     {/* Next Button */}
                     <button
                       onClick={() => handlePagination("next")}
-                      disabled={orders.length < 10}
+                      disabled={filters.page === paginationInfo.totalPages}
                       className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
                     >
                       Next
