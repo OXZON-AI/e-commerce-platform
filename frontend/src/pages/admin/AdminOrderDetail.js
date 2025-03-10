@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaPrint, FaPen } from "react-icons/fa";
+import { FaPrint, FaPen, FaCopy } from "react-icons/fa";
 import AdminNavbar from "./components/AdminNavbar";
 import Sidebar from "./components/Sidebar";
 import { useNavigate } from "react-router-dom";
@@ -46,6 +46,13 @@ const AdminOrderDetail = () => {
       .catch(() => {
         toast.error("Failed to update order status.");
       });
+  };
+
+  // hanlder for copy customer Id
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast.info("Customer ID copied to clipboard!");
+    });
   };
 
   // function for change distinct colors for diffrent order status
@@ -229,12 +236,19 @@ const AdminOrderDetail = () => {
                       {order.status === "cancelled" ? (
                         <p className="text-xs text-gray-500 py-2 italic">
                           {" "}
-                          *Note: The status of the cancelled order cannot be updated.
+                          *Note: The status of the cancelled order cannot be
+                          updated.
                         </p>
-                      ) : order.status === "delivered" || order.status === "processing" || order.status === "shipped" ? (
+                      ) : order.status === "delivered" ||
+                        order.status === "processing" ||
+                        order.status === "shipped" ? (
                         <p className="text-xs text-gray-500 py-2 italic">
                           {" "}
-                          *Note: The status of <span className="text-violet-600 font-semibold">{order.status}</span> orders cannot be changed to 'cancelled.'
+                          *Note: The status of{" "}
+                          <span className="text-violet-600 font-semibold">
+                            {order.status}
+                          </span>{" "}
+                          orders cannot be changed to 'cancelled.'
                         </p>
                       ) : null}
                     </div>
@@ -247,9 +261,29 @@ const AdminOrderDetail = () => {
                       Delivery Information
                     </h3>
                     <div className="mt-2">
+                      {order.isGuest ? (
+                        <p>
+                          <span className="font-semibold text-yellow-600">Guest User!</span>
+                        </p>
+                      ) : null}
+                      <p className="flex items-center gap-2">
+                        <span className="font-semibold">Customer ID:</span>
+                        {order.isGuest ? (
+                          "Not Available"
+                        ) : (
+                          <span className="flex items-center gap-1">
+                            {order.user._id}
+                            <FaCopy
+                              className="cursor-pointer text-gray-500 hover:text-black"
+                              onClick={() => handleCopy(order.user._id)}
+                              title="Copy ID"
+                            />
+                          </span>
+                        )}
+                      </p>
                       <p>
                         <span className="font-semibold">Name:</span>{" "}
-                        {order.user.name}
+                        {order.isGuest ? "Not Available" : order.user?.name}
                       </p>
                       <p>
                         <span className="font-semibold">Email:</span>{" "}
