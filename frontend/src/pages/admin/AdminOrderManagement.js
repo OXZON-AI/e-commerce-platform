@@ -3,7 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import AdminNavbar from "./components/AdminNavbar";
 import Sidebar from "./components/Sidebar";
 import { useDispatch, useSelector } from "react-redux";
-import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
+import {
+  cancelOrder,
+  fetchOrders,
+  setSelectedOrder,
+} from "../../store/slices/order-slice";
 import { toast } from "react-toastify";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
 import dropArrowIcon from "../../assets/icons/dropArrow.svg";
@@ -69,6 +73,12 @@ const AdminOrderManagement = () => {
       [e.target.name]: e.target.value || undefined, // undefine use when value is empty, then mark as undefine
       page: 1,
     });
+  };
+
+  // handler for view one order and set order details to Redux
+  const handleViewOrder = (order) => {
+    dispatch(setSelectedOrder(order)); // store order details in redux
+    navigate("/manage-order-details"); // Navigate to details page
   };
 
   // handler for pagination
@@ -217,14 +227,15 @@ const AdminOrderManagement = () => {
                             {getStatusBadge(order.status)}
                           </td>
                           <td className="p-4">
-                            <Link to="/manage-order-details/">
-                              <button className="text-blue-500 hover:underline mr-4">
-                                <FaEye className="mr-2" size={24} />
-                              </button>
-                            </Link>
-                            <button className="text-yellow-500 hover:underline">
-                              <FaEdit className="mr-2" size={24} />
+                            <button
+                              onClick={() => handleViewOrder(order)}
+                              className="text-blue-500 hover:underline mr-4"
+                            >
+                              <FaEye className="mr-2" size={24} />
                             </button>
+                            {/* <button className="text-yellow-500 hover:underline">
+                              <FaEdit className="mr-2" size={24} />
+                            </button> */}
                           </td>
                         </tr>
                       );

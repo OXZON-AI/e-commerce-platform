@@ -23,12 +23,17 @@ export const fetchOrders = createAsyncThunk(
 // Async thunk to update order status
 export const updateOrderStatus = createAsyncThunk(
   "orders/updateOrderStatus",
-  async ({ oid, status }, { rejectWithValue }) => {
+  async ({ oid, status, isGuest, userId }, { rejectWithValue }) => {
     try {
+      console.log("oid-update-order-status : ", oid);
+      console.log("status-update-order-status : ", status);
       const response = await axiosInstance.patch(`/v1/orders/${oid}`, {
         status,
+        isGuest,
+        user: userId,
       });
-      return response.data;
+      console.log("updatee-order-status-slice : ", response.data.order);
+      return response.data.order;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to update order status"
@@ -58,6 +63,7 @@ export const cancelOrder = createAsyncThunk(
 const initialState = {
   orders: [],
   paginationInfo: {},
+  selectedOrder: null, // this is for store selected order details
   status: "idle",
   error: null,
 };
@@ -65,7 +71,11 @@ const initialState = {
 const orderSlice = createSlice({
   name: "orders",
   initialState,
-  reducers: {},
+  reducers: {
+    setSelectedOrder: (state, action) => {
+      state.selectedOrder = action.payload; // Store selected order in Redux
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchOrders.pending, (state) => {
@@ -108,5 +118,7 @@ const orderSlice = createSlice({
       });
   },
 });
+
+export const { setSelectedOrder } = orderSlice.actions; // export action
 
 export default orderSlice.reducer;
