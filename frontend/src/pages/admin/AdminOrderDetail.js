@@ -2,41 +2,41 @@ import React, { useState } from "react";
 import { FaPrint, FaPen } from "react-icons/fa";
 import AdminNavbar from "./components/AdminNavbar";
 import Sidebar from "./components/Sidebar";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
+import { updateOrderStatus } from "../../store/slices/order-slice";
+import { toast } from "react-toastify";
+import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
+
 const AdminOrderDetail = () => {
-  const [orderStatus, setOrderStatus] = useState("Shipped");
-  const [paymentStatus, setPaymentStatus] = useState("Paid");
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [deliveryInfo, setDeliveryInfo] = useState({
-    name: "John Doe",
-    phone: "+94712345678",
-    address: "25, Main Street, Colombo",
-  });
-  const [isEditing, setIsEditing] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const order = useSelector((state) => state.orders.selectedOrder); // Get order from Redux
 
-  // ✅ Define order with sample data
-  const order = {
-    products: [
-      {
-        name: "Samsung Galaxy S23",
-        price: 220000,
-        quantity: 1,
-        image: "http://dummyimage.com/50x50/808080/fff.png",
-      },
-      {
-        name: "MacBook Air M2",
-        price: 380000,
-        quantity: 1,
-        image: "http://dummyimage.com/50x50/808080/fff.png",
-      },
-    ],
-    subTotal: 600000,
-    totalAmount: 600000,
+  console.log("Selected Order-Details : ", order);
+
+  const [orderStatus, setOrderStatus] = useState(order?.status || "pending");
+
+  const handleOrderStatusChange = (e) => {
+    const newStatus = e.target.value;
+    setOrderStatus(newStatus);
+    dispatch(
+      updateOrderStatus({
+        oid: order._id,
+        status: newStatus,
+        isGuest: order.isGuest,
+        userId: order.user._id,
+      })
+    )
+      .unwrap()
+      .then(() => {
+        toast.success("Order status updated successfully.");
+      })
+      .catch(() => {
+        toast.error("Failed to update order status.");
+      });
   };
-
-  const handleOrderStatusChange = (e) => setOrderStatus(e.target.value);
-  const handlePaymentStatusChange = (e) => setPaymentStatus(e.target.value);
-  const handleDeliveryDateChange = (e) => setDeliveryDate(e.target.value);
-  const toggleEdit = () => setIsEditing(!isEditing);
 
   return (
     <div className="flex flex-col h-screen">
@@ -52,184 +52,158 @@ const AdminOrderDetail = () => {
         <div className="flex-1 p-0 overflow-y-auto">
           <div className="p-0 sm:p-8 md:p-10 lg:p-12 w-full mx-auto">
             {/* <div className="p-6 bg-gray-100 flex justify-center "> */}
-            <div className="w-full max-w-full bg-white h-screen shadow-md p-6 flex gap-6">
-              {/* Left Side - Order Details */}
-              <div className="flex-1">
-                <div className="border-b pb-4 flex justify-between items-center">
-                  <h2 className="text-3xl font-semibold text-gray-800">
-                    Order Details
-                  </h2>
-                </div>
-                <div className="mt-2 flex justify-between items-center">
-                  <span className="text-lg font-bold">Order ID #200123</span>
-                  <div className="flex space-x-2">
+            {order ? (
+              <div className="w-full max-w-full bg-white h-screen shadow-md p-6 flex gap-6">
+                {/* Left Side - Order Details */}
+                <div className="flex-1">
+                  <div className="border-b pb-4 flex justify-between items-center">
+                    <h2 className="text-3xl font-semibold text-gray-800">
+                      Order Details
+                    </h2>
+                  </div>
+                  <div className="mt-2 flex justify-between items-center">
+                    <span className="text-lg font-bold">
+                      Order ID: {order._id}
+                    </span>
+                    {/* <div className="flex space-x-2">
                     <button className="flex items-center bg-green-500 text-white px-4 py-2 rounded">
                       <FaPrint className="mr-2" /> Print Invoice
                     </button>
+                  </div> */}
                   </div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">
-                  20 Feb 2025 14:45:00
-                </p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {moment(order.createdAt).format("DD-MMM-YYYY / h:mm:ss a")}
+                  </p>
 
-                <div className="mt-4 bg-gray-100 p-4 rounded-lg">
-                  <p>
-                    <span className="font-semibold">Status:</span>{" "}
-                    <span className="text-green-600">{orderStatus}</span>
-                  </p>
-                  <p>
-                    <span className="font-semibold">Payment Method:</span>{" "}
-                    Credit Card
-                  </p>
-                  <p>
-                    <span className="font-semibold">Payment Status:</span>{" "}
-                    <span className="text-green-600">{paymentStatus}</span>
-                  </p>
-                  <p>
-                    <span className="font-semibold">Order Type:</span> Home
-                    Delivery
-                  </p>
-                </div>
+                  <div className="mt-4 bg-gray-100 p-4 rounded-lg">
+                    <p>
+                      <span className="font-semibold">Status:</span>{" "}
+                      <span className="text-green-600">{order.status}</span>
+                    </p>
+                    <p>
+                      <span className="font-semibold">Payment Method:</span>{" "}
+                      {order.payment.brand}
+                    </p>
+                    <p>
+                      <span className="font-semibold">Payment Status:</span>{" "}
+                      <span
+                        className={`${
+                          order.payment?.refundId
+                            ? "text-red-600"
+                            : "text-green-600"
+                        }`}
+                      >
+                        {order.payment?.refundId ? "Refunded" : "Success"}
+                      </span>
+                    </p>
+                    <p>
+                      <span className="font-semibold">
+                        Order Earned Points:
+                      </span>{" "}
+                      <span className="text-yellow-600">
+                        {order.earnedPoints} points
+                      </span>
+                    </p>
+                  </div>
 
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold border-b pb-2">
-                    Order Items
-                  </h3>
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold border-b pb-2">
+                      Order Items
+                    </h3>
 
-                  {/* Order Table */}
-                  {order?.products?.length > 0 && (
-                    <table className="w-full mt-6 border border-gray-300 rounded-lg">
-                      <thead className="bg-gray-200">
-                        <tr className="text-gray-700">
-                          <th className="py-3 px-4 text-left">Product</th>
-                          <th className="py-3 px-4 text-left">
-                            Unit Price (Rs.)
-                          </th>
-                          <th className="py-3 px-4 text-left">Quantity</th>
-                          <th className="py-3 px-4 text-left">Total (Rs.)</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {order.products.map((product, idx) => (
-                          <tr key={idx} className="border-t border-gray-300">
-                            <td className="py-3 px-4 flex items-center">
-                              <img
-                                src={
-                                  product.image ||
-                                  "https://via.placeholder.com/50"
-                                }
-                                alt={product.name}
-                                className="w-12 h-12 rounded mr-3"
-                              />
-                              {product.name}
-                            </td>
-                            <td className="py-3 px-4">
-                              {product.price.toLocaleString()}
-                            </td>
-                            <td className="py-3 px-4">{product.quantity}</td>
-                            <td className="py-3 px-4 font-semibold">
-                              {(
-                                product.price * product.quantity
-                              ).toLocaleString()}
-                            </td>
+                    {/* Order Table */}
+                    {order?.items?.length > 0 && (
+                      <table className="w-full mt-6 border border-gray-300 rounded-lg">
+                        <thead className="bg-gray-200">
+                          <tr className="text-gray-700">
+                            <th className="py-3 px-4 text-left">Product</th>
+                            <th className="py-3 px-4 text-left">
+                              Unit Price (MVR)
+                            </th>
+                            <th className="py-3 px-4 text-left">Quantity</th>
+                            <th className="py-3 px-4 text-left">Total (MVR)</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
+                        </thead>
+                        <tbody>
+                          {order.items.map((item, idx) => (
+                            <tr key={idx} className="border-t border-gray-300">
+                              <td className="py-3 px-4 flex items-center">
+                                <img
+                                  src={
+                                    item.variant.image.url ||
+                                    "https://via.placeholder.com/50"
+                                  }
+                                  alt={item.variant.image.alt}
+                                  className="w-12 h-12 rounded mr-3"
+                                />
+                                {item.variant.product.name}
+                              </td>
+                              <td className="py-3 px-4">
+                                {(
+                                  item.subTotal / item.quantity
+                                ).toLocaleString()}{" "}
+                              </td>
+                              <td className="py-3 px-4">{item.quantity}</td>
+                              <td className="py-3 px-4 font-semibold">
+                                {item.subTotal.toLocaleString()}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
 
-                  {/* Total Summary */}
-                  <div className="mt-6 flex border justify-between items-center text-white px-6 py-4 rounded-lg">
-                    <p className="font-bold text-lg bg-gray-500 text-white px-6 py-2 rounded-md">
-                      Sub Total:{" "}
-                      <span className="font-medium">
-                        Rs {order?.subTotal?.toLocaleString()}
-                      </span>
-                    </p>
+                    {/* Total Summary */}
+                    <div className="mt-6 flex border justify-end items-center text-white px-6 py-4 rounded-lg">
+                      {/* <p className="font-bold text-lg bg-gray-500 text-white px-6 py-2 rounded-md">
+                      Sub Total: <span className="font-medium">N/A</span>
+                    </p> */}
 
-                    <p className="font-bold text-lg bg-gray-500 text-white px-6 py-2 rounded-md ">
-                      Total Amount:{" "}
-                      <span className="font-medium">
-                        Rs {order?.totalAmount?.toLocaleString()}
-                      </span>
-                    </p>
+                      <p className="font-bold text-lg bg-gray-500 text-white px-6 py-2 rounded-md ">
+                        Total Amount:{" "}
+                        <span className="font-medium">
+                          {order?.payment?.amount?.toLocaleString()} MVR
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Right Side - Order Setup */}
-              <div className="w-96 bg-gray-50 p-6 shadow-sm">
-                <h3 className="text-lg font-semibold border-b pb-2">
-                  Order Setup
-                </h3>
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <label className="block text-gray-700">
-                      Change Order Status:
-                    </label>
-                    <select
-                      className="border p-2 w-full rounded"
-                      value={orderStatus}
-                      onChange={handleOrderStatusChange}
-                    >
-                      <option>Shipped</option>
-                      <option>Pending</option>
-                      <option>Delivered</option>
-                      <option>Cancelled</option>
-                      <option>Returned</option>
-                      <option>Processing</option>
-                    </select>
+                {/* Right Side - Order Setup */}
+                <div className="w-96 bg-gray-50 p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold border-b pb-2">
+                    Order Setup
+                  </h3>
+                  <div className="mt-4 space-y-4">
+                    <div>
+                      <label className="block text-gray-700">
+                        Change Order Status:
+                      </label>
+                      <select
+                        className="border p-2 w-full rounded"
+                        value={orderStatus}
+                        onChange={handleOrderStatusChange}
+                      >
+                        <option>pending</option>
+                        <option>processing</option>
+                        <option>shipped</option>
+                        <option>delivered</option>
+                        <option>cancelled</option>
+                      </select>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-gray-700">
-                      Payment Status:
-                    </label>
-                    <select
-                      className="border p-2 w-full rounded"
-                      value={paymentStatus}
-                      onChange={handlePaymentStatusChange}
-                    >
-                      <option>Paid</option>
-                      <option>Refunded</option>
-                      <option>Partially Paid</option>
-                      <option>Failed</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700">
-                      Delivery Date & Time:
-                    </label>
-                    <input
-                      type="date"
-                      className="border p-2 w-full rounded"
-                      value={deliveryDate}
-                      onChange={handleDeliveryDateChange}
-                    />
-                  </div>
-                  <button className="w-full bg-blue-600 text-white py-2 rounded">
-                    Assign Delivery Man Manually
-                  </button>
-                </div>
 
-                {/* Delivery Information */}
-                {/* <div className="mt-6">
-            <h3 className="text-lg font-semibold border-b pb-2">Delivery Information</h3>
-            <p><span className="font-semibold">Name:</span> John Doe</p>
-            <p><span className="font-semibold">Phone:</span> +94712345678</p>
-            <p><span className="font-semibold">Address:</span> 25, Main Street, Colombo</p>
-            {deliveryDate && <p><span className="font-semibold">Scheduled Delivery Date:</span> {deliveryDate}</p>}
-          </div> */}
-
-                {/* Delivery Information with Edit Option */}
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold border-b pb-2 flex justify-between items-center">
-                    Delivery Information
-                    <FaPen
+                  {/* Delivery Information */}
+                  {/* Delivery Information with Edit Option */}
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold border-b pb-2 flex justify-between items-center">
+                      Delivery Information
+                      {/* <FaPen
                       className="text-gray-500 cursor-pointer"
                       onClick={toggleEdit}
-                    />
-                  </h3>
-                  {isEditing ? (
+                    /> */}
+                    </h3>
+                    {/* {isEditing ? (
                     <div className="space-y-2 mt-2">
                       <input
                         className="border p-2 w-full rounded"
@@ -277,29 +251,53 @@ const AdminOrderDetail = () => {
                         Save
                       </button>
                     </div>
-                  ) : (
+                  ) : ( */}
                     <div className="mt-2">
                       <p>
                         <span className="font-semibold">Name:</span>{" "}
-                        {deliveryInfo.name}
+                        {order.user.name}
                       </p>
                       <p>
-                        <span className="font-semibold">Phone:</span>{" "}
-                        {deliveryInfo.phone}
+                        <span className="font-semibold">Email:</span>{" "}
+                        {order.email}
                       </p>
                       <p>
                         <span className="font-semibold">Address:</span>{" "}
-                        {deliveryInfo.address}
+                        {order.shipping.address.line1},{" "}
+                        {order.shipping.address.line2},{" "}
+                        {order.shipping.address.city},{" "}
+                        {order.shipping.address.state},{" "}
+                        {order.shipping.address.country}
                       </p>
-                      <p>
+                      {/* <p>
                         <span className="font-semibold">Delivery Date:</span>{" "}
                         {deliveryDate}
-                      </p>
+                      </p> */}
                     </div>
-                  )}
+                    {/* )} */}
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex justify-center items-center mt-100 gap-4">
+                <img
+                  src={emptyOrdersImg}
+                  alt="order not found image"
+                  className="w-[120px]"
+                />
+                <div className="flex flex-col items-start justify-center">
+                  <p className="text-center text-gray-700 font-semibold py-1">
+                    Something Went Wrong!
+                  </p>
+                  <button
+                    className="px-6 py-2 border-1 border-purple-500 bg-purple-100 font-medium text-purple-600 rounded-lg hover:bg-purple-600 hover:text-white transition"
+                    onClick={() => navigate("/admin-product")}
+                  >
+                    Back To Order Management
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
