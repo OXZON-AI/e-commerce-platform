@@ -229,7 +229,12 @@ const AdminOrderDetail = () => {
                       {order.status === "cancelled" ? (
                         <p className="text-xs text-gray-500 py-2 italic">
                           {" "}
-                          *Note: cancelled order status cant update
+                          *Note: The status of the cancelled order cannot be updated.
+                        </p>
+                      ) : order.status === "delivered" || order.status === "processing" || order.status === "shipped" ? (
+                        <p className="text-xs text-gray-500 py-2 italic">
+                          {" "}
+                          *Note: The status of <span className="text-violet-600 font-semibold">{order.status}</span> orders cannot be changed to 'cancelled.'
                         </p>
                       ) : null}
                     </div>
@@ -240,60 +245,7 @@ const AdminOrderDetail = () => {
                   <div className="mt-6">
                     <h3 className="text-lg font-semibold border-b pb-2 flex justify-between items-center">
                       Delivery Information
-                      {/* <FaPen
-                      className="text-gray-500 cursor-pointer"
-                      onClick={toggleEdit}
-                    /> */}
                     </h3>
-                    {/* {isEditing ? (
-                    <div className="space-y-2 mt-2">
-                      <input
-                        className="border p-2 w-full rounded"
-                        type="text"
-                        value={deliveryInfo.name}
-                        onChange={(e) =>
-                          setDeliveryInfo({
-                            ...deliveryInfo,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                      <input
-                        className="border p-2 w-full rounded"
-                        type="text"
-                        value={deliveryInfo.phone}
-                        onChange={(e) =>
-                          setDeliveryInfo({
-                            ...deliveryInfo,
-                            phone: e.target.value,
-                          })
-                        }
-                      />
-                      <input
-                        className="border p-2 w-full rounded"
-                        type="text"
-                        value={deliveryInfo.address}
-                        onChange={(e) =>
-                          setDeliveryInfo({
-                            ...deliveryInfo,
-                            address: e.target.value,
-                          })
-                        }
-                      />
-                      <input
-                        className="border p-2 w-full rounded"
-                        type="date"
-                        value={deliveryDate}
-                        onChange={handleDeliveryDateChange}
-                      />
-                      <button
-                        className="w-full bg-green-600 text-white py-2 rounded"
-                        onClick={toggleEdit}
-                      >
-                        Save
-                      </button>
-                    </div>
-                  ) : ( */}
                     <div className="mt-2">
                       <p>
                         <span className="font-semibold">Name:</span>{" "}
@@ -311,12 +263,7 @@ const AdminOrderDetail = () => {
                         {order.shipping.address.state},{" "}
                         {order.shipping.address.country}
                       </p>
-                      {/* <p>
-                        <span className="font-semibold">Delivery Date:</span>{" "}
-                        {deliveryDate}
-                      </p> */}
                     </div>
-                    {/* )} */}
                   </div>
                 </div>
               </div>
