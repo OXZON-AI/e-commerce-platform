@@ -128,15 +128,28 @@ const AdminOrderManagement = () => {
                     placeholder="Search by Customer ID..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full max-w-md p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
+                    disabled={filters.guestOnly}
+                    className={`w-full max-w-md p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition ${
+                      filters.guestOnly ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   />
+
                   <button
                     onClick={handleSearch}
-                    className="flex items-center justify-center w-36 px-5 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition"
+                    disabled={filters.guestOnly}
+                    className={`flex items-center justify-center w-36 px-5 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition ${
+                      filters.guestOnly ? "opacity-50" : ""
+                    }`}
                   >
                     <FaSearch className="mr-2" />
                     <span>Search</span>
                   </button>
+
+                  {filters.guestOnly && filters.guestOnly ? (
+                    <p className="text-gray-400 text-xs">
+                      *Note: Customer ID search is disabled when guest-only filters are applied
+                    </p>
+                  ) : null}
                 </div>
 
                 {/* Guest Only Filter */}
