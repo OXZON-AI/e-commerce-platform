@@ -752,7 +752,7 @@ const AdminProductManagement = () => {
                         setFilters((prev) => ({
                           ...prev,
                           priceRange: [
-                            Math.min(newMin, prev.priceRange[1] - 1), // Ensure minPrice < minPrice
+                            Math.min(newMin, prev.priceRange[1] - 1), // Ensure minPrice < maxPrice
                             prev.priceRange[1],
                           ],
                           page: 1,
