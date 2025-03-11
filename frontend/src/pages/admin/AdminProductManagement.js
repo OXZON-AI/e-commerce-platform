@@ -747,16 +747,17 @@ const AdminProductManagement = () => {
                     <input
                       type="number"
                       value={filters.priceRange[0]}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const newMin = Number(e.target.value);
                         setFilters((prev) => ({
                           ...prev,
                           priceRange: [
-                            Number(e.target.value),
+                            Math.min(newMin, prev.priceRange[1] - 1), // Ensure minPrice < minPrice
                             prev.priceRange[1],
                           ],
                           page: 1,
-                        }))
-                      }
+                        }));
+                      }}
                       className="px-3 py-2 border rounded-md w-30"
                       placeholder="Min Price"
                     />
@@ -764,16 +765,17 @@ const AdminProductManagement = () => {
                     <input
                       type="number"
                       value={filters.priceRange[1]}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const newMax = Number(e.target.value);
                         setFilters((prev) => ({
                           ...prev,
                           priceRange: [
                             prev.priceRange[0],
-                            Number(e.target.value),
+                            Math.max(newMax, prev.priceRange[0] + 1), // Ensure maxPrice > minPrice
                           ],
                           page: 1,
-                        }))
-                      }
+                        }));
+                      }}
                       className="px-3 py-2 border rounded-md w-30"
                       placeholder="Max Price"
                     />
