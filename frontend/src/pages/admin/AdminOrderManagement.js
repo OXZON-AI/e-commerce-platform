@@ -13,6 +13,8 @@ import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
 import dropArrowIcon from "../../assets/icons/dropArrow.svg";
 import { FaSearch, FaDownload, FaEye, FaEdit } from "react-icons/fa";
 import { HashLoader } from "react-spinners";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const AdminOrderManagement = () => {
   const dispatch = useDispatch();
@@ -63,6 +65,62 @@ const AdminOrderManagement = () => {
       [e.target.name]: e.target.value || undefined, // undefine use when value is empty, then mark as undefine
       page: 1,
     });
+  };
+
+  // handler for export Excel sheet of orders
+  const handleExport = async () => {
+    let allOrders = [];
+    let totalPages = paginationInfo?.totalPages || 1; // Get total pages from Redux
+    let currentPage = 1;
+
+    // Fetch all orders from all pages
+    while (currentPage <= totalPages) {
+      try {
+        const response = await dispatch(
+          fetchOrders({ page: currentPage, limit: 10 })
+        ).unwrap();
+
+        allOrders = [...allOrders, ...response.orders];
+        currentPage++;
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        toast.error("Failed to fetch all orders for export.");
+        return;
+      }
+    }
+
+    if (allOrders.length === 0) {
+      toast.info("No orders available to export.");
+      return;
+    }
+
+    // Format data for excel export
+    const dataToExport = allOrders.map((order) => ({
+      "Order ID": order._id,
+      "Customer Name": order.user?.name || "Guest",
+      Email: order.email,
+      "Total Amount (MVR)": order.payment.amount,
+      "Order Status": order.status,
+      "Created At": new Date(order.createdAt).toLocaleString(),
+    }));
+
+    // Create a new worksheet and workbook
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+
+    // Convert workbook to Excel file
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    // Save file using FileSaver
+    const data = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(data, `Orders_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   // handler for view one order and set order details to Redux
@@ -147,7 +205,8 @@ const AdminOrderManagement = () => {
 
                   {filters.guestOnly && filters.guestOnly ? (
                     <p className="text-gray-400 text-xs">
-                      *Note: Customer ID search is disabled when guest-only filters are applied
+                      *Note: Customer ID search is disabled when guest-only
+                      filters are applied
                     </p>
                   ) : null}
                 </div>
@@ -205,7 +264,10 @@ const AdminOrderManagement = () => {
                   </select>
 
                   {/* Export Button */}
-                  <button className="flex items-center justify-center w-36 px-5 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700 transition">
+                  <button
+                    onClick={handleExport}
+                    className="flex items-center justify-center w-36 px-5 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
+                  >
                     <FaDownload className="mr-2" />
                     <span>Export</span>
                   </button>
