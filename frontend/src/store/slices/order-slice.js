@@ -20,6 +20,25 @@ export const fetchOrders = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch all orders separately [Ex: for all order export as excel file]
+export const fetchAllOrders = createAsyncThunk(
+  "orders/fetchAllOrders",
+  async (filters = {}, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/v1/orders/", {
+        params: filters,
+      });
+      console.log("all-orders-slice : ", response.data);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get orders"
+      );
+    }
+  }
+);
+
 // Async thunk to update order status
 export const updateOrderStatus = createAsyncThunk(
   "orders/updateOrderStatus",
@@ -64,6 +83,10 @@ const initialState = {
   selectedOrder: null, // this is for store selected order details
   status: "idle",
   error: null,
+
+  // For all orders for excel download
+  allOrderStatus: "idle",
+  allOrdersPaginationInfo: {},
 };
 
 const orderSlice = createSlice({
@@ -91,6 +114,16 @@ const orderSlice = createSlice({
       .addCase(fetchOrders.rejected, (state, action) => {
         state.status = "fetch-failed";
         state.error = action.payload;
+      })
+      .addCase(fetchAllOrders.pending, (state) => {
+        state.allOrderStatus = "fetch-loading";
+      })
+      .addCase(fetchAllOrders.fulfilled, (state, action) => {
+        state.allOrderStatus = "fetch-succeeded";
+        state.allOrdersPaginationInfo = action.payload.paginationInfo;
+      })
+      .addCase(fetchAllOrders.rejected, (state, action) => {
+        state.allOrderStatus = "fetch-failed";
       })
       .addCase(updateOrderStatus.pending, (state) => {
         state.status = "update-loading";

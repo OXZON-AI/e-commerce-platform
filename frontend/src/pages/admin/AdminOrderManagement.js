@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AdminNavbar from "./components/AdminNavbar";
 import Sidebar from "./components/Sidebar";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,11 +8,10 @@ import {
   fetchOrders,
   setSelectedOrder,
 } from "../../store/slices/order-slice";
-import { toast } from "react-toastify";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
-import dropArrowIcon from "../../assets/icons/dropArrow.svg";
 import { FaSearch, FaDownload, FaEye, FaEdit } from "react-icons/fa";
 import { HashLoader } from "react-spinners";
+import OrdersToExcel from "./components/order-Management-Componenets/OrdersToExcel";
 
 const AdminOrderManagement = () => {
   const dispatch = useDispatch();
@@ -147,7 +146,8 @@ const AdminOrderManagement = () => {
 
                   {filters.guestOnly && filters.guestOnly ? (
                     <p className="text-gray-400 text-xs">
-                      *Note: Customer ID search is disabled when guest-only filters are applied
+                      *Note: Customer ID search is disabled when guest-only
+                      filters are applied
                     </p>
                   ) : null}
                 </div>
@@ -204,11 +204,8 @@ const AdminOrderManagement = () => {
                     <option value="oldest">Oldest First</option>
                   </select>
 
-                  {/* Export Button */}
-                  <button className="flex items-center justify-center w-36 px-5 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700 transition">
-                    <FaDownload className="mr-2" />
-                    <span>Export</span>
-                  </button>
+                  {/* Export Button - Export Component */}
+                  <OrdersToExcel />
                 </div>
               </div>
 
