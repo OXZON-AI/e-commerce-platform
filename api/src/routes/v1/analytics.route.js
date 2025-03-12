@@ -13,13 +13,13 @@ const route = express.Router();
 
 route.get("/sales/summary", verifyToken, verifyAdmin, salesSummary);
 route.get("/sales/performance", verifyToken, verifyAdmin, salesPerformance);
-route.get("/sales/export", salesExport);
+route.get("/sales/export", verifyToken, verifyAdmin, salesExport);
 route.get(
   "/categories/performance",
   verifyToken,
   verifyAdmin,
   categoryPerformance
 );
-route.get("/products/export", productsExport);
+route.get("/products/export", verifyToken, verifyAdmin, productsExport);
 
 export default route;
