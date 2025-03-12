@@ -56,6 +56,14 @@ const OrderHistory = () => {
 
   // Handler for reorder
   const handleReorder = (productSlug, productQuantity) => {
+    if (!productSlug || !productQuantity) {
+      toast.info("Product Not Available");
+      console.error(
+        `Product Slug or Product Quantity error : product slug : ${productSlug} producct quantity : ${productQuantity}`
+      );
+      return;
+    }
+
     // fetch product details to check product stock for product availability.
     dispatch(fetchProductDetails(productSlug))
       .unwrap()
@@ -276,7 +284,7 @@ const OrderHistory = () => {
                             >
                               <td className="p-3">{index + 1}</td>
                               <td className="p-3">
-                                {item.variant.product.name}
+                                {item.variant?.product?.name}
                               </td>
                               <td className="p-3">{item.quantity}</td>
                               <td className="p-3">
@@ -305,7 +313,7 @@ const OrderHistory = () => {
                                     }
                                     onClick={() =>
                                       handleReorder(
-                                        item.variant.product.slug,
+                                        item.variant?.product?.slug,
                                         item.quantity
                                       )
                                     }
@@ -330,7 +338,9 @@ const OrderHistory = () => {
                   >
                     Previous
                   </button>
-                  <span className="px-4 py-2">Page {filters.page} of {paginationInfo.totalPages}</span>
+                  <span className="px-4 py-2">
+                    Page {filters.page} of {paginationInfo.totalPages}
+                  </span>
                   <button
                     className="px-4 py-2 bg-gray-500 text-white rounded disabled:opacity-50"
                     disabled={orders.length < 10}
@@ -344,7 +354,7 @@ const OrderHistory = () => {
           </div>
         </div>
       </LayoutOne>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} position="bottom-right" />
     </Fragment>
   );
 };
