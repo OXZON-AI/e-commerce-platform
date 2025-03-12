@@ -161,7 +161,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         formData.append("file", file);
         formData.append(
           "upload_preset",
-          process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+          process.env.REACT_APP_CLOUDINARY_UPLOAD_REVIEWS_PRESET
         ); // Set in Cloudinary settings
 
         try {
