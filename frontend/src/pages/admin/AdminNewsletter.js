@@ -2,52 +2,51 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaSearch, FaPlus } from "react-icons/fa"; // Icons
 import AdminNavbar from "./components/AdminNavbar"; // Assuming this is already created
-import Sidebar from "./components/Sidebar";// Assuming this is already created
+import Sidebar from "./components/Sidebar"; // Assuming this is already created
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchNewsletters,
+  publishNewsletter,
+  uploadImage,
+} from "../../store/slices/news-slice";
 
 function AdminNewsletter() {
-  const [newsletters, setNewsletters] = useState([]);
+  const dispatch = useDispatch();
+  const { newsletters, totalNews, status, imageUrl, error } = useSelector(
+    (state) => state.news
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [image, setImage] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
+    sortBy: "date",
+    sortOrder: "desc",
   });
   const [search, setSearch] = useState("");
 
-  // Fetch newsletters from the backend
-  const fetchNewsletters = async () => {
-    try {
-      const response = await axios.get("/api/news", {
-        params: {
-          page: filters.page,
-          limit: filters.limit,
-          search,
-        },
-      });
-      setNewsletters(response.data);
-    } catch (error) {
-      console.error("Error fetching newsletters", error);
-    }
-  };
-
+  // Effect hook for fetch newsletters from the backend
   useEffect(() => {
-    fetchNewsletters();
-  }, [filters.page, filters.limit, search]);
+    dispatch(fetchNewsletters(filters));
+  }, [dispatch, filters]);
 
   // Handle newsletter submission (upload image & publish)
-  const submitNewsletter = async () => {
+  const handlePublish = async () => {
+    if (!title || !body || !imageUrl) {
+      alert("Please fill in all fields before publishing.");
+      return;
+    }
+
     try {
-      const response = await axios.post("/api/news/publish", {
-        title,
-        body,
-        image: imageUrl,
-      });
-      alert(response.data.message);
-      fetchNewsletters(); // Refresh newsletters
-      setIsModalOpen(false); // Close the modal
+      dispatch(publishNewsletter({ title, body, image: imageUrl }))
+        .unwrap()
+        .then(() => {
+          alert("Newsletter published successfully!");
+          setIsModalOpen(false);
+          dispatch(fetchNewsletters(filters)); // Refresh data
+        })
+        .catch((err) => alert(err));
     } catch (error) {
       console.error("Error publishing newsletter", error);
       alert("Failed to publish the newsletter");
@@ -56,20 +55,21 @@ function AdminNewsletter() {
 
   // Handle image upload and set the image URL
   const handleImageUpload = async (event) => {
-    const formData = new FormData();
-    formData.append("image", event.target.files[0]);
+    const file = event.target.files[0];
+    console.log("image file : ", file);
 
-    try {
-      const response = await axios.post("/api/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setImageUrl(response.data.url);
-      alert("Image uploaded successfully!");
-    } catch (error) {
-      console.error("Error uploading image", error);
-      alert("Image upload failed");
+    // Check if a file was selected and validate if it's an image (optional)
+    if (file) {
+      const fileType = file.type.split("/")[0]; // Get the type (image, video, etc.)
+      if (fileType !== "image") {
+        alert("Please select a valid image file.");
+        return;
+      }
+
+      // Dispatch the action to upload the image
+      dispatch(uploadImage(file)).unwrap();
+    } else {
+      alert("No file selected.");
     }
   };
 
@@ -134,8 +134,13 @@ function AdminNewsletter() {
                         (filters.page - 1) * filters.limit + index + 1;
 
                       return (
-                        <tr key={news._id} className="border-b hover:bg-gray-50">
-                          <td className="py-4 px-6 text-gray-800">{currentIndex}</td>
+                        <tr
+                          key={news._id}
+                          className="border-b hover:bg-gray-50"
+                        >
+                          <td className="py-4 px-6 text-gray-800">
+                            {currentIndex}
+                          </td>
                           <td className="p-4">{news.title}</td>
                           <td className="p-4">
                             <img
@@ -154,7 +159,9 @@ function AdminNewsletter() {
               <div className="flex justify-end items-center mt-4 space-x-4">
                 {/* Previous Button */}
                 <button
-                  onClick={() => setFilters((prev) => ({ ...prev, page: prev.page - 1 }))}
+                  onClick={() =>
+                    setFilters((prev) => ({ ...prev, page: prev.page - 1 }))
+                  }
                   disabled={filters.page === 1}
                   className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
                 >
@@ -166,8 +173,10 @@ function AdminNewsletter() {
 
                 {/* Next Button */}
                 <button
-                  onClick={() => setFilters((prev) => ({ ...prev, page: prev.page + 1 }))}
-                  disabled={newsletters.length < filters.limit}
+                  onClick={() =>
+                    setFilters((prev) => ({ ...prev, page: prev.page + 1 }))
+                  }
+                  disabled={newsletters?.length < filters.limit}
                   className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
                 >
                   Next
@@ -185,12 +194,22 @@ function AdminNewsletter() {
                     >
                       &times;
                     </button>
-                    <h3 className="text-xl font-semibold mb-4">Publish Newsletter</h3>
+                    <h3 className="text-xl font-semibold mb-4">
+                      Publish Newsletter
+                    </h3>
 
                     {/* Form to submit newsletter */}
-                    <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+                    <form
+                      onSubmit={(e) => e.preventDefault()}
+                      className="space-y-4"
+                    >
                       <div>
-                        <label htmlFor="title" className="block text-sm font-medium">Title</label>
+                        <label
+                          htmlFor="title"
+                          className="block text-sm font-medium"
+                        >
+                          Title
+                        </label>
                         <input
                           id="title"
                           type="text"
@@ -201,7 +220,12 @@ function AdminNewsletter() {
                         />
                       </div>
                       <div>
-                        <label htmlFor="body" className="block text-sm font-medium">Body</label>
+                        <label
+                          htmlFor="body"
+                          className="block text-sm font-medium"
+                        >
+                          Body
+                        </label>
                         <textarea
                           id="body"
                           value={body}
@@ -211,14 +235,21 @@ function AdminNewsletter() {
                         ></textarea>
                       </div>
                       <div className="relative">
-                        <label htmlFor="image" className="block text-sm font-medium mb-2">Image</label>
+                        <label
+                          htmlFor="image"
+                          className="block text-sm font-medium mb-2"
+                        >
+                          Image
+                        </label>
                         <div className="flex justify-center items-center w-full p-6 border-2 border-dashed border-gray-300 rounded-lg">
                           <input
                             type="file"
                             onChange={handleImageUpload}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                           />
-                          <div className="text-gray-500">Click to choose a file</div>
+                          <div className="text-gray-500">
+                            Click to choose a file
+                          </div>
                         </div>
                         {imageUrl && (
                           <div className="mt-4 text-center">
@@ -232,7 +263,7 @@ function AdminNewsletter() {
                       </div>
                       <button
                         type="button"
-                        onClick={submitNewsletter}
+                        onClick={handlePublish}
                         className="w-full py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                       >
                         Publish Newsletter

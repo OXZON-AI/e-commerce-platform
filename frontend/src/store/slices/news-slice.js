@@ -78,20 +78,33 @@ export const uploadImage = createAsyncThunk(
   "news/uploadImage",
   async (file, { rejectWithValue }) => {
     try {
+      // Ensure file is provided
+      if (!file) {
+        return rejectWithValue("No file selected for upload.");
+      }
+
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("file", file);
       formData.append(
         "upload_preset",
-        process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
-      ); // Set in Cloudinary settings
+        process.env.REACT_APP_CLOUDINARY_UPLOAD_NEWS_PRESET
+      ); // Assuming this value is in your .env
+      formData.append("public_id", `news/${file.name}`); // Save under 'news' folder
+
+      // Log FormData content for debugging
+      console.log("FormData being sent: ", formData);
+
+      // Send request to Cloudinary
       const response = await axios.post(
         `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
         formData
       );
-      return response.data.secure_url;
+
+      return response.data.secure_url; // Return the URL after upload
     } catch (error) {
+      console.error("Error uploading image: ", error);
       return rejectWithValue(
-        error.response?.data?.message || "Image upload failed"
+        error.response?.data?.message || "Image upload failed."
       );
     }
   }
