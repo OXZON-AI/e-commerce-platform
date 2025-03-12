@@ -124,7 +124,7 @@ const AdminProductManagement = () => {
         imgFormData.append("file", file);
         imgFormData.append(
           "upload_preset",
-          process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+          process.env.REACT_APP_CLOUDINARY_UPLOAD_PRODUCT_PRESET
         ); // Set in Cloudinary settings
         try {
           const response = await axios.post(

@@ -76,7 +76,7 @@ export default function AdminCategoryManagement() {
     imgFormData.append("file", file);
     imgFormData.append(
       "upload_preset",
-      process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+      process.env.REACT_APP_CLOUDINARY_UPLOAD_CATEGORY_PRESET
     ); // Set in Cloudinary settings
 
     try {
