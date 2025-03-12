@@ -9,6 +9,7 @@ import {
   publishNewsletter,
   uploadImage,
 } from "../../store/slices/news-slice";
+import moment from "moment";
 
 function AdminNewsletter() {
   const dispatch = useDispatch();
@@ -123,8 +124,10 @@ function AdminNewsletter() {
                 <thead className="bg-gray-100 text-base">
                   <tr>
                     <th className="p-4 text-left">Index</th>
-                    <th className="p-4 text-left">Title</th>
                     <th className="p-4 text-left">Image</th>
+                    <th className="p-4 text-left">Title</th>
+                    <th className="p-4 text-left">Detailed Body</th>
+                    <th className="p-4 text-left">Created Date</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -141,13 +144,19 @@ function AdminNewsletter() {
                           <td className="py-4 px-6 text-gray-800">
                             {currentIndex}
                           </td>
-                          <td className="p-4">{news.title}</td>
                           <td className="p-4">
                             <img
                               src={news.image}
                               alt={news.title}
                               className="w-16 h-16 object-cover rounded-md"
                             />
+                          </td>
+                          <td className="p-4">{news.title}</td>
+                          <td className={`p-4 ${news.body ? "text-green-600" : "text-red-600"}`}>{news.body ? "Provided" : "Not-Provide"}</td>
+                          <td className="p-4">
+                            {moment(news.createdAt).format(
+                              "DD-MMM-YYYY / h:mm:ss a"
+                            )}
                           </td>
                         </tr>
                       );

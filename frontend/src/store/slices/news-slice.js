@@ -45,6 +45,7 @@ export const fetchNewsletters = createAsyncThunk(
       const response = await axiosInstance.get("v1/news/", {
         params: filters,
       });
+      console.log("fetch all news letter - slice : ", response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -167,7 +168,7 @@ const newsSlice = createSlice({
       })
       .addCase(fetchNewsletters.fulfilled, (state, action) => {
         state.status = "fetch-news-success";
-        state.newsletters = action.payload.news;
+        state.newsletters = action.payload;
         state.totalNews = action.payload.totalNews;
       })
       .addCase(fetchNewsletters.rejected, (state, action) => {
