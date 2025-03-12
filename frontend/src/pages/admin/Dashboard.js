@@ -1,7 +1,6 @@
 import React from "react";
 import Sidebar from "./components/Sidebar";
 import AdminNavbar from "./components/AdminNavbar";
-import SalesSummaryChart from "./components/DashbardAnalytics/SalesSummaryChart";
 import SalesPerformanceChart from "./components/DashbardAnalytics/SalesPerformanceChart";
 import { Stats } from "./components/DashbardAnalytics/stats";
 import { FiFileText, FiFile } from "react-icons/fi";
@@ -10,13 +9,12 @@ import CategoryChart from "./components/DashbardAnalytics/CategoryComparisonChar
 import SalesComparisonChart from "./components/DashbardAnalytics/SalesComparisonChart";
 
 const Dashboard = () => {
-
-   const handleExcelExport = () => {
-    alert('Excel export triggered');
+  const handleProductsExport = () => {
+    window.open("http://localhost:3000/v1/analytics/products/export");
   };
 
-  const handleCSVExport = () => {
-    alert('CSV export triggered');
+  const handleOrdersExport = () => {
+    window.open("http://localhost:3000/v1/analytics/sales/export");
   };
 
   return (
@@ -30,21 +28,21 @@ const Dashboard = () => {
               <h2 className="text-3xl font-semibold text-gray-800">
                 Genuine Electronics Dash Board
               </h2>
-              
+
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <button
-                  onClick={handleExcelExport}
+                  onClick={handleProductsExport}
                   className="flex items-center justify-center bg-indigo-600 text-white px-6 py-3 rounded-lg shadow hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 w-full sm:w-auto transition-all"
                 >
                   <FiFileText className="w-5 h-5 mr-2" />
-                  Export Excel
+                  Export Products
                 </button>
                 <button
-                  onClick={handleCSVExport}
+                  onClick={handleOrdersExport}
                   className="flex items-center justify-center bg-emerald-600 text-white px-6 py-3 rounded-lg shadow hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-300 w-full sm:w-auto transition-all"
                 >
                   <FiFile className="w-5 h-5 mr-2" />
-                  Export CSV
+                  Export Orders
                 </button>
               </div>
             </div>
@@ -57,13 +55,12 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-1">
               {/* Top Section */}
               <div className="lg:col-span-1">
-                <SalesSummaryChart/>
+                <SalesPerformanceChart />
               </div>
 
               {/* Middle Section */}
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                <OrderCountStatusChart/>
-                <SalesPerformanceChart />
+                <OrderCountStatusChart />
                 <CategoryChart />
               </div>
 
@@ -80,5 +77,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
