@@ -268,14 +268,14 @@ const AdminOrderDetail = () => {
                       ) : null}
                       <p className="flex items-center gap-2">
                         <span className="font-semibold">Customer ID:</span>
-                        {order.isGuest ? (
+                        {order.isGuest || !order.user ? (
                           "Not Available"
                         ) : (
                           <span className="flex items-center gap-1">
-                            {order.user._id}
+                            {order.user?._id}
                             <FaCopy
                               className="cursor-pointer text-gray-500 hover:text-black"
-                              onClick={() => handleCopy(order.user._id)}
+                              onClick={() => handleCopy(order.user?._id)}
                               title="Copy ID"
                             />
                           </span>
@@ -283,7 +283,7 @@ const AdminOrderDetail = () => {
                       </p>
                       <p>
                         <span className="font-semibold">Name:</span>{" "}
-                        {order.isGuest ? "Not Available" : order.user?.name}
+                        {order.isGuest || !order.user ? "Not Available" : order.user?.name}
                       </p>
                       <p>
                         <span className="font-semibold">Email:</span>{" "}
