@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../axiosConfig";
+import axios from "axios";
 
 // Async thunk for subscribe to newsletter API request
 export const subscribeToNewsletter = createAsyncThunk(
@@ -36,21 +37,90 @@ export const unsubscribeFromNewsletter = createAsyncThunk(
   }
 );
 
+// Async thunk for fetch newsletters with filters
+export const fetchNewsletters = createAsyncThunk(
+  "news/fetchNewsltters",
+  async (filters, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("v1/news/", {
+        params: filters,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response.data.message || "Failed to fetch news letters!"
+      );
+    }
+  }
+);
+
+// Async thunk for publish a new newsletter
+export const publishNewsletter = createAsyncThunk(
+  "news/publishNewsletter",
+  async ({ title, body, image }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("v1/news/publish", {
+        title,
+        body,
+        image,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response.data.message || "Failed to publish news letter!"
+      );
+    }
+  }
+);
+
+// Async thunk for upload image and get URL from cloudinary
+export const uploadImage = createAsyncThunk(
+  "news/uploadImage",
+  async (file, { rejectWithValue }) => {
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append(
+        "upload_preset",
+        process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+      ); // Set in Cloudinary settings
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        formData
+      );
+      return response.data.secure_url;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Image upload failed"
+      );
+    }
+  }
+);
+
 // Initital state
 const initialState = {
+  newsletters: [],
+  totalNews: 0,
   status: "idle",
   isSubscribed: false,
+  imageUrl: "",
   error: null,
 };
 
 const newsSlice = createSlice({
   name: "news",
   initialState,
-  reducers: {},
+  reducers: {
+    resetImageUrl: (state) => {
+      state.imageUrl = "";
+    },
+  },
   extraReducers: (builder) => {
     builder
+      // for subscribe
       .addCase(subscribeToNewsletter.pending, (state) => {
         state.status = "subscribe-loading";
+        state.isSubscribed = false;
         state.error = null;
       })
       .addCase(subscribeToNewsletter.fulfilled, (state) => {
@@ -59,8 +129,11 @@ const newsSlice = createSlice({
       })
       .addCase(subscribeToNewsletter.rejected, (state, action) => {
         state.status = "subscribe-error";
+        state.isSubscribed = false;
         state.error = action.payload;
       })
+
+      //for unsubscribe
       .addCase(unsubscribeFromNewsletter.pending, (state) => {
         state.status = "unsubscribe-loading";
         state.error = null;
@@ -72,8 +145,53 @@ const newsSlice = createSlice({
       .addCase(unsubscribeFromNewsletter.rejected, (state, action) => {
         state.status = "unsubscribe-error";
         state.error = action.payload;
+      })
+
+      // for fetch news letters
+      .addCase(fetchNewsletters.pending, (state) => {
+        state.status = "fetch-news-loading";
+        state.error = null;
+      })
+      .addCase(fetchNewsletters.fulfilled, (state, action) => {
+        state.status = "fetch-news-success";
+        state.newsletters = action.payload.news;
+        state.totalNews = action.payload.totalNews;
+      })
+      .addCase(fetchNewsletters.rejected, (state, action) => {
+        state.status = "fetch-news-error";
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+
+      // for publish news letter
+      .addCase(publishNewsletter.pending, (state) => {
+        state.status = "publish-news-loading";
+        state.error = null;
+      })
+      .addCase(publishNewsletter.fulfilled, (state) => {
+        state.status = "publish-news-success";
+      })
+      .addCase(publishNewsletter.rejected, (state, action) => {
+        state.status = "publish-news-error";
+        state.error = action.payload;
+      })
+
+      // for upload letter banner image to cloudinary
+      .addCase(uploadImage.pending, (state) => {
+        state.status = "uploadImage-news-loading";
+        state.error = null;
+      })
+      .addCase(uploadImage.fulfilled, (state, action) => {
+        state.status = "uploadImage-news-success";
+        state.imageUrl = action.payload;
+      })
+      .addCase(uploadImage.rejected, (state, action) => {
+        state.status = "uploadImage-news-error";
+        state.error = action.payload;
       });
   },
 });
+
+export const { resetImageUrl } = newsSlice.actions;
 
 export default newsSlice.reducer;
