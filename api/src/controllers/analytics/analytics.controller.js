@@ -6,9 +6,11 @@ import {
 } from "../../services/analytics.service.js";
 import { logger } from "../../utils/logger.util.js";
 import {
+  validateCategoryPerformance,
   validateSalesPerformance,
   validateSalesSummary,
 } from "../../utils/validator.util.js";
+import { categoryPipeline } from "./pipelines/sales/category.pipeline.js";
 import { performancePipeline } from "./pipelines/sales/performance.pipline.js";
 import { summaryPipeline } from "./pipelines/sales/summary.pipeline.js";
 
@@ -73,7 +75,7 @@ export const salesPerformance = async (req, res, next) => {
         $dateToString: {
           format:
             interval === "year"
-              ? "%Y-%m-%d"
+              ? "%Y"
               : interval === "month"
               ? "%Y-%m"
               : interval === "week"
@@ -170,6 +172,64 @@ export const productsExport = async (req, res, next) => {
     res.status(200).end();
   } catch (error) {
     logger.error("Failed to export products excel: ", error);
+    return next(error);
+  }
+};
+
+export const categoryPerformance = async (req, res, next) => {
+  const { error, value } = validateCategoryPerformance(req.query);
+
+  if (error) return next(error);
+
+  const { userType, interval, startDate, endDate } = value;
+
+  const pipeline = [...categoryPipeline];
+
+  pipeline.unshift({
+    $match: {
+      status: {
+        $ne: "cancelled",
+      },
+      ...(userType && { isGuest: userType === "customer" ? false : true }),
+      ...(startDate && {
+        createdAt: {
+          $gte: new Date(startDate),
+          ...(endDate && { $lt: new Date(endDate) }),
+        },
+      }),
+    },
+  });
+
+  pipeline.splice(6, 0, {
+    $group: {
+      _id: {
+        category: "$category._id",
+        date: {
+          $dateToString: {
+            format:
+              interval === "year"
+                ? "%Y"
+                : interval === "month"
+                ? "%Y-%m"
+                : interval === "week"
+                ? "%Y-%U"
+                : "%Y-%m-%d",
+            date: "$createdAt",
+          },
+        },
+      },
+      count: {
+        $sum: "$items.quantity",
+      },
+    },
+  });
+  try {
+    const performance = await Order.aggregate(pipeline);
+
+    logger.info("Category performance fetched successfully.");
+    return res.status(200).json(performance);
+  } catch (error) {
+    logger.error("Failed to fetch category performance analytics: ", error);
     return next(error);
   }
 };
