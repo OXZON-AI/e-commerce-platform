@@ -2,7 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import PuffLoader from "react-spinners/PuffLoader";
-import { Upload } from "lucide-react"; // Import Upload icon
+import { ClockArrowUp, Upload } from "lucide-react"; // Import Upload icon
 
 const ProductModal = ({
   loading,
@@ -19,11 +19,12 @@ const ProductModal = ({
   setFormData,
   addAttributeField,
   removeAttributeField,
-  imageLocalPreview,
+  previewImages,
   handleImageUpload,
-  selectedImage,
-  imageUrl,
+  isImageSelected,
+  isUploading,
   handleToggle,
+  handleRemoveImage,
 }) => {
   if (!isOpen) return null;
 
@@ -81,18 +82,6 @@ const ProductModal = ({
                   type="text"
                   name="name"
                   value={formData.name}
-                  onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">
-                  Slug
-                </label>
-                <input
-                  type="text"
-                  name="slug"
-                  value={formData.slug}
                   onChange={handleChange}
                   className="w-full p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300"
                 />
@@ -161,7 +150,7 @@ const ProductModal = ({
             {/* Right Side - Remaining Inputs */}
             <div className="flex flex-col gap-4">
               {/* if update form load show stock otherwise  dont show */}
-              {formData.name ? (
+              {productDetail ? (
                 <div>
                   <label className="text-sm font-medium text-gray-700">
                     Stock
@@ -215,30 +204,59 @@ const ProductModal = ({
                 {/* Hidden File Input */}
                 <input
                   type="file"
+                  multiple
                   id="fileInput"
                   onChange={handleImageUpload}
                   className="hidden" // Hide the default file input
+                  disabled={isUploading}
                 />
 
                 {/* Custom Upload Button */}
                 <label
                   htmlFor="fileInput"
-                  className="w-full flex items-center justify-center gap-2 p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 cursor-pointer bg-gray-100 hover:bg-gray-200 transition"
+                  className={`w-full flex items-center justify-center gap-2 p-3 border border-gray-300 rounded-xl focus:ring focus:ring-purple-300 cursor-pointer bg-gray-100 hover:bg-gray-200 transition ${
+                    isUploading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
-                  <Upload className="w-5 h-5 text-purple-500" />
-                  <span className="text-gray-700">Upload Image</span>
+                  {isUploading ? (
+                    <>
+                      <ClockArrowUp className="w-5 h-5 text-purple-500" />
+                      <span className="text-gray-700 opacity-100">
+                        Uploading...
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-5 h-5 text-purple-500" />
+                      <span className="text-gray-700">Upload Image</span>
+                    </>
+                  )}
                 </label>
 
                 {/* Show preview near input */}
-                {(imageLocalPreview || formData.images[0].url) && (
-                  <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-                    <img
-                      src={imageLocalPreview || formData.images[0].url}
-                      alt={"Selected" || formData.images[0].alt}
-                      className="w-10 h-10 rounded-full border border-gray-400 object-cover"
-                    />
+                {previewImages.length > 0 ? (
+                  <div className="flex space-x-2 mt-2">
+                    {previewImages.map((image, index) => (
+                      <div key={index} className="relative">
+                        {/* Remove Button */}
+                        <button
+                          onClick={(e) => handleRemoveImage(image, e)}
+                          type="button"
+                          className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full text-xs"
+                        >
+                          ✖
+                        </button>
+
+                        {/* Image Preview */}
+                        <img
+                          src={image.url}
+                          alt={image.alt || "Product image"}
+                          className="w-16 h-16 object-cover border rounded-md"
+                        />
+                      </div>
+                    ))}
                   </div>
-                )}
+                ) : null}
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-gray-700">
@@ -269,7 +287,7 @@ const ProductModal = ({
                     />
                     <button
                       type="button"
-                      onClick={() => removeAttributeField(index)}
+                      onClick={() => removeAttributeField(index, attr)}
                       className="bg-red-500 text-white px-3 py-2 rounded"
                     >
                       ✕
@@ -285,7 +303,7 @@ const ProductModal = ({
                 </button>
               </div>
               {/* if update form load show active status otherwise  dont show */}
-              {formData.name ? (
+              {productDetail ? (
                 <div className="flex items-center gap-2">
                   <label className="text-sm font-medium text-gray-700 ">
                     Active Status
@@ -341,14 +359,14 @@ const ProductModal = ({
                 </div>
               )}
 
-              {/* Save button (appears above the loader) */}
-              {selectedImage && !imageUrl ? (
+              {/* Save button (loadder apears if images uploading to cloudinary) */}
+              {isUploading ? (
                 <PuffLoader size={30} color="#9333ea" />
               ) : (
                 <button
                   type="button"
                   onClick={handleSave}
-                  disabled={loading}
+                  disabled={loading || isUploading}
                   className={`relative bg-purple-500 text-white px-5 py-3 rounded-lg hover:bg-purple-600 transition ${
                     loading ? "opacity-50 cursor-not-allowed" : ""
                   } z-10`}

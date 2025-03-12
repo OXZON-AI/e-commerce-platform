@@ -67,13 +67,38 @@ export const getOrders = async (req, res, next) => {
         localField: "variants.product",
         foreignField: "_id",
         as: "products",
+        pipeline: [
+          {
+            $project: {
+              "description.detailed": 0,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+        pipeline: [
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+            },
+          },
+        ],
       },
     }
   );
 
   ordersPipeline.push({
     $project: {
-      user: 1,
+      user: {
+        $first: "$user",
+      },
       isGuest: 1,
       email: 1,
       payment: 1,

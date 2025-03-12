@@ -13,7 +13,12 @@ import { toast } from "react-toastify";
 
 const RegisteredUsers = () => {
   const dispatch = useDispatch();
-  const { users, loading, error } = useSelector((state) => state.users);
+  const {
+    users,
+    paginationInfo,
+    loading: userLoading,
+    error: userError,
+  } = useSelector((state) => state.users);
   const [filters, setFilters] = useState({
     userType: undefined,
     sortBy: undefined,
@@ -43,12 +48,16 @@ const RegisteredUsers = () => {
 
   // handler for filterChange
   const handleFilterChange = (e) => {
-    setFilters({
-      ...filters,
-      [e.target.name]: e.target.value || undefined, // undefine use when value is empty, then mark as undefine
+    const { name, value } = e.target;
+  
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: value || undefined, // Set undefined if value is empty
+      ...(name === "sortBy" && !value ? { sortOrder: undefined } : {}), // Reset sortOrder when sortBy is cleared
       page: 1,
-    });
+    }));
   };
+  
 
   // handler for pagination
   const handlePagination = (direction) => {
@@ -119,9 +128,12 @@ const RegisteredUsers = () => {
                 <div className="relative">
                   <select
                     name="sortOrder"
-                    value={filters.sortOrder || ""}
+                    value={!filters.sortBy ? "" : filters.sortOrder}
                     onChange={handleFilterChange}
-                    className="p-2 border rounded w-[150px] appearance-none pr-8"
+                    disabled={!filters.sortBy}
+                    className={`p-2 border rounded w-[150px] appearance-none pr-8 ${
+                      !filters.sortBy ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   >
                     <option value="">Sort Order</option>
                     <option value="desc">Desc</option>
@@ -154,8 +166,8 @@ const RegisteredUsers = () => {
               </div>
 
               <div className="overflow-x-auto">
-                {loading && <p>Loading...</p>}
-                {error && <p className="text-red-500">{error}</p>}
+                {userLoading && <p>Loading...</p>}
+                {userError && <p className="text-red-500">{userError}</p>}
                 <table className="min-w-full bg-white border border-gray-300">
                   <thead className="bg-gray-50">
                     <tr>
@@ -190,7 +202,7 @@ const RegisteredUsers = () => {
                       users.map((user, index) => {
                         // Calculate the starting index based on the current page
                         const currentIndex =
-                        (filters.page - 1) * filters.limit + index + 1;
+                          (filters.page - 1) * filters.limit + index + 1;
 
                         return (
                           <tr
@@ -258,12 +270,14 @@ const RegisteredUsers = () => {
                   </button>
 
                   {/* Page Indicator */}
-                  <span className="text-gray-700">Page {filters.page}</span>
+                  <span className="text-gray-700">
+                    Page {filters.page} of {paginationInfo.totalPages}
+                  </span>
 
                   {/* Next Button */}
                   <button
                     onClick={() => handlePagination("next")}
-                    disabled={users.length < 10}
+                    disabled={filters.page === paginationInfo.totalPages}
                     className="px-4 py-2 bg-gray-300 rounded-md disabled:opacity-50"
                   >
                     Next
