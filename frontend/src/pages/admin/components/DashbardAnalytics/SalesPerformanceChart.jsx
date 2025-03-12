@@ -12,7 +12,7 @@ import React from "react";
 import axiosInstance from "../../../../axiosConfig";
 import { format } from "date-fns";
 
-const SalesSummaryChart = () => {
+const SalesPerformanceChart = () => {
   const [data, setData] = React.useState();
 
   React.useEffect(() => {
@@ -90,4 +90,4 @@ const SalesSummaryChart = () => {
   );
 };
 
-export default SalesSummaryChart;
+export default SalesPerformanceChart;
