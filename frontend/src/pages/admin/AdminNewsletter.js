@@ -10,6 +10,8 @@ import {
   uploadImage,
 } from "../../store/slices/news-slice";
 import moment from "moment";
+import { MoonLoader } from "react-spinners";
+import { Newspaper, Paperclip } from "lucide-react";
 
 function AdminNewsletter() {
   const dispatch = useDispatch();
@@ -152,7 +154,13 @@ function AdminNewsletter() {
                             />
                           </td>
                           <td className="p-4">{news.title}</td>
-                          <td className={`p-4 ${news.body ? "text-green-600" : "text-red-600"}`}>{news.body ? "Provided" : "Not-Provide"}</td>
+                          <td
+                            className={`p-4 ${
+                              news.body ? "text-green-600" : "text-red-600"
+                            }`}
+                          >
+                            {news.body ? "Provided" : "Not-Provide"}
+                          </td>
                           <td className="p-4">
                             {moment(news.createdAt).format(
                               "DD-MMM-YYYY / h:mm:ss a"
@@ -203,8 +211,8 @@ function AdminNewsletter() {
                     >
                       &times;
                     </button>
-                    <h3 className="text-xl font-semibold mb-4">
-                      Publish Newsletter
+                    <h3 className="text-xl font-semibold mb-4 flex gap-2">
+                      Publish Newsletter <Newspaper color="gray" />
                     </h3>
 
                     {/* Form to submit newsletter */}
@@ -217,7 +225,7 @@ function AdminNewsletter() {
                           htmlFor="title"
                           className="block text-sm font-medium"
                         >
-                          Title
+                          Letter Title
                         </label>
                         <input
                           id="title"
@@ -228,12 +236,15 @@ function AdminNewsletter() {
                           placeholder="Enter newsletter title"
                         />
                       </div>
+                      <span className="text-gray-400 text-xs font-normal">
+                        *Letter title is for email subject & heading
+                      </span>
                       <div>
                         <label
                           htmlFor="body"
                           className="block text-sm font-medium"
                         >
-                          Body
+                          Letter Body
                         </label>
                         <textarea
                           id="body"
@@ -243,39 +254,83 @@ function AdminNewsletter() {
                           placeholder="Enter newsletter body"
                         ></textarea>
                       </div>
+                      <span className="text-gray-400 text-xs font-normal">
+                        *Letter body is for email body
+                      </span>
                       <div className="relative">
                         <label
                           htmlFor="image"
                           className="block text-sm font-medium mb-2"
                         >
-                          Image
+                          Banner Image
                         </label>
                         <div className="flex justify-center items-center w-full p-6 border-2 border-dashed border-gray-300 rounded-lg">
                           <input
                             type="file"
                             onChange={handleImageUpload}
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer ${
+                              status === "uploadImage-news-loading"
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                            disabled={status === "uploadImage-news-loading"}
                           />
                           <div className="text-gray-500">
-                            Click to choose a file
+                            {status === "uploadImage-news-loading" ? (
+                              <div className="flex items-center text-gray-400">
+                                <MoonLoader
+                                  size={15}
+                                  color="gray"
+                                  className="mr-2"
+                                />
+                                Uploading...
+                              </div>
+                            ) : (
+                              <span className="text flex gap-2">
+                                <Paperclip size={20} /> Click to choose a file
+                              </span>
+                            )}
                           </div>
                         </div>
+                        <span className="text-gray-400 text-xs font-normal">
+                          *This is for email body banner image for news article
+                        </span>
                         {imageUrl && (
                           <div className="mt-4 text-center">
                             <img
                               src={imageUrl}
                               alt="Uploaded"
-                              className="w-24 h-24 object-cover rounded-full mx-auto"
+                              className="w-full h-24 object-cover border-1 rounded-2 mx-auto"
                             />
                           </div>
                         )}
                       </div>
                       <button
                         type="button"
+                        disabled={
+                          status === "uploadImage-news-loading" ||
+                          status === "publish-news-loading"
+                        }
                         onClick={handlePublish}
-                        className="w-full py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                        className={`w-full py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 ${
+                          status === "uploadImage-news-loading" ||
+                          status === "publish-news-loading"
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
                       >
-                        Publish Newsletter
+                        {status === "publish-news-loading" ? (
+                          <div className="flex items-center justify-center text-white-400">
+                            <MoonLoader
+                              size={15}
+                              color="white"
+                              className="mr-2"
+                            />
+                            Publishing...
+                          </div>
+                        ) : (
+                          "Publish Newsletter"
+                        )}
                       </button>
                     </form>
                   </div>
