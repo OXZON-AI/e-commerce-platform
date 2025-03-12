@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { useState, Fragment, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Slider from "react-slick";
 import PuffLoader from "react-spinners/PuffLoader";
@@ -26,6 +26,9 @@ const ProductDetailPage = () => {
   const { status: cartStatus, error: cartError } = useSelector(
     (state) => state.cart
   );
+  
+  // State to manage the main image when clicking on a thumbnail
+  const [mainImage, setMainImage] = useState(placeholderImage);
 
   useEffect(() => {
     dispatch(fetchProductDetails(slug));
@@ -35,6 +38,18 @@ const ProductDetailPage = () => {
     };
   }, [slug, dispatch]);
 
+  // Update main image when product details are fetched
+  useEffect(() => {
+    if (productDetail?.variants?.[0]?.images?.length > 0) {
+      setMainImage(productDetail.variants[0].images[0].url);
+    }
+  }, [productDetail]);
+
+  // Update the main image on thumbnail click
+  const handleImageClick = (imgUrl) => {
+    setMainImage(imgUrl);
+  };
+
   const addToCartHandler = async () => {
     if (productDetail.variants[0]?.stock > 0) {
       try {
@@ -43,11 +58,11 @@ const ProductDetailPage = () => {
             variantId: productDetail.variants[0]._id,
             quantity,
           })
-        ).unwrap(); // Ensures we get the resolved response of the async thunk
+        ).unwrap();
 
         toast.success(`${quantity} item(s) added to cart!`);
 
-        await dispatch(fetchCart()).unwrap(); // Wait for addToCart to complete, then fetch the latest cart
+        await dispatch(fetchCart()).unwrap();
       } catch (error) {
         setNotification({ type: "error", message: "Something went wrong!" });
       }
@@ -57,20 +72,12 @@ const ProductDetailPage = () => {
   };
 
   const sliderSettings = {
-    dots: true, // Show dots for navigation
-    infinite: true, // Infinite scrolling
-    speed: 500, // Transition speed
-    slidesToShow: 3, // Number of images visible at a time
-    slidesToScroll: 1, // Number of images to scroll per click
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
   };
-
-  const calculateOverallRating = (reviews) => {
-    if (reviews.length === 0) return 0;
-    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-    return (totalRating / reviews.length).toFixed(1);
-  };
-
-  // const overallRating = calculateOverallRating(product.reviews);
 
   return (
     <Fragment>
@@ -91,30 +98,37 @@ const ProductDetailPage = () => {
         {productDetail && (
           <div className="max-w-5xl mx-auto px-6 lg:px-10">
             <div className="flex flex-col md:flex-row gap-10 mt-16">
-              <div className="w-full md:w-2/3 lg:w-1/2">
-                <img
-                  src={
-                    productDetail.variants?.[0]?.images?.[0]?.url ||
-                    placeholderImage
-                  }
-                  alt={productDetail.name}
-                  className="w-full rounded-lg shadow-lg mb-4"
-                  onError={(e) => {
-                    e.target.src = placeholderImage;
-                  }}
-                />
+              {/* Main Image Section with Hover Zoom Effect */}
+              <div className="w-full md:w-2/3 lg:w-1/2 relative">
+                <div className="overflow-hidden rounded-lg shadow-lg mb-4">
+                  {/* Main image container */}
+                  <img
+                    src={mainImage}
+                    alt={productDetail.name}
+                    className="w-full h-full object-contain transition-transform duration-500 ease-in-out transform hover:scale-125"
+                    onError={(e) => {
+                      e.target.src = placeholderImage;
+                    }}
+                  />
+                </div>
+                {/* Slider for other images */}
                 {productDetail.variants?.[0]?.images?.length > 0 ? (
                   <Slider {...sliderSettings}>
                     {productDetail.variants[0].images.map((img, index) => (
-                      <img
+                      <div
                         key={index}
-                        src={img.url || placeholderImage}
-                        alt={`${productDetail.name} ${index + 1}`}
-                        className="w-full rounded-lg shadow-lg my-2"
-                        onError={(e) => {
-                          e.target.src = placeholderImage;
-                        }}
-                      />
+                        className="px-1 py-1 cursor-pointer" // Added cursor-pointer for clickable images
+                        onClick={() => handleImageClick(img.url)} // Update main image on click
+                      >
+                        <img
+                          src={img.url || placeholderImage}
+                          alt={`${productDetail.name} ${index + 1}`}
+                          className="w-full h-60 object-contain rounded-lg shadow-sm"
+                          onError={(e) => {
+                            e.target.src = placeholderImage;
+                          }}
+                        />
+                      </div>
                     ))}
                   </Slider>
                 ) : (
@@ -123,6 +137,8 @@ const ProductDetailPage = () => {
                   </p>
                 )}
               </div>
+
+              {/* Product Details Section */}
               <div className="flex-1">
                 <h1 className="text-3xl md:text-4xl font-bold mb-4">
                   {productDetail.name}
@@ -133,10 +149,6 @@ const ProductDetailPage = () => {
                 <p className="text-2xl font-semibold mb-2">
                   {productDetail.variants?.[0]?.price} MVR
                 </p>
-                {/* <p className="text-yellow-500 mb-2">
-                {"★".repeat(Math.round(overallRating))}
-                {"☆".repeat(5 - Math.round(overallRating))} ({overallRating})
-              </p> */}
                 <hr className="my-6 h-0.5 border-t-0 bg-indigo-950" />
                 {productDetail.variants?.[0]?.stock > 0 ? (
                   <p className="text-green-500 font-medium mb-4">
@@ -147,7 +159,7 @@ const ProductDetailPage = () => {
                 )}
 
                 <div className="flex items-center gap-4 mb-4">
-                  <div style={{ marginLeft: "200px" }}>
+                  <div className="ml-0">
                     <button
                       className={`px-4 py-2 rounded-none text-white font-medium ${
                         productDetail.variants?.[0]?.stock > 0

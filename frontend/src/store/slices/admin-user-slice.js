@@ -9,7 +9,7 @@ export const fetchUsers = createAsyncThunk(
       const response = await axiosInstance.get("/v1/users", {
         params: filters,
       });
-      console.log("users: ", response.data);
+      console.log("users-slice: ", response.data);
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -42,6 +42,7 @@ const adminUserSlice = createSlice({
   name: "users",
   initialState: {
     users: [],
+    paginationInfo: {},
     loading: false,
     error: null,
   },
@@ -58,7 +59,8 @@ const adminUserSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.loading = false;
-        state.users = action.payload;
+        state.users = action.payload.users;
+        state.paginationInfo = action.payload.paginationInfo;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.loading = false;

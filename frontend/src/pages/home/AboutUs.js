@@ -12,31 +12,82 @@ import {
   Globe,
 } from "lucide-react";
 import LayoutOne from "../../layouts/LayoutOne";
+import { ChevronDown, Mouse } from "lucide-react";
+import ExtensiveProductRange from "../../assets/images/AboutUS/Extensive-Product-Range.jpg";
+import image1 from "../../assets/images/AboutUS/image1.jpg";
+import heroImage from "../../assets/images/AboutUS/image.png";
+
+import image2 from "../../assets/images/AboutUS/image2.jpg";
+import AdvancedAdminTools from "../../assets/images/AboutUS/Advanced-Admin-Tools.jpeg";
+import UserFriendlyInterface from "../../assets/images/AboutUS/User-Friendly-Interface.avif";
 
 const AboutUs = () => {
   return (
     <Fragment>
       <LayoutOne>
-        <div className="bg-gray-50 text-gray-900">
+        <div className="bg-gray-50 text-gray-900 overflow-x-hidden">
           {/* Hero Section */}
-          <section className="bg-indigo-500 text-white py-20 px-4 text-center">
-            <motion.h1
-              className="text-5xl font-extrabold"
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              Welcome to Genuine Electronics
-            </motion.h1>
-            <motion.p
-              className="mt-4 text-lg"
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1 }}
-            >
-              Your premier online destination for high-quality electronic
-              products in the Maldives.
-            </motion.p>
+          <section className="relative w-screen h-screen min-h-[450px] text-white">
+            {" "}
+            {/* Background Image with Overlay */}
+            <div className="absolute inset-0 z-0">
+              <img
+                className="w-full h-full object-cover"
+                src={heroImage}
+                alt="Genuine Electronics Background"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/40 to-purple-500/20" />
+            </div>
+            {/* Content */}
+            <div className="relative z-10 flex flex-col justify-center items-center text-center h-full px-6 lg:px-16 max-w-7xl mx-auto">
+              <motion.h1
+                className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6"
+                initial={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                About Genuine Electronics
+              </motion.h1>
+
+              <motion.p
+                className="text-lg md:text-xl lg:text-2xl mb-8 max-w-4xl  text-white"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1 }}
+                style={{
+                  textShadow: `
+      1px 1px 2px rgba(0, 0, 0, 0.8),
+      -1px -1px 2px rgba(0, 0, 0, 0.8),
+      1px -1px 2px rgba(0, 0, 0, 0.8),
+      -1px 1px 2px rgba(0, 0, 0, 0.8)
+    `,
+                }}
+              >
+                Your premier online destination for high-quality electronic
+                products in the Maldives.
+              </motion.p>
+
+              {/* Scroll down button */}
+              <motion.div
+                className="mt-8 cursor-pointer"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                onClick={() =>
+                  window.scrollTo({
+                    top: window.innerHeight,
+                    behavior: "smooth",
+                  })
+                }
+              >
+                <div className="relative inline-block">
+                  <Mouse className="text-white w-12 h-12 animate-[scroll-wheel_2s_infinite]" />
+                  <div className="absolute inset-0 flex items-center justify-center pt-1">
+                    <div className="w-1 h-4 bg-white rounded-full animate-[scroll-dot_2s_infinite]" />
+                  </div>
+                </div>
+              </motion.div>
+            </div>
           </section>
 
           {/* Who We Are Section */}
@@ -44,7 +95,7 @@ const AboutUs = () => {
             <div className="container mx-auto flex flex-col md:flex-row items-center gap-12">
               {/* Image Section */}
               <motion.div
-                className="md:w-1/2 w-full"
+                className="md:w-1/2 w-full overflow-hidden"
                 initial={{ opacity: 0, x: -100 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -52,7 +103,7 @@ const AboutUs = () => {
               >
                 <img
                   className="w-full h-full object-cover rounded-none shadow-md"
-                  src="https://www.dummyimage.com/800x600/ddd/333"
+                  src={image1}
                   alt="Who We Are"
                 />
               </motion.div>
@@ -107,7 +158,7 @@ const AboutUs = () => {
 
               {/* Image Section */}
               <motion.div
-                className="md:w-1/2 w-full"
+                className="md:w-1/2 w-full  overflow-hidden"
                 initial={{ opacity: 0, x: 100 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -115,7 +166,7 @@ const AboutUs = () => {
               >
                 <img
                   className="w-full h-full object-cover rounded-none shadow-md"
-                  src="https://www.dummyimage.com/800x600/ddd/333"
+                  src={image2}
                   alt="Our Vision"
                 />
               </motion.div>
@@ -139,24 +190,24 @@ const AboutUs = () => {
                   title: "Extensive Product Range",
                   description:
                     "From the latest smartphones and laptops to home appliances and smart gadgets, we offer a comprehensive selection of electronics tailored to meet diverse needs.",
-                  img: "https://www.dummyimage.com/400x300/ddd/333",
+                  img: ExtensiveProductRange,
                 },
                 {
                   title: "User-Friendly Interface",
                   description:
                     "Our website features an intuitive design that allows customers to easily browse products, manage their shopping carts, and complete transactions securely.",
-                  img: "https://www.dummyimage.com/400x300/ddd/333",
+                  img: UserFriendlyInterface,
                 },
                 {
                   title: "Advanced Admin Tools",
                   description:
                     "Our system includes robust tools for managing inventory, processing orders efficiently, and gaining insights from sales data, ensuring a smooth operation behind the scenes.",
-                  img: "https://www.dummyimage.com/400x300/ddd/333",
+                  img: AdvancedAdminTools,
                 },
               ].map((offer, index) => (
                 <motion.div
                   key={index}
-                  className="p-4 bg-gray-50 shadow-md rounded-lg"
+                  className="p-4 bg-gray-50 shadow-md rounded-lg  overflow-hidden"
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}

@@ -131,14 +131,22 @@ const ProductListPage = () => {
     e.preventDefault();
     const { name, value } = e.target;
     if (name === "minPrice") {
+      const newMin = Number(value);
       setFilters((prevFilters) => ({
         ...prevFilters,
-        priceRange: [Number(value), prevFilters.priceRange[1]],
+        priceRange: [
+          Math.min(newMin, prevFilters.priceRange[1] - 1), // Ensure minPrice < maxPrice
+          prevFilters.priceRange[1],
+        ],
       }));
     } else if (name === "maxPrice") {
+      const newMax = Number(value);
       setFilters((prevFilters) => ({
         ...prevFilters,
-        priceRange: [prevFilters.priceRange[0], Number(value)],
+        priceRange: [
+          prevFilters.priceRange[0],
+          Math.max(newMax, prevFilters.priceRange[0] + 1), // Ensure maxPrice > minPrice
+        ],
       }));
     }
   };

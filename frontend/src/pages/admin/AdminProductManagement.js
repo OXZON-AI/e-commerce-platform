@@ -50,12 +50,11 @@ const AdminProductManagement = () => {
   const [serverError, setServerError] = useState("");
   const [errorValidation, setErrorValidation] = useState("");
   const [deleteProductId, setDeleteProductId] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState("");
-  const [imageLocalPreview, setImageLocalPreview] = useState("");
+  const [isImageSelected, setIsImageSelected] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [previewImages, setPreviewImages] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
-    slug: "",
     shortDescription: "",
     detailedDescription: "",
     price: "",
@@ -63,10 +62,13 @@ const AdminProductManagement = () => {
     cost: "",
     category: "",
     brand: "",
-    images: [{ url: "", alt: "", isDefault: true }],
+    images: [],
     attributes: [{ name: "color", value: "" }],
     isDefault: true,
     isActive: false,
+    toAdd: {},
+    toChange: {},
+    toRemove: {},
   });
   const [filters, setFilters] = useState({
     search: "",
@@ -110,32 +112,58 @@ const AdminProductManagement = () => {
 
   // Image Upload Handler
   const handleImageUpload = async (event) => {
-    const file = event.target.files[0];
+    const files = Array.from(event.target.files); // taking multiple images
 
-    // set selected image to local state
-    setSelectedImage(file);
+    // if at least a image select then set isImageSelected to true.
+    setIsImageSelected(files.length > 0);
+    setIsUploading(true);
 
-    // Show local preview before upload
-    const previewUrl = URL.createObjectURL(file);
-    setImageLocalPreview(previewUrl); // Temporarily show preview image
+    const uploadedImages = await Promise.all(
+      files.map(async (file, index) => {
+        const imgFormData = new FormData();
+        imgFormData.append("file", file);
+        imgFormData.append(
+          "upload_preset",
+          process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
+        ); // Set in Cloudinary settings
+        try {
+          const response = await axios.post(
+            `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
+            imgFormData
+          );
 
-    const imgFormData = new FormData();
-    imgFormData.append("file", file);
-    imgFormData.append(
-      "upload_preset",
-      process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET
-    ); // Set in Cloudinary settings
+          return {
+            url: response.data.secure_url,
+            // public_id: response.data.public_id, // Store public_id for deletion from cloudinary
+            alt: "Uploaded product image",
+            isDefault: index === 0, // First image is default image
+          };
+        } catch (error) {
+          console.error("Image upload failed", error);
+          return null;
+        }
+      })
+    );
 
-    try {
-      const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        imgFormData
-      );
+    // Filter out faield uploads
+    const validImages = uploadedImages.filter((img) => img !== null);
 
-      setImageUrl(response.data.secure_url); // take saved image url in Cloudinary
-    } catch (error) {
-      console.error("Image upload failed", error);
-    }
+    // set local images to local state to preview
+    setPreviewImages((prevImages) => [
+      ...prevImages,
+      ...validImages, // store upload image objects
+    ]);
+
+    console.log("valid-Images : ", validImages);
+    console.log("Preview-Images : ", previewImages);
+
+    // Update product formData with new images
+    setFormData((prevData) => ({
+      ...prevData,
+      images: [...prevData.images, ...validImages], // add new images
+    }));
+
+    setIsUploading(false);
   };
 
   // effect hook for asign error in state to servererror local state
@@ -157,9 +185,16 @@ const AdminProductManagement = () => {
   // Effect hook to fetch selected product details and set form data if update. if create formdata empty
   useEffect(() => {
     if (productDetail) {
+      setPreviewImages(
+        productDetail?.variants[0]?.images.map((image) => ({
+          _id: image._id,
+          url: image.url,
+          alt: image.alt || "Product image",
+          isDefault: image.isDefault || false,
+        })) || []
+      );
       setFormData({
         name: productDetail?.name || "",
-        slug: productDetail?.slug || "",
         shortDescription: productDetail?.description?.short || "",
         detailedDescription: productDetail?.description?.detailed || "",
         price: productDetail?.variants[0]?.price || null,
@@ -172,11 +207,14 @@ const AdminProductManagement = () => {
         attributes: productDetail?.variants[0]?.attributes || [],
         isDefault: productDetail?.variants[0]?.isDefault,
         isActive: productDetail?.isActive,
+        toAdd: {},
+        toChange: {},
+        toRemove: {},
       });
     } else {
+      setPreviewImages([]);
       setFormData({
         name: "",
-        slug: "",
         shortDescription: "",
         detailedDescription: "",
         price: null,
@@ -185,9 +223,12 @@ const AdminProductManagement = () => {
         stock: null,
         category: "",
         brand: "",
-        images: [{ url: "", alt: "", isDefault: true }],
+        images: [],
         attributes: [{ name: "color", value: "" }],
         isDefault: true,
+        toAdd: {},
+        toChange: {},
+        toRemove: {},
       });
     }
   }, [productDetail]);
@@ -216,12 +257,12 @@ const AdminProductManagement = () => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
-  const openModal = (productSlug = null) => {
+  const openModal = async (productSlug = null) => {
     dispatch(clearProductDetail()); // Always clear previous data first
 
     // get selected product details fom product details endpoint for update form input details only
     if (productSlug) {
-      dispatch(fetchProductDetails(productSlug)); // // If editing a product, fetch its details
+      await dispatch(fetchProductDetails(productSlug)).unwrap(); // // If editing a product, fetch its details
       console.log("select-prod-detail :::: ", productDetail);
     }
 
@@ -235,14 +276,12 @@ const AdminProductManagement = () => {
 
     // clear server error
     setServerError("");
-    setSelectedImage(null);
-    setImageUrl("");
-    setImageLocalPreview("");
+    setIsImageSelected(false);
+    setPreviewImages([]);
 
     // clear the form
     setFormData({
       name: "",
-      slug: "",
       shortDescription: "",
       detailedDescription: "",
       price: null,
@@ -251,10 +290,13 @@ const AdminProductManagement = () => {
       stock: null,
       category: "",
       brand: "",
-      images: [{ url: "", alt: "", isDefault: true }],
+      images: [],
       attributes: [{ name: "color", value: "" }],
       isDefault: true,
       isActive: false,
+      toAdd: {},
+      toChange: {},
+      toRemove: {},
     });
 
     setErrorValidation("");
@@ -294,17 +336,31 @@ const AdminProductManagement = () => {
   };
 
   // Let users remove an attribute if necessary
-  const removeAttributeField = (index) => {
-    const updatedAttributes = formData.attributes.filter((_, i) => i !== index);
-    setFormData({
-      ...formData,
-      attributes: updatedAttributes,
-      toRemove: {
-        attributes: [
-          ...(formData.toRemove?.attributes || []),
-          formData.attributes[index]._id,
-        ],
-      },
+  const removeAttributeField = (index, attribute) => {
+    console.log("Removing attribute:", attribute);
+
+    setFormData((prevData) => {
+      // Remove attribute from `attributes` array
+      const updatedAttributes = prevData.attributes.filter(
+        (_, i) => i !== index
+      );
+
+      // If the attribute has an `_id`, add it to `toRemove.attributes`
+      const updatedToRemove = attribute._id
+        ? [...(prevData.toRemove?.attributes || []), attribute._id] // Store only `_id`
+        : prevData.toRemove?.attributes || [];
+
+      console.log("Updated attributes after removal:", updatedAttributes);
+      console.log("Updated toRemove list:", updatedToRemove);
+
+      return {
+        ...prevData,
+        attributes: updatedAttributes, // Remove from attributes
+        toRemove: {
+          ...prevData.toRemove,
+          attributes: updatedToRemove, // Send only `_id`s in `toRemove`
+        },
+      };
     });
   };
 
@@ -353,10 +409,10 @@ const AdminProductManagement = () => {
       return false;
     }
 
-    if (!imageUrl) {
-      alert("Product Image Required!");
-      return false;
-    }
+    // if (!imageUrl) {
+    //   alert("Product Image Required!");
+    //   return false;
+    // }
 
     return true;
   };
@@ -378,19 +434,16 @@ const AdminProductManagement = () => {
   };
 
   // Add the useEffect to fetch products when filters change
-useEffect(() => {
-  const filterQuery = buildFilters(filters);
-  console.log("Fetching products with filters:", filters);
-  dispatch(fetchProducts(filterQuery));
-}, [filters, dispatch]);
+  useEffect(() => {
+    const filterQuery = buildFilters(filters);
+    console.log("Fetching products with filters:", filters);
+    dispatch(fetchProducts(filterQuery));
+  }, [filters, dispatch]);
 
-  // Handler for create or update product
+  // Handler for create or update product ----------------------------------
   const handleSave = async () => {
     console.log("handleSave called");
     console.log("Form Data:", formData);
-
-    // Clear local image preview state
-    setImageLocalPreview("");
 
     // update or not
     const isUpdating = !!productDetail;
@@ -429,24 +482,7 @@ useEffect(() => {
                 ? parseFloat(formData.compareAtPrice)
                 : undefined,
               cost: formData.cost ? parseFloat(formData.cost) : undefined,
-              images: imageUrl
-                ? [
-                    {
-                      url: imageUrl,
-                      alt: "Product Image",
-                      isDefault: true,
-                    },
-                  ]
-                : [],
-              // images: formData.image
-              //   ? [
-              //       {
-              //         url: formData.image,
-              //         alt: "Product Image",
-              //         isDefault: true,
-              //       },
-              //     ]
-              //   : [],
+              images: formData.images,
               attributes: formData.attributes.filter(
                 (attr) => attr.name && attr.value
               ),
@@ -498,8 +534,8 @@ useEffect(() => {
           const newAttributes =
             formData.attributes?.filter((attr) => !attr._id) || [];
 
-          // Get default image id
-          const imgId = productDetail.variants[0].images[0]._id;
+          // Separate new images by checking there is id or not
+          const newImages = formData.images.filter((img) => !img._id);
 
           // format selected product variant for backend
           const updatedVariant = {
@@ -520,9 +556,7 @@ useEffect(() => {
                     value: attr.value,
                   }))
                 : undefined,
-              images: formData.toAdd?.images?.length
-                ? formData.toAdd.images
-                : [],
+              images: newImages.length ? newImages : [],
             },
             // Only send existing attributes to `toChange`
             toChange: {
@@ -533,35 +567,26 @@ useEffect(() => {
                     value: attr.value,
                   }))
                 : undefined,
-              images: imageUrl
-                ? [
-                    {
-                      id: imgId,
-                      url: imageUrl,
-                      alt: "Product Image",
-                      isDefault: true,
-                    },
-                  ]
-                : [],
-              // images: formData.toChange?.images?.length
-              //   ? formData.toChange.images
-              //   : [],
             },
-            toRemove: {
-              // Remove empty or null attributes from `toRemove`
-              attributes:
-                formData.toRemove?.attributes?.filter((attr) => attr) ||
-                undefined,
-              images:
-                formData.toRemove?.images?.filter((img) => img) || undefined,
-            },
-            // image: formData.image
-            //   ? [{ url: formData.image, alt: "Product Image", isDefault: true }]
-            //   : [],
-            // attributes: formData.attributes.filter(
-            //   (attr) => attr.name && attr.value
-            // ),
+            // toRemove: {
+            //   // Remove empty or null attributes from `toRemove`
+            //   attributes:
+            //     formData.toRemove?.attributes?.filter((attr) => attr) ||
+            //     undefined,
+            //   images: formData.toRemove?.images
+            //     ? formData.toRemove.images
+            //     : undefined,
+            // },
           };
+
+          // Only include `toRemove` if it contains values
+          updatedVariant.toRemove = {};
+          if (formData.toRemove?.attributes?.length > 0) {
+            updatedVariant.toRemove.attributes = formData.toRemove.attributes; // Send only if not empty
+          }
+          if (formData.toRemove?.images?.length > 0) {
+            updatedVariant.toRemove.images = formData.toRemove.images; // Send only if not empty
+          }
 
           console.log("updatd variant details : ", updatedVariant);
 
@@ -580,9 +605,8 @@ useEffect(() => {
       }
 
       const filterQuery = buildFilters(filters);
-      setSelectedImage(null);
-      setImageUrl("");
-      setImageLocalPreview("");
+      setIsImageSelected(false);
+      setPreviewImages([]);
       await dispatch(fetchProducts(filterQuery));
       closeModal();
       setTimeout(() => setSuccessMessage(""), 3000);
@@ -590,16 +614,20 @@ useEffect(() => {
       console.error("Error saving product : ", err);
     }
   };
+
+  // handler for open delete model
   const openDeleteModal = (productId) => {
     setDeleteProductId(productId);
     setDeleteModalOpen(true);
   };
 
+  // handler for close delete model
   const closeDeleteModal = () => {
     setServerError(""); // clear server errors when modal close
     setDeleteModalOpen(false);
   };
 
+  // handler for delete product
   const handleDelete = async (productId) => {
     try {
       await dispatch(deleteProduct(productId)).unwrap();
@@ -614,9 +642,50 @@ useEffect(() => {
     }
   };
 
+  // handler for naviagate to category section
   const openCategoryModal = () => {
     // Navigate to the category management page
     navigate("/manage-categories");
+  };
+
+  // handler for remove image
+  const handleRemoveImage = (image, e) => {
+    e.preventDefault();
+    e.stopPropagation(); // Stops event from affecting parent elements
+
+    console.log("Removing image:", image);
+
+    console.log("Form-Data (removeImageHandler) top:", formData);
+
+    setFormData((prevData) => {
+      // filter removed image from formData to upload other images
+      const updatedImages = prevData.images?.filter(
+        (img) => img.url !== image.url
+      );
+
+      // If the image has an `_id`, send it to `toRemove.images`, else ignore
+      const updatedToRemove = image._id
+        ? [...(prevData.toRemove?.images || []), image._id]
+        : prevData.toRemove.images;
+
+      console.log("Updated images after removal:", updatedImages);
+      console.log("Updated toRemove list:", updatedToRemove);
+
+      // update formData
+      return {
+        ...prevData,
+        images: updatedImages,
+        toRemove: {
+          ...prevData.toRemove,
+          images: updatedToRemove, // Add to 'toRemove' for remove from db when handleSave triggered click
+        },
+      };
+    });
+
+    console.log("Form-Data (removeImageHandler) bottom:", formData);
+
+    // Remove preview images
+    setPreviewImages((prev) => prev.filter((img) => img.url !== image.url));
   };
 
   return (
@@ -678,16 +747,17 @@ useEffect(() => {
                     <input
                       type="number"
                       value={filters.priceRange[0]}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const newMin = Number(e.target.value);
                         setFilters((prev) => ({
                           ...prev,
                           priceRange: [
-                            Number(e.target.value),
+                            Math.min(newMin, prev.priceRange[1] - 1), // Ensure minPrice < maxPrice
                             prev.priceRange[1],
                           ],
                           page: 1,
-                        }))
-                      }
+                        }));
+                      }}
                       className="px-3 py-2 border rounded-md w-30"
                       placeholder="Min Price"
                     />
@@ -695,16 +765,17 @@ useEffect(() => {
                     <input
                       type="number"
                       value={filters.priceRange[1]}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        const newMax = Number(e.target.value);
                         setFilters((prev) => ({
                           ...prev,
                           priceRange: [
                             prev.priceRange[0],
-                            Number(e.target.value),
+                            Math.max(newMax, prev.priceRange[0] + 1), // Ensure maxPrice > minPrice
                           ],
                           page: 1,
-                        }))
-                      }
+                        }));
+                      }}
                       className="px-3 py-2 border rounded-md w-30"
                       placeholder="Max Price"
                     />
@@ -869,7 +940,7 @@ useEffect(() => {
                     {items.map((product, index) => (
                       <tr key={product._id} className="border-t">
                         <td className="px-6 py-4 text-sm text-gray-700">
-                        {(filters.page - 1) * filters.limit + index + 1}
+                          {(filters.page - 1) * filters.limit + index + 1}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
                           <img
@@ -982,11 +1053,12 @@ useEffect(() => {
                 setFormData={setFormData}
                 addAttributeField={addAttributeField}
                 removeAttributeField={removeAttributeField}
-                imageLocalPreview={imageLocalPreview}
+                previewImages={previewImages}
                 handleImageUpload={handleImageUpload}
-                selectedImage={selectedImage}
-                imageUrl={imageUrl}
+                isImageSelected={isImageSelected}
+                isUploading={isUploading}
                 handleToggle={handleToggle}
+                handleRemoveImage={handleRemoveImage}
               />
             )}
 
