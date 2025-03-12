@@ -94,32 +94,37 @@ function AdminNewsletter() {
                 Manage Newsletters
               </h2>
 
-              {/* Search Options */}
-              <div className="flex flex-wrap justify-between items-center gap-6 p-6 bg-white shadow-sm rounded-lg">
-                {/* Search Input */}
-                <div className="flex items-center gap-4 flex-1">
-                  <input
-                    type="text"
-                    placeholder="Search newsletters..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="w-full max-w-md p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 transition"
-                  />
-                  <button className="flex items-center justify-center w-36 px-5 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition">
-                    <FaSearch className="mr-2" />
-                    <span>Search</span>
-                  </button>
+              <div className="flex justify-between items-center p-4 bg-white shadow-sm rounded-lg">
+                {/* Left Side: Dropdown Filters */}
+                <div className="flex items-center gap-4">
+                  <select
+                    className="p-3 border border-gray-300 rounded-lg w-40"
+                    onChange={(e) =>
+                      setFilters({ ...filters, sortBy: e.target.value })
+                    }
+                  >
+                    <option value="date">Sort by Date</option>
+                  </select>
+                  <select
+                    className="p-3 border border-gray-300 rounded-lg w-40"
+                    onChange={(e) =>
+                      setFilters({ ...filters, sortOrder: e.target.value })
+                    }
+                  >
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                  </select>
                 </div>
-              </div>
 
-              {/* Add Newsletter Button */}
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="flex items-center justify-center w-full px-5 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700 transition mt-6"
-              >
-                <FaPlus className="mr-2" />
-                <span>Add Newsletter</span>
-              </button>
+                {/* Right Side: Add Newsletter Button */}
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="flex items-center px-5 py-[11px] text-white bg-green-600 rounded-lg hover:bg-green-700 transition"
+                >
+                  <FaPlus className="mr-2" />
+                  <span>Add Newsletter</span>
+                </button>
+              </div>
 
               {/* Newsletters Table */}
               <table className="min-w-full table-auto bg-white border border-gray-200 rounded-lg shadow-sm mt-6">
