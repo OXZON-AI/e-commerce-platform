@@ -56,13 +56,12 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-1">
               {/* Top Section */}
               <div className="lg:col-span-1">
-                <SalesSummaryChart />
+                <SalesPerformanceChart />
               </div>
 
               {/* Middle Section */}
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                 <OrderCountStatusChart />
-                <SalesPerformanceChart />
                 <CategoryChart />
               </div>
 
