@@ -88,15 +88,15 @@ export const signin = async (req, res, next) => {
     let token = req.cookies.token;
 
     if (token) {
-      jwt.verify(token, process.env.JWT_SECRET, async (error, decodedUser) => {
-        if (error) {
-          logger.error("Unauthorized access, invalid token: ", error);
-          return next(customError(401, "Unauthorized access"));
-        }
+      try {
+        const decodedUser = jwt.verify(token, process.env.JWT_SECRET);
 
         if (decodedUser.role === "guest")
           await cartMigration(decodedUser.id, user._id);
-      });
+      } catch (error) {
+        logger.error("Unauthorized access, invalid token: ", error);
+        return next(customError(401, "Unauthorized access"));
+      }
     }
 
     token = jwt.sign(
