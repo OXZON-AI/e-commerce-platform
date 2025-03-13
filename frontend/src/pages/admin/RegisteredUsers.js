@@ -9,7 +9,8 @@ import {
 import Sidebar from "./components/Sidebar";
 import AdminNavbar from "./components/AdminNavbar";
 import dropArrowIcon from "../../assets/icons/dropArrow.svg";
-import { toast } from "react-toastify";
+import { HashLoader } from "react-spinners";
+import UsersImg from "../../assets/images/Users.svg";
 
 const RegisteredUsers = () => {
   const dispatch = useDispatch();
@@ -49,7 +50,7 @@ const RegisteredUsers = () => {
   // handler for filterChange
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-  
+
     setFilters((prevFilters) => ({
       ...prevFilters,
       [name]: value || undefined, // Set undefined if value is empty
@@ -57,7 +58,6 @@ const RegisteredUsers = () => {
       page: 1,
     }));
   };
-  
 
   // handler for pagination
   const handlePagination = (direction) => {
@@ -166,95 +166,122 @@ const RegisteredUsers = () => {
               </div>
 
               <div className="overflow-x-auto">
-                {userLoading && <p>Loading...</p>}
-                {userError && <p className="text-red-500">{userError}</p>}
-                <table className="min-w-full bg-white border border-gray-300">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="text-left px-6 py-3 text-gray-600 font-medium">
-                        Index
-                      </th>
-                      <th className="text-left px-6 py-3 text-gray-600 font-medium">
-                        Name
-                      </th>
-                      <th className="text-left px-6 py-3 text-gray-600 font-medium">
-                        Phone
-                      </th>
-                      <th className="text-left px-6 py-3 text-gray-600 font-medium">
-                        Email
-                      </th>
-                      <th className="text-left px-6 py-3 text-gray-600 font-medium">
-                        Registered Date
-                      </th>
-                      <th className="text-center px-6 py-3 text-gray-600 font-medium">
-                        Loyalty Points
-                      </th>
-                      <th className="text-center px-6 py-3 text-gray-600 font-medium">
-                        Role
-                      </th>
-                      <th className="text-center px-6 py-3 text-gray-600 font-medium">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users &&
-                      users.map((user, index) => {
-                        // Calculate the starting index based on the current page
-                        const currentIndex =
-                          (filters.page - 1) * filters.limit + index + 1;
-
-                        return (
-                          <tr
-                            key={user._id}
-                            className="border-b border-gray-200 hover:bg-gray-50"
-                          >
-                            <td className="px-6 py-4 text-gray-700">
-                              {currentIndex}
-                            </td>
-                            <td className="px-6 py-4 text-gray-700">
-                              {user.name}
-                            </td>
-                            <td className="px-6 py-4 text-gray-700">
-                              {user.phone}
-                            </td>
-                            <td className="px-6 py-4 text-gray-700">
-                              {user.email}
-                            </td>
-                            <td className="px-6 py-4 text-gray-700">
-                              {new Date(user.createdAt).toLocaleDateString()}
-                            </td>
-                            <td className="px-6 py-4 text-center text-gray-700">
-                              {user.loyaltyPoints}
-                            </td>
-                            <td className="px-6 py-4 text-center text-gray-700">
-                              <div className="inline-block bg-blue-100 border-2 border-blue-500 text-blue-500 rounded px-2 py-1">
-                                {user.role}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 text-center">
-                              <button
-                                onClick={() => handleDelete(user._id)}
-                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
-                              >
-                                Delete
-                              </button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    {users && users.length === 0 && (
+                {userLoading ? (
+                  // Show Loading State with Centered HashLoader
+                  <div className="flex flex-col justify-center items-center py-[50px] mx-auto text-gray-700 font-semibold">
+                    <HashLoader color="#a855f7" size={50} />
+                    <span className="mt-3">Loading Users...</span>
+                  </div>
+                ) : userError ? (
+                  // Show Error Message Instead of Table
+                  <div className="my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
+                    <span className="mt-3">{userError}</span>
+                  </div>
+                ) : users.length === 0 ? (
+                  // Show no users available
+                  <div className="flex flex-col items-center text-center py-6">
+                    <img
+                      src={UsersImg}
+                      alt="empty user"
+                      className="w-[150px]"
+                    />
+                    <p className="text-center text-gray-700 font-semibold py-6">
+                      No{" "}
+                      <span className="text-purple-600">
+                        {filters.userType ? filters.userType + " " : ""}
+                      </span>
+                      users data found.
+                    </p>
+                  </div>
+                ) : (
+                  <table className="min-w-full bg-white border border-gray-300">
+                    <thead className="bg-gray-50">
                       <tr>
-                        <td
-                          colSpan="5"
-                          className="px-6 py-4 text-center text-gray-500"
-                        >
-                          No users found.
-                        </td>
+                        <th className="text-left px-6 py-3 text-gray-600 font-medium">
+                          Index
+                        </th>
+                        <th className="text-left px-6 py-3 text-gray-600 font-medium">
+                          Name
+                        </th>
+                        <th className="text-left px-6 py-3 text-gray-600 font-medium">
+                          Phone
+                        </th>
+                        <th className="text-left px-6 py-3 text-gray-600 font-medium">
+                          Email
+                        </th>
+                        <th className="text-left px-6 py-3 text-gray-600 font-medium">
+                          Registered Date
+                        </th>
+                        <th className="text-center px-6 py-3 text-gray-600 font-medium">
+                          Loyalty Points
+                        </th>
+                        <th className="text-center px-6 py-3 text-gray-600 font-medium">
+                          Role
+                        </th>
+                        <th className="text-center px-6 py-3 text-gray-600 font-medium">
+                          Actions
+                        </th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {users &&
+                        users.map((user, index) => {
+                          // Calculate the starting index based on the current page
+                          const currentIndex =
+                            (filters.page - 1) * filters.limit + index + 1;
+
+                          return (
+                            <tr
+                              key={user._id}
+                              className="border-b border-gray-200 hover:bg-gray-50"
+                            >
+                              <td className="px-6 py-4 text-gray-700">
+                                {currentIndex}
+                              </td>
+                              <td className="px-6 py-4 text-gray-700">
+                                {user.name}
+                              </td>
+                              <td className="px-6 py-4 text-gray-700">
+                                {user.phone}
+                              </td>
+                              <td className="px-6 py-4 text-gray-700">
+                                {user.email}
+                              </td>
+                              <td className="px-6 py-4 text-gray-700">
+                                {new Date(user.createdAt).toLocaleDateString()}
+                              </td>
+                              <td className="px-6 py-4 text-center text-gray-700">
+                                {user.loyaltyPoints}
+                              </td>
+                              <td className="px-6 py-4 text-center text-gray-700">
+                                <div className="inline-block bg-blue-100 border-2 border-blue-500 text-blue-500 rounded px-2 py-1">
+                                  {user.role}
+                                </div>
+                              </td>
+                              <td className="px-6 py-4 text-center">
+                                <button
+                                  onClick={() => handleDelete(user._id)}
+                                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200"
+                                >
+                                  Delete
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      {users && users.length === 0 && (
+                        <tr>
+                          <td
+                            colSpan="5"
+                            className="px-6 py-4 text-center text-gray-500"
+                          >
+                            No users found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                )}
 
                 {/* ------------Pagination--------------- */}
                 <div className="flex justify-end items-center mt-4 space-x-4">
