@@ -45,6 +45,9 @@ const FAQ = lazy(() => import("./pages/home/FAQ"));
 const Cart = lazy(() => import("./pages/other/Cart"));
 const Checkout = lazy(() => import("./pages/other/Checkout"));
 
+//Unsubscribe page
+const UnsubscribeNews = lazy(() => import("./pages/other/UnsubscribeNews"));
+
 //Admin Management Page
 const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const RegisteredUsers = lazy(() => import("./pages/admin/RegisteredUsers"));
@@ -92,6 +95,11 @@ const App = () => {
             <Route
               path={process.env.PUBLIC_URL + "/reset-password"}
               element={<ResetPassword />}
+            />
+            
+            <Route
+              path={process.env.PUBLIC_URL + "/cancel"}
+              element={<UnsubscribeNews />}
             />
 
             <Route path="/payment-success" element={<PaymentSuccess />} />
