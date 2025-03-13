@@ -61,9 +61,15 @@ const UnsubscribeNews = () => {
           </p>
           <button
             className={`mt-4 bg-red-500 hover:bg-red-600 text-white w-full py-2 rounded-md ${
-              message ? "opacity-50 cursor-not-allowed" : ""
+              status === "unsubscribe-loading" ||
+              error?.includes("Invalid token")
+                ? "opacity-50 cursor-not-allowed"
+                : ""
             }`}
-            disabled={message}
+            disabled={
+              status === "unsubscribe-loading" ||
+              error?.includes("Invalid token")
+            }
             onClick={handleUnsubscribe}
           >
             {error?.includes("Invalid token")
