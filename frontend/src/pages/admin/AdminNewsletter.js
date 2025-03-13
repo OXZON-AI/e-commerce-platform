@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { FaSearch, FaPlus } from "react-icons/fa"; // Icons
+import { FaPlus } from "react-icons/fa"; // Icons
 import AdminNavbar from "./components/AdminNavbar"; // Assuming this is already created
 import Sidebar from "./components/Sidebar"; // Assuming this is already created
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchNewsletters,
   publishNewsletter,
+  resetImageUrl,
   uploadImage,
 } from "../../store/slices/news-slice";
 import moment from "moment";
-import { MoonLoader } from "react-spinners";
+import { HashLoader, MoonLoader } from "react-spinners";
 import { Newspaper, Paperclip } from "lucide-react";
+import NoNewsImg from "../../assets/images/NoNews.svg";
 
 function AdminNewsletter() {
   const dispatch = useDispatch();
-  const { newsletters, totalNews, status, imageUrl, error } = useSelector(
+  const { newsletters, status, imageUrl, error } = useSelector(
     (state) => state.news
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,10 +28,10 @@ function AdminNewsletter() {
     sortBy: "date",
     sortOrder: "desc",
   });
-  const [search, setSearch] = useState("");
 
   // Effect hook for fetch newsletters from the backend
   useEffect(() => {
+    dispatch(resetImageUrl()); //reset image url from redux state
     dispatch(fetchNewsletters(filters));
   }, [dispatch, filters]);
 
@@ -46,6 +47,9 @@ function AdminNewsletter() {
         .unwrap()
         .then(() => {
           alert("Newsletter published successfully!");
+          dispatch(resetImageUrl()); //reset image url from redux state when submit completed.
+          setTitle("");
+          setBody("");
           setIsModalOpen(false);
           dispatch(fetchNewsletters(filters)); // Refresh data
         })
@@ -126,56 +130,78 @@ function AdminNewsletter() {
                 </button>
               </div>
 
-              {/* Newsletters Table */}
-              <table className="min-w-full table-auto bg-white border border-gray-200 rounded-lg shadow-sm mt-6">
-                <thead className="bg-gray-100 text-base">
-                  <tr>
-                    <th className="p-4 text-left">Index</th>
-                    <th className="p-4 text-left">Image</th>
-                    <th className="p-4 text-left">Title</th>
-                    <th className="p-4 text-left">Detailed Body</th>
-                    <th className="p-4 text-left">Created Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {newsletters &&
-                    newsletters.map((news, index) => {
-                      const currentIndex =
-                        (filters.page - 1) * filters.limit + index + 1;
+              {status === "fetch-news-loading" ? (
+                // Show Loading State with Centered HashLoader
+                <div className="flex flex-col justify-center items-center py-[50px] mx-auto text-gray-700 font-semibold">
+                  <HashLoader color="#a855f7" size={50} />
+                  <span className="mt-3">Loading News Letters...</span>
+                </div>
+              ) : status === "fetch-news-error" ? (
+                // Show Error Message Instead of Table
+                <div className="my-[50px] text-red-600 font-semibold bg-red-100 p-3 rounded-lg">
+                  <span className="mt-3">{error}</span>
+                </div>
+              ) : newsletters.length === 0 ? (
+                // Show no news letters available
+                <div className="flex flex-col items-center text-center py-6">
+                  <img src={NoNewsImg} alt="empty news" className="w-[150px]" />
+                  <p className="text-center text-gray-700 font-semibold py-6">
+                    No <span className="text-purple-600">news letters</span>{" "}
+                    found.
+                  </p>
+                </div>
+              ) : (
+                // Newsletters Table
+                <table className="min-w-full table-auto bg-white border border-gray-200 rounded-lg shadow-sm mt-6">
+                  <thead className="bg-gray-100 text-base">
+                    <tr>
+                      <th className="p-4 text-left">Index</th>
+                      <th className="p-4 text-left">Image</th>
+                      <th className="p-4 text-left">Title</th>
+                      <th className="p-4 text-left">Detailed Body</th>
+                      <th className="p-4 text-left">Created Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {newsletters &&
+                      newsletters.map((news, index) => {
+                        const currentIndex =
+                          (filters.page - 1) * filters.limit + index + 1;
 
-                      return (
-                        <tr
-                          key={news._id}
-                          className="border-b hover:bg-gray-50"
-                        >
-                          <td className="py-4 px-6 text-gray-800">
-                            {currentIndex}
-                          </td>
-                          <td className="p-4">
-                            <img
-                              src={news.image}
-                              alt={news.title}
-                              className="w-16 h-16 object-cover rounded-md"
-                            />
-                          </td>
-                          <td className="p-4">{news.title}</td>
-                          <td
-                            className={`p-4 ${
-                              news.body ? "text-green-600" : "text-red-600"
-                            }`}
+                        return (
+                          <tr
+                            key={news._id}
+                            className="border-b hover:bg-gray-50"
                           >
-                            {news.body ? "Provided" : "Not-Provide"}
-                          </td>
-                          <td className="p-4">
-                            {moment(news.createdAt).format(
-                              "DD-MMM-YYYY / h:mm:ss a"
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
+                            <td className="py-4 px-6 text-gray-800">
+                              {currentIndex}
+                            </td>
+                            <td className="p-4">
+                              <img
+                                src={news.image}
+                                alt={news.title}
+                                className="w-16 h-16 object-cover rounded-md"
+                              />
+                            </td>
+                            <td className="p-4">{news.title}</td>
+                            <td
+                              className={`p-4 ${
+                                news.body ? "text-green-600" : "text-red-600"
+                              }`}
+                            >
+                              {news.body ? "Provided" : "Not-Provide"}
+                            </td>
+                            <td className="p-4">
+                              {moment(news.createdAt).format(
+                                "DD-MMM-YYYY / h:mm:ss a"
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              )}
 
               {/* Pagination */}
               <div className="flex justify-end items-center mt-4 space-x-4">
