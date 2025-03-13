@@ -3,9 +3,8 @@ import ScrollToTop from "./helpers/scroll-top";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/router-protector/ProtectedRoute";
 import AdminRouteProtector from "./components/router-protector/AdminRouteProtector";
-import SampleProductCatalogue from "./pages/other/SampleProductCatalogue";
 import UnauthorizedPage from "./pages/admin/Unauthorized_Page";
-import Unauthorized_Client_Page from "./pages/admin/Unauthorized_Client_Page";
+import Unauthorized_Client_Page from "./pages/admin/UnauthorizedClientPage";
 import ClientRouteProtector from "./components/router-protector/ClientRouteProtector";
 import MenuCart from "./components/header/sub-components/MenuCart";
 import AdminOrderManagement from "./pages/admin/AdminOrderManagement";
@@ -44,6 +43,9 @@ const FAQ = lazy(() => import("./pages/home/FAQ"));
 //Cart Checkout
 const Cart = lazy(() => import("./pages/other/Cart"));
 const Checkout = lazy(() => import("./pages/other/Checkout"));
+
+//Unsubscribe page
+const UnsubscribeNews = lazy(() => import("./pages/other/UnsubscribeNews"));
 
 //Admin Management Page
 const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -92,6 +94,11 @@ const App = () => {
             <Route
               path={process.env.PUBLIC_URL + "/reset-password"}
               element={<ResetPassword />}
+            />
+            
+            <Route
+              path={process.env.PUBLIC_URL + "/cancel"}
+              element={<UnsubscribeNews />}
             />
 
             <Route path="/payment-success" element={<PaymentSuccess />} />

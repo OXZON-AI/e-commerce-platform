@@ -3,13 +3,9 @@ import { useNavigate } from "react-router-dom";
 import AdminNavbar from "./components/AdminNavbar";
 import Sidebar from "./components/Sidebar";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  cancelOrder,
-  fetchOrders,
-  setSelectedOrder,
-} from "../../store/slices/order-slice";
+import { fetchOrders, setSelectedOrder } from "../../store/slices/order-slice";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
-import { FaSearch, FaDownload, FaEye, FaEdit } from "react-icons/fa";
+import { FaSearch, FaEye } from "react-icons/fa";
 import { HashLoader } from "react-spinners";
 import OrdersToExcel from "./components/order-Management-Componenets/OrdersToExcel";
 
@@ -24,8 +20,6 @@ const AdminOrderManagement = () => {
   } = useSelector((state) => state.orders);
 
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [dateSort, setDateSort] = useState("newest");
 
   const [filters, setFilters] = useState({
     customer: undefined,
@@ -225,7 +219,7 @@ const AdminOrderManagement = () => {
                 <div className="flex flex-col items-center text-center py-6">
                   <img
                     src={emptyOrdersImg}
-                    alt="empty order image"
+                    alt="empty order"
                     className="w-[100px]"
                   />
                   <p className="text-center text-gray-700 font-semibold py-6">

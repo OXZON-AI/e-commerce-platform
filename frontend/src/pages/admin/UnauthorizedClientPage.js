@@ -1,10 +1,10 @@
 import React from "react";
 import { Lock, ArrowLeft } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, signoutUser } from "../../store/slices/user-slice";
+import { signoutUser } from "../../store/slices/user-slice";
 
-const Authorized_Client_Page = () => {
+const UnauthorizedClientPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.user);
@@ -72,4 +72,4 @@ const Authorized_Client_Page = () => {
   );
 };
 
-export default Authorized_Client_Page;
+export default UnauthorizedClientPage;

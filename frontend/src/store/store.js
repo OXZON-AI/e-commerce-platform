@@ -22,6 +22,7 @@ import variantReducer from "./slices/variant-slice";
 import checkoutReducer from "./slices/checkout-slice";
 import orderReducer from "./slices/order-slice";
 import reviewReducer from "./slices/review-slice";
+import newsReducer from "./slices/news-slice";
 
 const persistConfig = {
   key: "frontend",
@@ -43,6 +44,7 @@ export const rootReducer = combineReducers({
   checkout: checkoutReducer,
   orders: orderReducer,
   reviews: reviewReducer,
+  news: newsReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
