@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import { MailX } from "lucide-react";
 import NewslettersImg from "../../assets/images/Newsletters.svg";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { unsubscribeFromNewsletter } from "../../store/slices/news-slice";
 
 const UnsubscribeNews = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const subscriberToken = searchParams.get("token"); // Get the subscriber token from the URL
   const { status, error } = useSelector((state) => state.news);
@@ -42,7 +41,7 @@ const UnsubscribeNews = () => {
           <MailX className="mx-auto text-red-500" size={28} />
           <img
             src={NewslettersImg}
-            alt="newsletter image"
+            alt="newsletter"
             className="mx-auto my-4 w-1/2"
           />
           <h2 className="text-2xl font-semibold mt-4">
@@ -67,7 +66,9 @@ const UnsubscribeNews = () => {
             disabled={message}
             onClick={handleUnsubscribe}
           >
-            {error?.includes("Invalid token") ? "Already Unsubscribed" : "Unsubscribe"}
+            {error?.includes("Invalid token")
+              ? "Already Unsubscribed"
+              : "Unsubscribe"}
           </button>
 
           <p
