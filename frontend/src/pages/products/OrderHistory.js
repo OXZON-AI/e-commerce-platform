@@ -31,40 +31,46 @@ const OrderHistory = () => {
     limit: 10,
   });
 
-  // Efect hook for fetch orders
+  const [loadingOrders, setLoadingOrders] = useState({
+    cancel: {},
+    reorder: {},
+  });
+
   useEffect(() => {
     dispatch(fetchOrders(filters));
   }, [dispatch, filters]);
 
-  // Handler for cancel order
+  useEffect(() => {
+    console.log("Updated Orders:", orders);
+  }, [orders]);
+
   const handleCancelOrder = (oid) => {
+    setLoadingOrders((prev) => ({
+      ...prev,
+      cancel: { ...prev.cancel, [oid]: true },
+    }));
     dispatch(cancelOrder(oid))
       .unwrap()
       .then(() => {
         toast.success("Order cancelled successfully.");
-        // Use current filters (which include the current page) when refetching orders
-        dispatch(fetchOrders(filters))
-          .unwrap()
-          .then(() => {
-            console.log("🔰 Orders are re-fetched!");
-          });
+        dispatch(fetchOrders(filters));
       })
       .catch(() => {
         toast.error("Failed to cancel order.");
+      })
+      .finally(() => {
+        setLoadingOrders((prev) => ({
+          ...prev,
+          cancel: { ...prev.cancel, [oid]: false },
+        }));
       });
   };
 
-  // Handler for reorder
-  const handleReorder = (productSlug, productQuantity) => {
-    if (!productSlug || !productQuantity) {
-      toast.info("Product Not Available");
-      console.error(
-        `Product Slug or Product Quantity error : product slug : ${productSlug} producct quantity : ${productQuantity}`
-      );
-      return;
-    }
-
-    // fetch product details to check product stock for product availability.
+  const handleReorder = (productSlug, productQuantity, orderId) => {
+    setLoadingOrders((prev) => ({
+      ...prev,
+      reorder: { ...prev.reorder, [orderId]: true },
+    }));
     dispatch(fetchProductDetails(productSlug))
       .unwrap()
       .then((product) => {
@@ -80,7 +86,6 @@ const OrderHistory = () => {
           toast.warning(`Only ${product.variants[0].stock} items left!`);
           return;
         }
-        // dispatch addToCart request for add product to cart.
         dispatch(
           addToCart({
             variantId: product.variants[0]._id,
@@ -99,6 +104,12 @@ const OrderHistory = () => {
       })
       .catch(() => {
         toast.error("Failed to check stock!");
+      })
+      .finally(() => {
+        setLoadingOrders((prev) => ({
+          ...prev,
+          reorder: { ...prev.reorder, [orderId]: false },
+        }));
       });
   };
 
@@ -106,7 +117,7 @@ const OrderHistory = () => {
   const handleFilterChange = (e) => {
     setFilters({
       ...filters,
-      [e.target.name]: e.target.value || undefined, // undefine use when value is empty, then mark as undefine
+      [e.target.name]: e.target.value || undefined,
       page: 1,
     });
   };
@@ -119,7 +130,6 @@ const OrderHistory = () => {
     }));
   };
 
-  // function for change distinct colors for diffrent order status
   const getStatusBadge = (status) => {
     const statusStyles = {
       pending: "border-amber-500 bg-amber-50 text-amber-600",
@@ -144,7 +154,7 @@ const OrderHistory = () => {
     <Fragment>
       <LayoutOne>
         <div className="min-h-full bg-gray-100 flex items-center justify-center p-6">
-          <div className="w-full lg:w-3/4 xl:w-2/3 bg-white p-6 rounded-lg shadow-md">
+          <div className="w-full lg:w-3/4 xl:w- bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">My Orders</h2>
 
             <div className="flex gap-4 mb-4">
@@ -227,14 +237,15 @@ const OrderHistory = () => {
             ) : (
               // Show Table Only If There’s No Loading/Error -----------------------------------------------------------------
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse rounded-lg overflow-hidden">
+                <table className="min-w-full border-collapse rounded-lg">
                   <thead>
                     <tr className="bg-gray-700 text-white">
                       <th className="p-3 text-left">Index</th>
+                      <th className="p-3 text-left">Image</th>
                       <th className="p-3 text-left">Item</th>
                       <th className="p-3 text-left">Quantity</th>
                       <th className="p-3 text-left">Date</th>
-                      <th className="p-3 text-left">Total price</th>
+                      <th className="p-3 text-left">Total Price</th>
                       <th className="p-3 text-left">Order Status</th>
                       <th className="p-3 text-left">Loyalty Points</th>
                       <th className="p-3 text-left">Action</th>
@@ -243,11 +254,8 @@ const OrderHistory = () => {
                   <tbody>
                     {orders &&
                       orders.map((order, orderIndex) => (
-                        <>
-                          <tr
-                            key={order._id}
-                            className="bg-gray-200 font-medium"
-                          >
+                        <Fragment key={order._id}>
+                          <tr className="bg-gray-200 font-medium">
                             <td className="p-3" colSpan="6">
                               Order ID: {order._id} -{" "}
                               {new Date(order.createdAt).toLocaleDateString()}
@@ -258,7 +266,7 @@ const OrderHistory = () => {
                             <td className="p-3 text-left" colSpan="1">
                               {order.status === "pending" ? (
                                 <>
-                                  {orderStatus === "cancelOrder-loading" ? (
+                                  {loadingOrders.cancel[order._id] ? (
                                     <>
                                       <HashLoader color="#a855f7" size={20} />
                                       <p>Canceling Order...</p>
@@ -284,6 +292,15 @@ const OrderHistory = () => {
                             >
                               <td className="p-3">{index + 1}</td>
                               <td className="p-3">
+                                {item.variant?.image?.url && (
+                                  <img
+                                    src={item.variant.image.url}
+                                    alt={item.variant.product.name}
+                                    className="w-12 h-12 object-cover"
+                                  />
+                                )}
+                              </td>
+                              <td className="p-3">
                                 {item.variant?.product?.name}
                               </td>
                               <td className="p-3">{item.quantity}</td>
@@ -298,7 +315,7 @@ const OrderHistory = () => {
                               </td>
                               <td className="p-3">{}</td>
                               <td className="p-3 flex items-center gap-2">
-                                {cartStatus === "loading-add-to-cart" ? (
+                                {loadingOrders.reorder[order._id] ? (
                                   <button
                                     className="px-4 py-2 bg-purple-300 text-white rounded"
                                     disabled={true}
@@ -314,7 +331,8 @@ const OrderHistory = () => {
                                     onClick={() =>
                                       handleReorder(
                                         item.variant?.product?.slug,
-                                        item.quantity
+                                        item.quantity,
+                                        order._id
                                       )
                                     }
                                   >
@@ -324,7 +342,7 @@ const OrderHistory = () => {
                               </td>
                             </tr>
                           ))}
-                        </>
+                        </Fragment>
                       ))}
                   </tbody>
                 </table>
