@@ -65,6 +65,12 @@ const LoginRegister = () => {
     return phoneRegex.test(phone);
   };
 
+  // Helper function to validate names (only alphabets, no numbers or symbols)
+  const validateName = (name) => {
+    const nameRegex = /^[A-Za-z]+$/; // Only allows alphabets
+    return nameRegex.test(name);
+  };
+
   // Helper function to validate password
   const validatePassword = (password) => {
     return password.length >= 6; // Minimum 6 characters
@@ -92,10 +98,23 @@ const LoginRegister = () => {
 
     if (!firstName) {
       newErrors.firstName = "First name is required.";
+    } else if (!validateName(firstName)) {
+      newErrors.firstName = "First name can only contain alphabets.";
     }
 
     if (!lastName) {
       newErrors.lastName = "Last name is required.";
+    } else if (!validateName(lastName)) {
+      newErrors.lastName = "Last name can only contain alphabets.";
+    }
+
+    if (
+      firstName &&
+      lastName &&
+      firstName.toLowerCase() === lastName.toLowerCase()
+    ) {
+      newErrors.firstName = "First name and last name cannot be the same.";
+      newErrors.lastName = "First name and last name cannot be the same.";
     }
 
     if (!validateEmail(email)) {

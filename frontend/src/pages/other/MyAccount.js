@@ -33,20 +33,33 @@ const MyAccount = () => {
       setPassword("");
       setConfirmPassword("");
 
-      // Show success toast notification when password is updated
-      toast.success("Password updated successfully!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
+      if (!password && !confirmPassword) {
+        // Show success toast for profile update
+        toast.success("Profile information successfully updated!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      } else {
+        // Show success toast for password update
+        toast.success("Password updated successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      }
     }
-    
-  }, [success, error, dispatch]);
+  }, [success, dispatch, password, confirmPassword]);
 
   useEffect(() => {
     // If Redux userInfo is empty, try fetching from localStorage
@@ -72,10 +85,21 @@ const MyAccount = () => {
   // validate user details form
   const validateDetailsForm = () => {
     const errors = {};
+    const nameRegex = /^[A-Za-z]+$/;
+
     if (!firstName.trim()) errors.firstName = "First name is required.";
+    else if (!nameRegex.test(firstName))
+      errors.firstName = "First name must contain only letters.";
+
     if (!lastName.trim()) errors.lastName = "Last name is required.";
+    else if (!nameRegex.test(lastName))
+      errors.lastName = "Last name must contain only letters.";
+
+    if (firstName.trim() && lastName.trim() && firstName === lastName)
+      errors.nameMatch = "First and last name cannot be the same.";
+
     if (!email.trim() || !/\S+@\S+\.\S+/.test(email))
-      errors.email = "Please enter valid email.";
+      errors.email = "Please enter a valid email.";
     if (!phone.trim() || !/^[0-9]{7}$/.test(phone))
       errors.phone = "Please enter a valid 7-digit phone number.";
 
@@ -367,7 +391,7 @@ const MyAccount = () => {
               </div>
             </div>
           </div>
-        </div>       
+        </div>
       </LayoutOne>
     </Fragment>
   );
