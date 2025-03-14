@@ -372,6 +372,7 @@ import { fetchProductDetails } from "../../store/slices/product-slice";
 import HashLoader from "react-spinners/HashLoader";
 import { useNavigate } from "react-router-dom";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
+import { MoonLoader } from "react-spinners";
 
 const OrderHistory = () => {
   const dispatch = useDispatch();
@@ -379,6 +380,9 @@ const OrderHistory = () => {
   const { orders, status: orderStatus } = useSelector((state) => state.orders);
   const { status: cartStatus } = useSelector((state) => state.cart);
 
+  const [isReOrdering, setIsReOrdering] = useState(false);
+  const [reorderingOrderId, setReorderingOrderId] = useState(null);
+  const [cancelingOrderId, setCancelingOrderId] = useState(null);
   const [filters, setFilters] = useState({
     status: undefined,
     sortBy: "date",
@@ -391,7 +395,10 @@ const OrderHistory = () => {
     dispatch(fetchOrders(filters));
   }, [dispatch, filters]);
 
+  // handler for cancel order
   const handleCancelOrder = (oid) => {
+    setCancelingOrderId(oid);
+
     dispatch(cancelOrder(oid))
       .unwrap()
       .then(() => {
@@ -400,27 +407,32 @@ const OrderHistory = () => {
       })
       .catch(() => {
         toast.error("Failed to cancel order.");
+      })
+      .finally(() => {
+        setCancelingOrderId(null);
       });
   };
 
-  const handleReorder = (productSlug, productQuantity) => {
-    dispatch(fetchProductDetails(productSlug))
-      .unwrap()
-      .then((product) => {
-        if (product.variants[0].stock >= productQuantity) {
-          dispatch(
-            addToCart({
-              variantId: product.variants[0]._id,
-              quantity: productQuantity,
-            })
-          );
-          dispatch(fetchCart());
-          toast.success("Product Added to cart.");
-        } else {
-          toast.warning("Not enough stock available!");
-        }
-      })
-      .catch(() => toast.error("Failed to check stock!"));
+  // handler for reorder
+  const handleReorderAll = async (orderId, items) => {
+    setIsReOrdering(true);
+    setReorderingOrderId(orderId);
+    for (const item of items) {
+      try {
+        await dispatch(
+          addToCart({ variantId: item.variant?._id, quantity: item.quantity })
+        ).unwrap();
+      } catch (error) {
+        console.error("Failed to add item to cart", error);
+        toast.error("Some items couldn't be added. Please try again.");
+        return;
+      }
+    }
+    dispatch(fetchCart());
+
+    toast.success("All items added to cart.");
+    setIsReOrdering(false);
+    setReorderingOrderId(null);
   };
 
   // function for change distinct colors for diffrent order status
@@ -547,23 +559,40 @@ const OrderHistory = () => {
                     <div className="flex justify-between mt-4">
                       {order.status === "pending" ? (
                         <button
-                          className="px-4 py-2 text-sm bg-gray-500 text-white rounded-lg"
+                          disabled={cancelingOrderId === order._id}
                           onClick={() => handleCancelOrder(order._id)}
+                          className={`flex items-center justify-center px-4 py-2 text-sm bg-gray-500 text-white rounded-lg ${
+                            cancelingOrderId
+                              ? "bg-opacity-50 cursor-not-allowed"
+                              : ""
+                          }`}
                         >
+                          {cancelingOrderId === order._id ? (
+                            <MoonLoader
+                              size={18}
+                              color="white"
+                              className="mr-2"
+                            />
+                          ) : null}
                           Cancel
                         </button>
                       ) : null}
 
                       <button
-                        className="px-4 py-2 text-sm bg-purple-600 text-white rounded-lg"
-                        onClick={() =>
-                          handleReorder(
-                            order.items[0]?.variant?.product?.slug,
-                            order.items[0]?.quantity
-                          )
-                        }
+                        onClick={() => handleReorderAll(order._id, order.items)}
+                        disabled={reorderingOrderId === order._id}
+                        className={`flex items-center justify-center px-4 py-2 text-sm bg-purple-600 text-white rounded-lg ${
+                          isReOrdering ? "bg-opacity-50 cursor-not-allowed" : ""
+                        }`}
                       >
-                        Reorder
+                        {reorderingOrderId === order._id ? (
+                          <MoonLoader
+                            size={18}
+                            color="white"
+                            className="mr-2"
+                          />
+                        ) : null}
+                        Reorder All
                       </button>
                     </div>
                   </div>
