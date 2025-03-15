@@ -398,7 +398,7 @@ const OrderHistory = () => {
     sortBy: "date",
     sortOrder: "desc",
     page: 1,
-    limit: 9,
+    limit: 6,
   });
 
   useEffect(() => {
