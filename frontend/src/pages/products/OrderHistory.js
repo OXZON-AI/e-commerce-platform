@@ -368,17 +368,27 @@ import LayoutOne from "../../layouts/LayoutOne";
 import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCart } from "../../store/slices/cart-slice";
-import { fetchProductDetails } from "../../store/slices/product-slice";
 import HashLoader from "react-spinners/HashLoader";
 import { useNavigate } from "react-router-dom";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
 import { MoonLoader } from "react-spinners";
+import {
+  Hourglass,
+  Truck,
+  CheckCircle,
+  XCircle,
+  RefreshCcw,
+} from "lucide-react";
 
 const OrderHistory = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { orders, status: orderStatus } = useSelector((state) => state.orders);
-  const { status: cartStatus } = useSelector((state) => state.cart);
+  const {
+    orders,
+    paginationInfo,
+    status: orderStatus,
+  } = useSelector((state) => state.orders);
+  // const { status: cartStatus } = useSelector((state) => state.cart);
 
   const [isReOrdering, setIsReOrdering] = useState(false);
   const [reorderingOrderId, setReorderingOrderId] = useState(null);
@@ -388,12 +398,21 @@ const OrderHistory = () => {
     sortBy: "date",
     sortOrder: "desc",
     page: 1,
-    limit: 10,
+    limit: 9,
   });
 
   useEffect(() => {
     dispatch(fetchOrders(filters));
   }, [dispatch, filters]);
+
+  // handler for filters
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value === "" ? undefined : e.target.value,
+      page: 1,
+    });
+  };
 
   // handler for cancel order
   const handleCancelOrder = (oid) => {
@@ -435,6 +454,13 @@ const OrderHistory = () => {
     setReorderingOrderId(null);
   };
 
+  // handler for pagination
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= paginationInfo.totalPages) {
+      setFilters({ ...filters, page: newPage });
+    }
+  };
+
   // function for change distinct colors for diffrent order status
   const getStatusBadge = (status) => {
     const statusStyles = {
@@ -468,6 +494,46 @@ const OrderHistory = () => {
         <div className="min-h-full bg-gray-100 flex flex-col items-center p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">My Orders</h2>
 
+          <div className="flex gap-4 mb-4">
+            <select
+              name="status"
+              value={filters.status}
+              onChange={handleFilterChange}
+              className="p-2 bg-white border rounded"
+            >
+              <option value="">All Status</option>
+              <option value="pending">
+                {" "}
+                <Hourglass className="inline w-4 h-4 mr-1" /> Pending
+              </option>
+              <option value="processing">
+                {" "}
+                <RefreshCcw className="inline w-4 h-4 mr-1" /> Processing
+              </option>
+              <option value="shipped">
+                {" "}
+                <Truck className="inline w-4 h-4 mr-1" /> Shipped
+              </option>
+              <option value="delivered">
+                {" "}
+                <CheckCircle className="inline w-4 h-4 mr-1" /> Delivered
+              </option>
+              <option value="cancelled">
+                {" "}
+                <XCircle className="inline w-4 h-4 mr-1" /> Cancelled
+              </option>
+            </select>
+            <select
+              name="sortOrder"
+              value={filters.sortOrder}
+              onChange={handleFilterChange}
+              className="p-2 bg-white border rounded"
+            >
+              <option value="desc">Newest First</option>
+              <option value="asc">Oldest First</option>
+            </select>
+          </div>
+
           {orderStatus === "fetch-loading" ? (
             <div className="flex flex-col justify-center items-center py-10 text-gray-700 font-semibold">
               <HashLoader color="#a855f7" size={50} />
@@ -487,118 +553,144 @@ const OrderHistory = () => {
               </button>
             </div>
           ) : (
-            // Use items-stretch so all cards match the height of the tallest card
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl items-stretch">
-              {orders.map((order) => (
-                <div
-                  key={order._id}
-                  className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col"
-                >
-                  <h3 className="text-xs font-semibold text-gray-500">
-                    Order ID: {order._id}
-                  </h3>
+            <>
+              {/* Use items-stretch so all cards match the height of the tallest card */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl items-stretch">
+                {orders.map((order) => (
+                  <div
+                    key={order._id}
+                    className="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col"
+                  >
+                    <h3 className="text-xs font-semibold text-gray-500">
+                      Order ID: {order._id}
+                    </h3>
 
-                  {/* STATUS + DATE */}
-                  <div className="flex items-center gap-2 mt-1">
-                    {getStatusBadge(order.status)}
-                    <p className="text-sm text-gray-500">
-                      {new Date(order.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
+                    {/* STATUS + DATE */}
+                    <div className="flex items-center gap-2 mt-1">
+                      {getStatusBadge(order.status)}
+                      <p className="text-sm text-gray-500">
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
 
-                  {/* 
+                    {/* 
                     Product list grows to fill the space:
                     - flex-1 to take up available vertical space
                     - max-h so it scrolls if > 3 items
                   */}
-                  <div className="flex-1 mt-2 space-y-4 pr-2 overflow-y-auto max-h-[300px]">
-                    {order.items.map((item, index) => (
-                      <div
-                        key={index}
-                        className="border-b pb-4 flex items-center gap-4"
-                      >
-                        <img
-                          src={item.variant?.image?.url}
-                          alt={item.variant?.image?.alt}
-                          className="w-16 h-16 object-cover rounded"
-                        />
-                        <div>
-                          <p className="font-medium truncate w-40">
-                            {item.variant?.product?.name}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Qty: {item.quantity}
-                          </p>
-                          <p className="font-semibold">{item.subTotal} MVR</p>
+                    <div className="flex-1 mt-2 space-y-4 pr-2 overflow-y-auto max-h-[300px]">
+                      {order.items.map((item, index) => (
+                        <div
+                          key={index}
+                          className="border-b pb-4 flex items-center gap-4"
+                        >
+                          <img
+                            src={item.variant?.image?.url}
+                            alt={item.variant?.image?.alt}
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                          <div>
+                            <p className="font-medium truncate w-40">
+                              {item.variant?.product?.name}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Qty: {item.quantity}
+                            </p>
+                            <p className="font-semibold">{item.subTotal} MVR</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
 
-                  {/* 
+                    {/* 
                     Footer (totals + buttons) pinned at the bottom:
                     - mt-auto pushes this section to the bottom
                   */}
-                  <div className="mt-auto">
-                    <div className="space-y-1">
-                      <p className="font-semibold text-md">
-                        Gross: {order.payment.amount.toFixed(2)} MVR
-                      </p>
-                      <p className="text-green-600 font-semibold text-md">
-                        Discount: {order.payment.discount.toFixed(2)} MVR
-                      </p>
-                      <p className="font-semibold text-md">
-                        Net:{" "}
-                        {(
-                          order.payment.amount - order.payment.discount
-                        ).toFixed(2)}{" "}
-                        MVR
-                      </p>
-                    </div>
+                    <div className="mt-auto">
+                      <div className="space-y-1">
+                        <p className="font-semibold text-md">
+                          Gross: {order.payment.amount.toFixed(2)} MVR
+                        </p>
+                        <p className="text-green-600 font-semibold text-md">
+                          Discount: {order.payment.discount.toFixed(2)} MVR
+                        </p>
+                        <p className="font-semibold text-md">
+                          Net:{" "}
+                          {(
+                            order.payment.amount - order.payment.discount
+                          ).toFixed(2)}{" "}
+                          MVR
+                        </p>
+                      </div>
 
-                    <div className="flex justify-between mt-4">
-                      {order.status === "pending" ? (
+                      <div className="flex justify-between mt-4">
+                        {order.status === "pending" ? (
+                          <button
+                            disabled={cancelingOrderId === order._id}
+                            onClick={() => handleCancelOrder(order._id)}
+                            className={`flex items-center justify-center px-4 py-2 text-sm bg-gray-500 text-white rounded-lg ${
+                              cancelingOrderId
+                                ? "bg-opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                          >
+                            {cancelingOrderId === order._id ? (
+                              <MoonLoader
+                                size={18}
+                                color="white"
+                                className="mr-2"
+                              />
+                            ) : null}
+                            Cancel
+                          </button>
+                        ) : null}
+
                         <button
-                          disabled={cancelingOrderId === order._id}
-                          onClick={() => handleCancelOrder(order._id)}
-                          className={`flex items-center justify-center px-4 py-2 text-sm bg-gray-500 text-white rounded-lg ${
-                            cancelingOrderId
+                          onClick={() =>
+                            handleReorderAll(order._id, order.items)
+                          }
+                          disabled={reorderingOrderId === order._id}
+                          className={`flex items-center justify-center px-4 py-2 text-sm bg-purple-600 text-white rounded-lg ${
+                            isReOrdering
                               ? "bg-opacity-50 cursor-not-allowed"
                               : ""
                           }`}
                         >
-                          {cancelingOrderId === order._id ? (
+                          {reorderingOrderId === order._id ? (
                             <MoonLoader
                               size={18}
                               color="white"
                               className="mr-2"
                             />
                           ) : null}
-                          Cancel
+                          Reorder All
                         </button>
-                      ) : null}
-
-                      <button
-                        onClick={() => handleReorderAll(order._id, order.items)}
-                        disabled={reorderingOrderId === order._id}
-                        className={`flex items-center justify-center px-4 py-2 text-sm bg-purple-600 text-white rounded-lg ${
-                          isReOrdering ? "bg-opacity-50 cursor-not-allowed" : ""
-                        }`}
-                      >
-                        {reorderingOrderId === order._id ? (
-                          <MoonLoader
-                            size={18}
-                            color="white"
-                            className="mr-2"
-                          />
-                        ) : null}
-                        Reorder All
-                      </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+              {/* pagination  */}
+              <div className="flex justify-center items-center gap-4 mt-6">
+                <button
+                  onClick={() => handlePageChange(filters.page - 1)}
+                  disabled={filters.page === 1}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <span className="text-gray-700">
+                  Page {filters.page} of {paginationInfo.totalPages}
+                </span>
+                <button
+                  onClick={() => handlePageChange(filters.page + 1)}
+                  disabled={filters.page === paginationInfo.totalPages}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg disabled:opacity-50"
+                >
+                  Next
+                </button>
+              </div>
+            </>
           )}
         </div>
       </LayoutOne>
