@@ -10,7 +10,6 @@ import {
   loginUser,
   registerUser,
   clearError,
-  clearSuccess,
 } from "../../store/slices/user-slice";
 
 // Importing Toast Container and Toast Functions
