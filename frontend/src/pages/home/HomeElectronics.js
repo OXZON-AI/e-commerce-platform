@@ -90,7 +90,40 @@ const HomeElectronics = () => {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
-    arrows: false,
+    arrows: true,
+    pauseOnHover: true,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+        },
+      },
+      {
+        breakpoint: 768,
+        settings: {
+          slidesToShow: 2,
+        },
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+        },
+      },
+    ],
+  };
+
+  // Slick slider settings for the just For You Slider Settings
+  const justForYouSliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
     pauseOnHover: true,
     responsive: [
       {
@@ -300,7 +333,6 @@ const HomeElectronics = () => {
           </div>
 
           {/* Featured Products with Sliding Effect */}
-          {/* Featured Products with Sliding Effect */}
           <div className="container mx-auto py-12">
             <h2 className="text-3xl font-bold text-center mb-6">
               Featured Products
@@ -383,66 +415,127 @@ const HomeElectronics = () => {
                         {categoryItem.category.name} for you!
                       </h2>
 
-                      {/* Products Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                        {categoryItem.products &&
-                          categoryItem.products.map((product) => (
-                            <div
-                              key={product._id}
-                              className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out"
-                            >
-                              {/* Product Image (Centered) */}
-                              <Link to={`/product/${product.slug}`}>
-                                <div className="flex justify-center items-center mb-4">
-                                  <div className="h-48 w-48 bg-whhite rounded-lg flex items-center justify-center">
-                                    <img
-                                      src={
-                                        product.defaultVariant?.image?.url ||
-                                        placeholderImage
-                                      }
-                                      alt={
-                                        product.defaultVariant?.image?.alt ||
-                                        "Recommen product image"
-                                      }
-                                      onError={(e) => {
-                                        e.target.src = placeholderImage;
-                                      }}
-                                      className="h-40 object-contain"
-                                    />
+                      {/* Check the number of products */}
+                      {categoryItem.products &&
+                      categoryItem.products.length < 4 ? (
+                        // Render in a grid layout if less than 4 products
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
+                          {categoryItem.products.map((product) => (
+                            <div key={product._id} className="p-4">
+                              <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
+                                {/* Product Image (Centered) */}
+                                <Link to={`/product/${product.slug}`}>
+                                  <div className="flex justify-center items-center mb-4">
+                                    <div className="h-48 w-48 bg-white rounded-lg flex items-center justify-center">
+                                      <img
+                                        src={
+                                          product.defaultVariant?.image?.url ||
+                                          placeholderImage
+                                        }
+                                        alt={
+                                          product.defaultVariant?.image?.alt ||
+                                          "Recommended product image"
+                                        }
+                                        onError={(e) => {
+                                          e.target.src = placeholderImage;
+                                        }}
+                                        className="h-40 object-contain"
+                                      />
+                                    </div>
                                   </div>
+                                </Link>
+
+                                {/* Product Details */}
+                                <Link to={`/product/${product.slug}`}>
+                                  <h3 className="text-lg font-semibold text-purple-800 text-center truncate">
+                                    {product.name}
+                                  </h3>
+                                </Link>
+                                <p className="text-gray-600 text-md text-center">
+                                  {product.defaultVariant?.price || "N/A"} MVR
+                                </p>
+
+                                {/* Centered Add to Cart Button */}
+                                <div className="flex justify-center mt-3">
+                                  <button
+                                    className={`px-5 py-2 bg-blue-600 text-white font-semibold rounded-md ${
+                                      product.defaultVariant?.stock > 0
+                                        ? "bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300"
+                                        : "bg-gray-400 cursor-not-allowed"
+                                    } transition duration-300 ease-in-out flex items-center`}
+                                    disabled={
+                                      product.defaultVariant?.stock === 0 ||
+                                      cartStatus === "loading-add-to-cart"
+                                    }
+                                    onClick={() => addToCartHandler(product)}
+                                  >
+                                    <FaCartPlus className="mr-2" /> Add to Cart
+                                  </button>
                                 </div>
-                              </Link>
-
-                              {/* Product Details */}
-                              <Link to={`/product/${product.slug}`}>
-                                <h3 className="text-lg font-semibold text-purple-800 text-center">
-                                  {product.name}
-                                </h3>
-                              </Link>
-                              <p className="text-gray-600 text-md text-center">
-                                {product.defaultVariant?.price || "N/A"} MVR
-                              </p>
-
-                              {/* Centered Add to Cart Button */}
-                              <div className="flex justify-center mt-3">
-                                <button
-                                  className={`px-5 py-2 bg-blue-600 text-white font-semibold rounded-md ${
-                                    product.defaultVariant?.stock > 0
-                                      ? "bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300"
-                                      : "bg-gray-400 cursor-not-allowed"
-                                  } transition duration-300 ease-in-out flex items-center`}
-                                  disabled={
-                                    product.defaultVariant?.stock === 0 ||
-                                    cartStatus === "loading-add-to-cart"
-                                  }
-                                  onClick={() => addToCartHandler(product)}
-                                >
-                                  <FaCartPlus className="mr-2" /> Add to Cart
-                                </button>
                               </div>
                             </div>
                           ))}
-                      </div>
+                        </div>
+                      ) : (
+                        // Render in a slider if 4 or more products
+                        <Slider {...justForYouSliderSettings}>
+                          {categoryItem.products.map((product) => (
+                            <div key={product._id} className="p-4">
+                              <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
+                                {/* Product Image (Centered) */}
+                                <Link to={`/product/${product.slug}`}>
+                                  <div className="flex justify-center items-center mb-4">
+                                    <div className="h-48 w-48 bg-white rounded-lg flex items-center justify-center">
+                                      <img
+                                        src={
+                                          product.defaultVariant?.image?.url ||
+                                          placeholderImage
+                                        }
+                                        alt={
+                                          product.defaultVariant?.image?.alt ||
+                                          "Recommended product image"
+                                        }
+                                        onError={(e) => {
+                                          e.target.src = placeholderImage;
+                                        }}
+                                        className="h-40 object-contain"
+                                      />
+                                    </div>
+                                  </div>
+                                </Link>
+
+                                {/* Product Details */}
+                                <Link to={`/product/${product.slug}`}>
+                                  <h3 className="text-lg font-semibold text-purple-800 text-center truncate">
+                                    {product.name}
+                                  </h3>
+                                </Link>
+                                <p className="text-gray-600 text-md text-center">
+                                  {product.defaultVariant?.price || "N/A"} MVR
+                                </p>
+
+                                {/* Centered Add to Cart Button */}
+                                <div className="flex justify-center mt-3">
+                                  <button
+                                    className={`px-5 py-2 bg-blue-600 text-white font-semibold rounded-md ${
+                                      product.defaultVariant?.stock > 0
+                                        ? "bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300"
+                                        : "bg-gray-400 cursor-not-allowed"
+                                    } transition duration-300 ease-in-out flex items-center`}
+                                    disabled={
+                                      product.defaultVariant?.stock === 0 ||
+                                      cartStatus === "loading-add-to-cart"
+                                    }
+                                    onClick={() => addToCartHandler(product)}
+                                  >
+                                    <FaCartPlus className="mr-2" /> Add to Cart
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </Slider>
+                      )}
                     </div>
                   ))}
               </div>
@@ -485,7 +578,6 @@ const HomeElectronics = () => {
               </div>
             </div>
           )}
-
           {/* Promotional Banner */}
           {/* <div
             className="relative w-full h-[300px] bg-cover bg-center flex items-center justify-center text-white text-center transition-all duration-300 hover:bg-opacity-70"
@@ -534,20 +626,59 @@ const HomeElectronics = () => {
             <h2 className="text-3xl font-bold mb-6">Our Trusted Brands</h2>
             <Slider {...brandSliderSettings}>
               {[
-                { name: 'Apple', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg' },
-                { name: 'Samsung', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg' },
-                { name: 'Sony', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png' },
-                { name: 'LG', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/LG_symbol.svg' },
-                { name: 'Dell', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg' },
-                { name: 'HP', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/HP_logo_2012.svg/1024px-HP_logo_2012.svg.png' },
-                { name: 'Lenovo', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Lenovo_%282015%29.svg/1920px-Lenovo_%282015%29.svg.png' },
-                { name: 'Asus', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/ASUS_Logo.svg/1920px-ASUS_Logo.svg.png' },
-                { name: 'OnePlus', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/OP_LU_Reg_1L_RGB_red_copy-01.svg/1920px-OP_LU_Reg_1L_RGB_red_copy-01.svg.png' },
-                { name: 'Xiaomi', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/29/Xiaomi_logo.svg' },
-                { name: 'Garmin', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/1/1d/Garmin_2024_logo.svg/1920px-Garmin_2024_logo.svg.png' },
-                { name: 'Fitbit', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Fitbit_logo16.svg/1920px-Fitbit_logo16.svg.png' },
+                {
+                  name: "Apple",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
+                },
+                {
+                  name: "Samsung",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg",
+                },
+                {
+                  name: "Sony",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Sony_logo.svg/1920px-Sony_logo.svg.png",
+                },
+                {
+                  name: "LG",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/2/20/LG_symbol.svg",
+                },
+                {
+                  name: "Dell",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg",
+                },
+                {
+                  name: "HP",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/HP_logo_2012.svg/1024px-HP_logo_2012.svg.png",
+                },
+                {
+                  name: "Lenovo",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Lenovo_%282015%29.svg/1920px-Lenovo_%282015%29.svg.png",
+                },
+                {
+                  name: "Asus",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/ASUS_Logo.svg/1920px-ASUS_Logo.svg.png",
+                },
+                {
+                  name: "OnePlus",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/OP_LU_Reg_1L_RGB_red_copy-01.svg/1920px-OP_LU_Reg_1L_RGB_red_copy-01.svg.png",
+                },
+                {
+                  name: "Xiaomi",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/2/29/Xiaomi_logo.svg",
+                },
+                {
+                  name: "Garmin",
+                  logo: "https://upload.wikimedia.org/wikipedia/en/thumb/1/1d/Garmin_2024_logo.svg/1920px-Garmin_2024_logo.svg.png",
+                },
+                {
+                  name: "Fitbit",
+                  logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Fitbit_logo16.svg/1920px-Fitbit_logo16.svg.png",
+                },
               ].map((brand, index) => (
-                <div key={index} className="flex items-center justify-center px-6">
+                <div
+                  key={index}
+                  className="flex items-center justify-center px-6"
+                >
                   <div className="w-40 h-28 flex items-center justify-center bg-gray-100 p-2 rounded-lg">
                     <img
                       src={brand.logo}

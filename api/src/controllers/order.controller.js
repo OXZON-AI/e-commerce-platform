@@ -45,15 +45,6 @@ export const getOrders = async (req, res, next) => {
 
   ordersPipeline.push(
     {
-      $skip: skip,
-    },
-    {
-      $limit: limit,
-    }
-  );
-
-  ordersPipeline.push(
-    {
       $lookup: {
         from: "variants",
         localField: "items.variant",
@@ -193,6 +184,15 @@ export const getOrders = async (req, res, next) => {
       },
     });
   }
+
+  ordersPipeline.push(
+    {
+      $skip: skip,
+    },
+    {
+      $limit: limit,
+    }
+  );
 
   pipeline.push({
     $facet: {
