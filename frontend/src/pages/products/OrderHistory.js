@@ -368,7 +368,6 @@ import LayoutOne from "../../layouts/LayoutOne";
 import { cancelOrder, fetchOrders } from "../../store/slices/order-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, fetchCart } from "../../store/slices/cart-slice";
-import { fetchProductDetails } from "../../store/slices/product-slice";
 import HashLoader from "react-spinners/HashLoader";
 import { useNavigate } from "react-router-dom";
 import emptyOrdersImg from "../../assets/images/emptyOrders.svg";
@@ -378,7 +377,7 @@ const OrderHistory = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { orders, status: orderStatus } = useSelector((state) => state.orders);
-  const { status: cartStatus } = useSelector((state) => state.cart);
+  // const { status: cartStatus } = useSelector((state) => state.cart);
 
   const [isReOrdering, setIsReOrdering] = useState(false);
   const [reorderingOrderId, setReorderingOrderId] = useState(null);
@@ -394,6 +393,11 @@ const OrderHistory = () => {
   useEffect(() => {
     dispatch(fetchOrders(filters));
   }, [dispatch, filters]);
+
+  // handler for filters
+  const handleFilterChange = (e) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value === "" ? undefined : e.target.value, page: 1 });
+  };
 
   // handler for cancel order
   const handleCancelOrder = (oid) => {
@@ -467,6 +471,21 @@ const OrderHistory = () => {
       <LayoutOne>
         <div className="min-h-full bg-gray-100 flex flex-col items-center p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">My Orders</h2>
+
+          <div className="flex gap-4 mb-4">
+            <select name="status" value={filters.status} onChange={handleFilterChange} className="p-2 border rounded">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <select name="sortOrder" value={filters.sortOrder} onChange={handleFilterChange} className="p-2 border rounded">
+              <option value="desc">Newest First</option>
+              <option value="asc">Oldest First</option>
+            </select>
+          </div>
 
           {orderStatus === "fetch-loading" ? (
             <div className="flex flex-col justify-center items-center py-10 text-gray-700 font-semibold">
