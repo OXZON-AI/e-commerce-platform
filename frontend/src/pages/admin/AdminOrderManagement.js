@@ -33,6 +33,7 @@ const AdminOrderManagement = () => {
 
   // Efect hook for fetch orders
   useEffect(() => {
+    console.log("order filters : ", filters);
     dispatch(fetchOrders(filters));
   }, [dispatch, filters]);
 
