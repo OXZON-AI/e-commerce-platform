@@ -111,6 +111,7 @@ export const getProductsSchema = Joi.object({
   }),
   maxPrice: Joi.number().min(1),
   isActive: Joi.boolean(),
+  latest: Joi.boolean().default(true),
   page: Joi.number().integer().min(1).default(1),
   limit: Joi.number().integer().min(1).default(10),
 });

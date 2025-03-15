@@ -161,6 +161,7 @@ export const getProducts = async (req, res, next) => {
     minPrice,
     maxPrice,
     isActive,
+    latest,
     page,
     limit,
   } = value;
@@ -290,6 +291,7 @@ export const getProducts = async (req, res, next) => {
                     0,
                   ],
                 },
+                createdAt: "$$variant.createdAt",
               },
             },
           },
@@ -310,13 +312,20 @@ export const getProducts = async (req, res, next) => {
     });
   }
 
-  if (sortBy) {
-    const sortByField =
-      sortBy === "ratings" ? "ratings.average" : "defaultVariant.price";
+  if (latest || sortBy) {
+    const sortStage = {};
+
+    if (sortBy) {
+      const sortByField =
+        sortBy === "ratings" ? "ratings.average" : "defaultVariant.price";
+
+      sortStage[sortByField] = sortOrder === "asc" ? 1 : -1;
+    }
+
+    if (latest) sortStage["defaultVariant.createdAt"] = -1;
+
     pipeline.push({
-      $sort: {
-        [sortByField]: sortOrder === "asc" ? 1 : -1,
-      },
+      $sort: sortStage,
     });
   }
 
