@@ -630,9 +630,10 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
           {relatedProducts &&
             relatedProducts.map((product) => (
               <div key={product._id} className="p-4">
-                <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
-                  {/* Product Image */}
-                  <Link to={`/product/${product.slug}`}>
+                <Link to={`/product/${product.slug}`}>
+                  <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
+                    {/* Product Image */}
+
                     <div className="h-52 flex items-center justify-center bg-white rounded-lg overflow-hidden mb-4">
                       <img
                         src={
@@ -648,48 +649,48 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
                         className="h-full w-full object-contain"
                       />
                     </div>
-                  </Link>
 
-                  {/* Vendor & Quantity */}
-                  <p className="mt-3 text-xs text-gray-500 line-clamp-1 overflow-hidden">
-                    Brand: {product.brand} . Qty:{" "}
-                    {product.defaultVariant?.stock}
-                  </p>
+                    {/* Vendor & Quantity */}
+                    <p className="mt-3 text-xs text-gray-500 line-clamp-1 overflow-hidden">
+                      Brand: {product.brand} . Qty:{" "}
+                      {product.defaultVariant?.stock}
+                    </p>
 
-                  <hr className="mt-3" />
+                    <hr className="mt-3" />
 
-                  {/* Product Details */}
-                  <div className="mt-3">
-                    <h4 className="text-md font-semibold text-gray-900 line-clamp-1 overflow-hidden">
-                      {product.name}
-                    </h4>
-                  </div>
-
-                  {/* Reviews Section */}
-                  <p className="text-xs text-gray-500 mt-1">
-                    ({product.ratings.count} Reviews)
-                  </p>
-
-                  {/* Rating Section - Progress Bar Style */}
-                  <div className="flex items-center mt-2 space-x-2">
-                    <div className="w-24 bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-purple-500"
-                        style={{
-                          width: `${(product.ratings.average / 5) * 100}%`,
-                        }}
-                      ></div>
+                    {/* Product Details */}
+                    <div className="mt-3">
+                      <h4 className="text-md font-semibold text-gray-900 line-clamp-1 overflow-hidden">
+                        {product.name}
+                      </h4>
                     </div>
-                    <span className="text-sm text-purple-500 font-medium">
-                      {product.ratings.average.toFixed(1)}
-                    </span>
-                  </div>
 
-                  {/* Pricing */}
-                  <div className="mt-2 text-lg font-bold text-gray-900">
-                    Rf {product.defaultVariant?.price || "N/A"}
+                    {/* Reviews Section */}
+                    <p className="text-xs text-gray-500 mt-1">
+                      ({product.ratings.count} Reviews)
+                    </p>
+
+                    {/* Rating Section - Progress Bar Style */}
+                    <div className="flex items-center mt-2 space-x-2">
+                      <div className="w-24 bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-purple-500"
+                          style={{
+                            width: `${(product.ratings.average / 5) * 100}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <span className="text-sm text-purple-500 font-medium">
+                        {product.ratings.average.toFixed(1)}
+                      </span>
+                    </div>
+
+                    {/* Pricing */}
+                    <div className="mt-2 text-lg font-bold text-gray-900">
+                      Rf {product.defaultVariant?.price || "N/A"}
+                    </div>
                   </div>
-                </div>
+                </Link>
               </div>
             ))}
         </div>

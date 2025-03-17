@@ -65,7 +65,7 @@ const HeaderOne = ({
             
             <div className="col-xl-2 col-lg-2 col-md-6 col-4 d-flex align-items-center">
               {/* header logo */} 
-              <Logo imageUrl="/assets/img/logo/logo1.png" logoClass="logo"   />
+              <Logo imageUrl="/assets/img/logo/logo1.png" logoClass="logo" width={40}  />
             </div>
 
             <div className="col-xl-8 col-lg-8 d-none d-lg-block">
