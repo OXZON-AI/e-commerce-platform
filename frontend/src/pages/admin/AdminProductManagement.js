@@ -17,6 +17,7 @@ import {
   clearProductDetail,
   clearProductError,
   clearProducts,
+  fetchBrands,
   fetchProductDetails,
 } from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
@@ -236,6 +237,11 @@ const AdminProductManagement = () => {
   // Effect hook to fetch categories when component mounts
   useEffect(() => {
     dispatch(fetchCategories()); // Dispatch the fetchCategories action
+  }, [dispatch]);
+
+  // Effect hook for fetch all brands
+  useEffect(() => {
+    dispatch(fetchBrands());
   }, [dispatch]);
 
   // Clear brands when the component unmounts
