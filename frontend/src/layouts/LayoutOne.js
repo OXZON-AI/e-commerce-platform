@@ -6,6 +6,7 @@ import FooterOne from "../wrappers/footer/FooterOne";
 import ScrollToTop from "../components/scroll-to-top";
 import { useSelector } from "react-redux";
 import AdminNavbar from "../pages/admin/components/AdminNavbar";
+import Sidebar from "../pages/admin/components/Sidebar";
 
 const LayoutOne = ({
   children,
@@ -19,21 +20,31 @@ const LayoutOne = ({
     <Fragment>
       {/* <ToastContainer position="top-right" autoClose={3000} /> */}
       {userInfo?.role === "admin" ? (
-        <AdminNavbar />
+        <div className="flex flex-col h-screen">
+          <AdminNavbar />
+          <div className="flex flex-1">
+            {/* Sidebar */}
+            <Sidebar />
+            <div className="flex-1 p-0 overflow-y-auto">{children}</div>
+          </div>
+        </div>
       ) : (
-        <HeaderOne
-          layout={headerContainerClass}
-          top={headerTop}
-          headerPaddingClass={headerPaddingClass}
-          headerPositionClass={headerPositionClass}
-        />
+        <>
+          <HeaderOne
+            layout={headerContainerClass}
+            top={headerTop}
+            headerPaddingClass={headerPaddingClass}
+            headerPositionClass={headerPositionClass}
+          />
+          {children}
+          <FooterOne
+            backgroundColorClass="bg-gray"
+            spaceTopClass="pt-100"
+            spaceBottomClass="pb-70"
+          />
+        </>
       )}
-      {children}
-      <FooterOne
-        backgroundColorClass="bg-gray"
-        spaceTopClass="pt-100"
-        spaceBottomClass="pb-70"
-      />
+
       <ScrollToTop />
     </Fragment>
   );
