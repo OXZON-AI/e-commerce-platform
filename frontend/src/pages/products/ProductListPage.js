@@ -6,11 +6,12 @@ import {
   clearBrands,
 } from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaTh, FaThList, FaThLarge, FaEye } from "react-icons/fa"; // Import icons for grid views
 import placeholderImage from "../../assets/images/placeholder_image.png";
 import LayoutOne from "../../layouts/LayoutOne";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/solid"; // Import search icon
+import { Tooltip } from "react-tooltip";
 
 const ProductListPage = () => {
   const { categoryUrl } = useParams(); // Get category slug from url
@@ -41,7 +42,7 @@ const ProductListPage = () => {
     sortOrder: "", // Sort order (ascending or descending)
     priceRange: [0, 1000000], // Price range filter (min, max)
     page: 1, // Current page for pagination
-    limit: 12, // Number of products per page
+    limit: 15, // Number of products per page
   });
 
   // Function to build query params based on the selected filters
@@ -382,7 +383,7 @@ const ProductListPage = () => {
             <div
               className={`grid gap-8 ${
                 viewLayout === "grid"
-                  ? "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                  ? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
                   : ""
               } 
   ${
@@ -409,17 +410,130 @@ const ProductListPage = () => {
                 </p>
               )}
               {items?.map((product) => (
-                <div
-                  key={product._id}
-                  className="border rounded-lg shadow-lg bg-white p-6 hover:shadow-2xl transition-shadow"
-                  style={{ minHeight: "400px" }} // Ensuring uniform card sizes
-                >
-                  {/* For List Layout */}
-                  {viewLayout === "list" ? (
-                    <div className="flex flex-col md:flex-row items-start">
-                      {/* Product Image */}
-                      <div className="flex-shrink-0 mb-4 md:mb-0 mr-4">
-                        <div className="h-48 w-48 bg-gray-100 rounded-lg flex items-center justify-center">
+                <Link to={`/product/${product.slug}`}>
+                  <div
+                    key={product._id}
+                    className="border rounded-lg shadow-sm bg-white p-6 hover:shadow-2xl transition-shadow"
+                    style={{ minHeight: "400px" }} // Ensuring uniform card sizes
+                  >
+                    {/* For List Layout */}
+                    {viewLayout === "list" ? (
+                      <div className="flex flex-col md:flex-row items-start">
+                        {/* Product Image */}
+                        <div className="flex-shrink-0 mb-4 md:mb-0 mr-4">
+                          <div className="h-48 w-48 bg-white rounded-lg flex items-center justify-center">
+                            <img
+                              src={
+                                product.defaultVariant?.image?.url ||
+                                placeholderImage
+                              }
+                              alt={
+                                product.defaultVariant?.image?.alt ||
+                                "Product Image"
+                              }
+                              onError={(e) => {
+                                e.target.src = placeholderImage;
+                              }}
+                              className="h-40 object-contain"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Product Info */}
+                        <div className="flex-grow">
+                          <h4 className="text-lg font-bold text-gray-800 mb-2 truncate">
+                            {product.name}
+                          </h4>
+                          <p className="text-sm text-gray-600 mb-4">
+                            {product.category.name.charAt(0).toUpperCase() +
+                              product.category.name.slice(1)}
+                          </p>
+
+                          {/* Pricing Section */}
+                          <div className="text-lg mb-2">
+                            <span className="text-green-600 font-bold">
+                              {product.defaultVariant?.price || "N/A"} MVR
+                            </span>
+                            {/* <span className="line-through text-gray-500 ml-2">
+                            {product.price.toFixed(2)} MVR
+                          </span> */}
+                            {/* <span className="ml-2 text-green-600">
+                            ({product.discount}% OFF)
+                          </span> */}
+                          </div>
+
+                          {/* Additional Product Details */}
+                          <div className="mt-4 text-sm text-gray-600">
+                            <p>
+                              {product.description.short ||
+                                "No description available"}
+                            </p>
+                            {/* <p>SKU: {product.sku}</p> */}
+                          </div>
+                        </div>
+
+                        {/* View Details Button - Right Aligned */}
+                        <div className="flex justify-end mt-4 md:mt-0 md:ml-4 w-full">
+                          <button
+                            className="py-2 px-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center space-x-2"
+                            onClick={() => navigate(`/product/${product.slug}`)}
+                          >
+                            <FaEye className="text-white" />{" "}
+                            {/* FontAwesome Eye Icon */}
+                            <span>View Details</span>
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      // For Grid Layout
+                      // <div>
+                      //   {/* Product Image */}
+                      //   <div className="h-48 flex items-center justify-center bg-white rounded-lg mb-4">
+                      //     <img
+                      //       src={
+                      //         product.defaultVariant?.image?.url ||
+                      //         placeholderImage
+                      //       }
+                      //       alt={
+                      //         product.defaultVariant?.image?.alt ||
+                      //         "Product Image"
+                      //       }
+                      //       onError={(e) => {
+                      //         e.target.src = placeholderImage;
+                      //       }}
+                      //       className="h-40 object-contain"
+                      //     />
+                      //   </div>
+                      //   <h4 className="text-lg font-bold text-gray-800 mb-2 truncate">
+                      //     {product.name}
+                      //   </h4>
+                      //   <p className="text-sm text-gray-600 mb-4">
+                      //     {product.category?.name.charAt(0).toUpperCase() +
+                      //       product.category?.name.slice(1) || "N/A"}
+                      //   </p>
+
+                      //   {/* Pricing Section */}
+                      //   <div className="text-sm mb-2">
+                      //     <span className="text-green-600 text-sm font-bold">
+                      //       {product.defaultVariant?.price || "N/A"} MVR
+                      //     </span>
+                      //   </div>
+
+                      //   {/* View Details Button */}
+                      //   <div className="flex justify-end mt-4">
+                      //     <button
+                      //       className="py-2 px-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center space-x-2"
+                      //       onClick={() => navigate(`/product/${product.slug}`)}
+                      //     >
+                      //       <FaEye className="text-white" />{" "}
+                      //       {/* FontAwesome Eye Icon */}
+                      //       <span>View Details</span>
+                      //     </button>
+                      //   </div>
+                      // </div>
+                      <div>
+                        {/* Product Image */}
+                        <div className="h-52 flex items-center justify-center bg-white-100 rounded-lg overflow-hidden">
                           <img
                             src={
                               product.defaultVariant?.image?.url ||
@@ -432,111 +546,45 @@ const ProductListPage = () => {
                             onError={(e) => {
                               e.target.src = placeholderImage;
                             }}
-                            className="h-40 object-contain"
+                            className="h-full w-full object-contain"
                           />
                         </div>
-                      </div>
 
-                      {/* Product Info */}
-                      <div className="flex-grow">
-                        <h4 className="text-lg font-bold text-gray-800 mb-2 truncate">
-                          {product.name}
-                        </h4>
-                        <p className="text-sm text-gray-600 mb-4">
-                          {product.category.name.charAt(0).toUpperCase() +
-                            product.category.name.slice(1)}
+                        {/* Vendor */}
+                        <p className="mt-3 text-xs text-gray-500 mt-2">
+                          Brand: {product.brand} . Qty:{" "}
+                          {product.defaultVariant?.stock}
                         </p>
 
-                        {/* Pricing Section */}
-                        <div className="text-lg mb-2">
-                          <span className="text-green-600 font-bold">
-                            {product.defaultVariant?.price || "N/A"} MVR
-                          </span>
-                          {/* <span className="line-through text-gray-500 ml-2">
-                            {product.price.toFixed(2)} MVR
-                          </span> */}
-                          {/* <span className="ml-2 text-green-600">
-                            ({product.discount}% OFF)
-                          </span> */}
-                        </div>
+                        <hr className="mt-3 opacity-1" />
 
-                        {/* Additional Product Details */}
-                        <div className="mt-4 text-sm text-gray-600">
-                          <p>
-                            {product.description.short ||
-                              "No description available"}
+                        {/* Product Details */}
+                        <div className="mt-3">
+                          <h4
+                            className="text-md font-semibold text-gray-900 line-clamp-2 overflow-hidden whitespace-nowrap text-ellipsis"
+                            data-tooltip-id={`tooltip-${product.id}`}
+                          >
+                            {product.name}
+                          </h4>
+                          <Tooltip id={`tooltip-${product.id}`} place="top">
+                            {product.name}
+                          </Tooltip>
+                          <p className="text-sm text-gray-600">
+                            {product.category?.name
+                              ? product.category.name.charAt(0).toUpperCase() +
+                                product.category.name.slice(1)
+                              : "N/A"}
                           </p>
-                          {/* <p>SKU: {product.sku}</p> */}
+                        </div>
+
+                        {/* Pricing */}
+                        <div className="mt-2 text-lg font-bold text-gray-900">
+                          Rf {product.defaultVariant?.price || "N/A"}
                         </div>
                       </div>
-
-                      {/* View Details Button - Right Aligned */}
-                      <div className="flex justify-end mt-4 md:mt-0 md:ml-4 w-full">
-                        <button
-                          className="py-2 px-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center space-x-2"
-                          onClick={() => navigate(`/product/${product.slug}`)}
-                        >
-                          <FaEye className="text-white" />{" "}
-                          {/* FontAwesome Eye Icon */}
-                          <span>View Details</span>
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    // For Grid Layout
-                    <div>
-                      {/* Product Image */}
-                      <div className="h-48 flex items-center justify-center bg-gray-100 rounded-lg mb-4">
-                        <img
-                          src={
-                            product.defaultVariant?.image?.url ||
-                            placeholderImage
-                          }
-                          alt={
-                            product.defaultVariant?.image?.alt ||
-                            "Product Image"
-                          }
-                          onError={(e) => {
-                            e.target.src = placeholderImage;
-                          }}
-                          className="h-40 object-contain"
-                        />
-                      </div>
-                      <h4 className="text-lg font-bold text-gray-800 mb-2 truncate">
-                        {product.name}
-                      </h4>
-                      {/* <p className="text-sm text-gray-600 mb-4">
-                        {product.category.name.charAt(0).toUpperCase() +
-                          product.category.name.slice(1) || "N/A"}
-                      </p> */}
-
-                      {/* Pricing Section */}
-                      <div className="text-lg mb-2">
-                        <span className="text-green-600 font-bold">
-                          {product.defaultVariant?.price || "N/A"} MVR
-                        </span>
-                        {/* <span className="line-through text-gray-500 ml-2">
-                          {product.price.toFixed(2)} MVR
-                        </span>
-                        <span className="ml-2 text-green-600">
-                          ({product.discount}% OFF)
-                        </span> */}
-                      </div>
-
-                      {/* View Details Button */}
-                      <div className="flex justify-end mt-4">
-                        <button
-                          className="py-2 px-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center space-x-2"
-                          onClick={() => navigate(`/product/${product.slug}`)}
-                        >
-                          <FaEye className="text-white" />{" "}
-                          {/* FontAwesome Eye Icon */}
-                          <span>View Details</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                </Link>
               ))}
             </div>
 
