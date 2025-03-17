@@ -149,7 +149,7 @@ const ProductDetailPage = () => {
                   {productDetail.description.short}
                 </p>
                 <p className="text-2xl font-semibold mb-2">
-                  {productDetail.variants?.[0]?.price} MVR
+                  Rf {productDetail.variants?.[0]?.price}
                 </p>
                 <hr className="my-6 h-0.5 border-t-0 bg-indigo-950" />
                 {productDetail.variants?.[0]?.stock > 0 ? (

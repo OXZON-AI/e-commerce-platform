@@ -253,8 +253,8 @@ const ProductListPage = () => {
               <h4 className="text-xl font-bold mb-3">Filter by Price</h4>
               <div className="flex flex-col">
                 <div className="flex justify-between text-sm">
-                  <span>{filters.priceRange[0]} MVR</span>
-                  <span>{filters.priceRange[1]} MVR</span>
+                  <span>Rf {filters.priceRange[0]}</span>
+                  <span>Rf {filters.priceRange[1]}</span>
                 </div>
                 <input
                   type="range"
@@ -452,10 +452,10 @@ const ProductListPage = () => {
                           {/* Pricing Section */}
                           <div className="text-lg mb-2">
                             <span className="text-green-600 font-bold">
-                              {product.defaultVariant?.price || "N/A"} MVR
+                              Rf {product.defaultVariant?.price || "N/A"}
                             </span>
                             {/* <span className="line-through text-gray-500 ml-2">
-                            {product.price.toFixed(2)} MVR
+                            Rf {product.price.toFixed(2)}
                           </span> */}
                             {/* <span className="ml-2 text-green-600">
                             ({product.discount}% OFF)
