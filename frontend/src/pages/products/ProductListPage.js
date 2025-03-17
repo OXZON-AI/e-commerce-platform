@@ -413,7 +413,7 @@ const ProductListPage = () => {
                 <Link key={product._id} to={`/product/${product.slug}`} className="block">
                   <div
                     key={product._id}
-                    className="border rounded-lg shadow-sm bg-white p-6 hover:shadow-xl transition-shadow"
+                    className="border rounded-lg shadow-sm bg-white p-6 hover:shadow-lg transition-transform transform hover:scale-105 duration-300 ease-in-out"
                     style={{ minHeight: "400px" }}
                   >
                     {/* For List Layout */}

@@ -29,7 +29,7 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
   const [activeTab, setActiveTab] = useState("specs");
   const [relatedProdFilters, setRelatedProdFilters] = useState({
     cid: prodDetails.category._id,
-    limit: 5,
+    limit: 3,
   });
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [reviewData, setReviewData] = useState({
@@ -626,50 +626,71 @@ const ProductDetailSubComponent = ({ prodDetails }) => {
         <h2 className="text-3xl font-bold mb-6 text-gray-800">
           Related Products
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap">
           {relatedProducts &&
             relatedProducts.map((product) => (
-              <Link key={product._id} to={`/product/${product.slug}`}>
-                <div className="relative bg-white shadow-md rounded-2xl overflow-hidden p-5 transition-transform transform hover:scale-105 hover:shadow-2xl flex flex-col h-full">
-                  <div className="w-full h-44 flex items-center justify-center rounded-lg">
-                    <img
-                      src={
-                        product?.defaultVariant?.image?.url || placeholderImage
-                      }
-                      alt={
-                        product?.defaultVariant?.image?.alt || "Product Image"
-                      }
-                      className="w-full h-full object-contain"
-                    />
+              <div key={product._id} className="p-4">
+                <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
+                  {/* Product Image */}
+                  <Link to={`/product/${product.slug}`}>
+                    <div className="h-52 flex items-center justify-center bg-white rounded-lg overflow-hidden mb-4">
+                      <img
+                        src={
+                          product?.defaultVariant?.image?.url ||
+                          placeholderImage
+                        }
+                        alt={
+                          product?.defaultVariant?.image?.alt || "Product Image"
+                        }
+                        onError={(e) => {
+                          e.target.src = placeholderImage;
+                        }}
+                        className="h-full w-full object-contain"
+                      />
+                    </div>
+                  </Link>
+
+                  {/* Vendor & Quantity */}
+                  <p className="mt-3 text-xs text-gray-500 line-clamp-1 overflow-hidden">
+                    Brand: {product.brand} . Qty:{" "}
+                    {product.defaultVariant?.stock}
+                  </p>
+
+                  <hr className="mt-3" />
+
+                  {/* Product Details */}
+                  <div className="mt-3">
+                    <h4 className="text-md font-semibold text-gray-900 line-clamp-1 overflow-hidden">
+                      {product.name}
+                    </h4>
                   </div>
-                  {/* {product.discount && (
-                <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                  {product.discount}
-                </span>
-              )} */}
-                  {/* {product.newTag && (
-                <span className="absolute top-3 right-3 bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                  New
-                </span>
-              )} */}
 
-                  {/* Product Name */}
-                  <p className="mt-4 text-lg font-semibold text-gray-700 min-h-[3rem] text-center line-clamp-2">
-                    {product.name}
+                  {/* Reviews Section */}
+                  <p className="text-xs text-gray-500 mt-1">
+                    ({product.ratings.count} Reviews)
                   </p>
 
-                  {/* Product Price */}
-                  <p className="mt-2 text-base font-medium text-gray-700 text-center">
-                    {product?.defaultVariant?.price || "N/A"} MVR
-                  </p>
+                  {/* Rating Section - Progress Bar Style */}
+                  <div className="flex items-center mt-2 space-x-2">
+                    <div className="w-24 bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-purple-500"
+                        style={{
+                          width: `${(product.ratings.average / 5) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <span className="text-sm text-purple-500 font-medium">
+                      {product.ratings.average.toFixed(1)}
+                    </span>
+                  </div>
 
-                  {/* Ratings */}
-                  <div className="flex justify-center mt-3 text-yellow-500">
-                    {"★".repeat(Math.floor(product.ratings.average))}
-                    {"☆".repeat(5 - Math.floor(product.ratings.average))}
+                  {/* Pricing */}
+                  <div className="mt-2 text-lg font-bold text-gray-900">
+                    Rf {product.defaultVariant?.price || "N/A"}
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
         </div>
       </div>

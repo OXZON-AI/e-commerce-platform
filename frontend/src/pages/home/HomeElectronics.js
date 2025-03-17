@@ -119,7 +119,7 @@ const HomeElectronics = () => {
     dots: true,
     infinite: true,
     speed: 500,
-    slidesToShow: 4,
+    slidesToShow: 5,
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 3000,
@@ -371,7 +371,7 @@ const HomeElectronics = () => {
                         </h3>
                       </Link>
                       <p className="text-gray-600 text-md text-center">
-                        {product.defaultVariant?.price || "N/A"} MVR
+                        Rf {product.defaultVariant?.price || "N/A"}
                       </p>
 
                       {/* Centered Add to Cart Button */}
@@ -405,28 +405,25 @@ const HomeElectronics = () => {
               </h2>
               <div className="space-y-8">
                 {recommendProducts &&
-                  recommendProducts.map((categoryItem) => (
-                    <div
-                      key={categoryItem._id}
-                      className="bg-white p-6 rounded-lg"
-                    >
-                      {/* Category Name Container */}
-                      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                        {categoryItem.category.name} for you!
-                      </h2>
-
-                      {/* Check the number of products */}
-                      {categoryItem.products &&
-                      categoryItem.products.length < 4 ? (
-                        // Render in a grid layout if less than 4 products
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 ">
-                          {categoryItem.products.map((product) => (
-                            <div key={product._id} className="p-4">
-                              <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
-                                {/* Product Image (Centered) */}
-                                <Link to={`/product/${product.slug}`}>
-                                  <div className="flex justify-center items-center mb-4">
-                                    <div className="h-48 w-48 bg-white rounded-lg flex items-center justify-center">
+                  recommendProducts.map(
+                    (categoryItem) =>
+                      categoryItem.products &&
+                      categoryItem.products.length >= 3 ? (
+                        <div
+                          key={categoryItem._id}
+                          className="bg-white p-6 rounded-lg"
+                        >
+                          {/* Category Name Container */}
+                          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                            {categoryItem.category.name} for you!
+                          </h2>
+                          <Slider {...justForYouSliderSettings}>
+                            {categoryItem.products.map((product) => (
+                              <div key={product._id} className="p-4">
+                                <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
+                                  {/* Product Image */}
+                                  <Link to={`/product/${product.slug}`}>
+                                    <div className="h-52 flex items-center justify-center bg-white-100 rounded-lg overflow-hidden mb-4">
                                       <img
                                         src={
                                           product.defaultVariant?.image?.url ||
@@ -434,110 +431,66 @@ const HomeElectronics = () => {
                                         }
                                         alt={
                                           product.defaultVariant?.image?.alt ||
-                                          "Recommended product image"
+                                          "Product Image"
                                         }
                                         onError={(e) => {
                                           e.target.src = placeholderImage;
                                         }}
-                                        className="h-40 object-contain"
+                                        className="h-full w-full object-contain"
                                       />
                                     </div>
+                                  </Link>
+
+                                  {/* Vendor & Quantity */}
+                                  <p className="mt-3 text-xs text-gray-500 line-clamp-1 overflow-hidden">
+                                    Brand: {product.brand} . Qty:{" "}
+                                    {product.defaultVariant?.stock}
+                                  </p>
+
+                                  <hr className="mt-3" />
+
+                                  {/* Product Details */}
+                                  <div className="mt-3">
+                                    <h4 className="text-md font-semibold text-gray-900 line-clamp-1 overflow-hidden">
+                                      {product.name}
+                                    </h4>
+                                    {/* <p className="text-sm text-gray-600">
+                                        {product.category?.name
+                                          ? product.category.name.charAt(0).toUpperCase() + product.category.name.slice(1)
+                                          : "N/A"}
+                                      </p> */}
                                   </div>
-                                </Link>
 
-                                {/* Product Details */}
-                                <Link to={`/product/${product.slug}`}>
-                                  <h3 className="text-lg font-semibold text-purple-800 text-center truncate">
-                                    {product.name}
-                                  </h3>
-                                </Link>
-                                <p className="text-gray-600 text-md text-center">
-                                  {product.defaultVariant?.price || "N/A"} MVR
-                                </p>
+                                  {/* Pricing */}
+                                  <div className="mt-2 text-lg font-bold text-gray-900">
+                                    Rf {product.defaultVariant?.price || "N/A"}
+                                  </div>
 
-                                {/* Centered Add to Cart Button */}
-                                <div className="flex justify-center mt-3">
-                                  <button
-                                    className={`px-5 py-2 bg-blue-600 text-white font-semibold rounded-md ${
-                                      product.defaultVariant?.stock > 0
-                                        ? "bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300"
-                                        : "bg-gray-400 cursor-not-allowed"
-                                    } transition duration-300 ease-in-out flex items-center`}
-                                    disabled={
-                                      product.defaultVariant?.stock === 0 ||
-                                      cartStatus === "loading-add-to-cart"
-                                    }
-                                    onClick={() => addToCartHandler(product)}
-                                  >
-                                    <FaCartPlus className="mr-2" /> Add to Cart
-                                  </button>
+                                  {/* Add to Cart Button */}
+                                  <div className="flex justify-center mt-3">
+                                    <button
+                                      className={`w-full justify-center px-3 py-2 bg-blue-600 text-white font-semibold rounded-md ${
+                                        product.defaultVariant?.stock > 0
+                                          ? "bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300"
+                                          : "bg-gray-400 cursor-not-allowed"
+                                      } transition duration-300 ease-in-out flex items-center`}
+                                      disabled={
+                                        product.defaultVariant?.stock === 0 ||
+                                        cartStatus === "loading-add-to-cart"
+                                      }
+                                      onClick={() => addToCartHandler(product)}
+                                    >
+                                      <FaCartPlus className="mr-2" /> Add to
+                                      Cart
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
+                          </Slider>
                         </div>
-                      ) : (
-                        // Render in a slider if 4 or more products
-                        <Slider {...justForYouSliderSettings}>
-                          {categoryItem.products.map((product) => (
-                            <div key={product._id} className="p-4">
-                              <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-xl transition-transform transform hover:scale-105 duration-300 ease-in-out">
-                                {/* Product Image (Centered) */}
-                                <Link to={`/product/${product.slug}`}>
-                                  <div className="flex justify-center items-center mb-4">
-                                    <div className="h-48 w-48 bg-white rounded-lg flex items-center justify-center">
-                                      <img
-                                        src={
-                                          product.defaultVariant?.image?.url ||
-                                          placeholderImage
-                                        }
-                                        alt={
-                                          product.defaultVariant?.image?.alt ||
-                                          "Recommended product image"
-                                        }
-                                        onError={(e) => {
-                                          e.target.src = placeholderImage;
-                                        }}
-                                        className="h-40 object-contain"
-                                      />
-                                    </div>
-                                  </div>
-                                </Link>
-
-                                {/* Product Details */}
-                                <Link to={`/product/${product.slug}`}>
-                                  <h3 className="text-lg font-semibold text-purple-800 text-center truncate">
-                                    {product.name}
-                                  </h3>
-                                </Link>
-                                <p className="text-gray-600 text-md text-center">
-                                  {product.defaultVariant?.price || "N/A"} MVR
-                                </p>
-
-                                {/* Centered Add to Cart Button */}
-                                <div className="flex justify-center mt-3">
-                                  <button
-                                    className={`px-5 py-2 bg-blue-600 text-white font-semibold rounded-md ${
-                                      product.defaultVariant?.stock > 0
-                                        ? "bg-purple-600 hover:bg-purple-700 disabled:bg-purple-300"
-                                        : "bg-gray-400 cursor-not-allowed"
-                                    } transition duration-300 ease-in-out flex items-center`}
-                                    disabled={
-                                      product.defaultVariant?.stock === 0 ||
-                                      cartStatus === "loading-add-to-cart"
-                                    }
-                                    onClick={() => addToCartHandler(product)}
-                                  >
-                                    <FaCartPlus className="mr-2" /> Add to Cart
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </Slider>
-                      )}
-                    </div>
-                  ))}
+                      ) : null // if recommend products in one category less than condition products length (ex: 3 products minimum) then it will not showing until its go beyond condition product length
+                  )}
               </div>
             </div>
           ) : (
