@@ -398,7 +398,7 @@ const OrderHistory = () => {
     sortBy: "date",
     sortOrder: "desc",
     page: 1,
-    limit: 9,
+    limit: 6,
   });
 
   useEffect(() => {
@@ -493,6 +493,7 @@ const OrderHistory = () => {
       <LayoutOne>
         <div className="min-h-full bg-gray-100 flex flex-col items-center p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">My Orders</h2>
+          <p className="text-gray-700 mb-4">You have made <span className="text-purple-600 font-semibold">{paginationInfo.totalCount} </span> orders so far.</p>
 
           <div className="flex gap-4 mb-4">
             <select

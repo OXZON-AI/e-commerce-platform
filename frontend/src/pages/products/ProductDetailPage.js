@@ -26,7 +26,7 @@ const ProductDetailPage = () => {
   const { status: cartStatus, error: cartError } = useSelector(
     (state) => state.cart
   );
-  
+
   // State to manage the main image when clicking on a thumbnail
   const [mainImage, setMainImage] = useState(placeholderImage);
 
@@ -102,14 +102,16 @@ const ProductDetailPage = () => {
               <div className="w-full md:w-2/3 lg:w-1/2 relative">
                 <div className="overflow-hidden rounded-lg shadow-lg mb-4">
                   {/* Main image container */}
-                  <img
-                    src={mainImage}
-                    alt={productDetail.name}
-                    className="w-full h-full object-contain transition-transform duration-500 ease-in-out transform hover:scale-125"
-                    onError={(e) => {
-                      e.target.src = placeholderImage;
-                    }}
-                  />
+                  <div className="w-full h-80">
+                    <img
+                      src={mainImage}
+                      alt={productDetail.name}
+                      className="w-full h-full object-cover transition-transform duration-500 ease-in-out transform hover:scale-125"
+                      onError={(e) => {
+                        e.target.src = placeholderImage;
+                      }}
+                    />
+                  </div>
                 </div>
                 {/* Slider for other images */}
                 {productDetail.variants?.[0]?.images?.length > 0 ? (
@@ -123,7 +125,7 @@ const ProductDetailPage = () => {
                         <img
                           src={img.url || placeholderImage}
                           alt={`${productDetail.name} ${index + 1}`}
-                          className="w-full h-60 object-contain rounded-lg shadow-sm"
+                          className="w-full h-40 object-cover rounded-lg shadow-sm"
                           onError={(e) => {
                             e.target.src = placeholderImage;
                           }}
