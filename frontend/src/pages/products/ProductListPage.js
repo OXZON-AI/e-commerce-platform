@@ -410,11 +410,11 @@ const ProductListPage = () => {
                 </p>
               )}
               {items?.map((product) => (
-                <Link to={`/product/${product.slug}`}>
+                <Link key={product._id} to={`/product/${product.slug}`} className="block">
                   <div
                     key={product._id}
-                    className="border rounded-lg shadow-sm bg-white p-6 hover:shadow-2xl transition-shadow"
-                    style={{ minHeight: "400px" }} // Ensuring uniform card sizes
+                    className="border rounded-lg shadow-sm bg-white p-6 hover:shadow-xl transition-shadow"
+                    style={{ minHeight: "400px" }}
                   >
                     {/* For List Layout */}
                     {viewLayout === "list" ? (
@@ -486,51 +486,6 @@ const ProductListPage = () => {
                       </div>
                     ) : (
                       // For Grid Layout
-                      // <div>
-                      //   {/* Product Image */}
-                      //   <div className="h-48 flex items-center justify-center bg-white rounded-lg mb-4">
-                      //     <img
-                      //       src={
-                      //         product.defaultVariant?.image?.url ||
-                      //         placeholderImage
-                      //       }
-                      //       alt={
-                      //         product.defaultVariant?.image?.alt ||
-                      //         "Product Image"
-                      //       }
-                      //       onError={(e) => {
-                      //         e.target.src = placeholderImage;
-                      //       }}
-                      //       className="h-40 object-contain"
-                      //     />
-                      //   </div>
-                      //   <h4 className="text-lg font-bold text-gray-800 mb-2 truncate">
-                      //     {product.name}
-                      //   </h4>
-                      //   <p className="text-sm text-gray-600 mb-4">
-                      //     {product.category?.name.charAt(0).toUpperCase() +
-                      //       product.category?.name.slice(1) || "N/A"}
-                      //   </p>
-
-                      //   {/* Pricing Section */}
-                      //   <div className="text-sm mb-2">
-                      //     <span className="text-green-600 text-sm font-bold">
-                      //       {product.defaultVariant?.price || "N/A"} MVR
-                      //     </span>
-                      //   </div>
-
-                      //   {/* View Details Button */}
-                      //   <div className="flex justify-end mt-4">
-                      //     <button
-                      //       className="py-2 px-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-700 flex items-center space-x-2"
-                      //       onClick={() => navigate(`/product/${product.slug}`)}
-                      //     >
-                      //       <FaEye className="text-white" />{" "}
-                      //       {/* FontAwesome Eye Icon */}
-                      //       <span>View Details</span>
-                      //     </button>
-                      //   </div>
-                      // </div>
                       <div>
                         {/* Product Image */}
                         <div className="h-52 flex items-center justify-center bg-white-100 rounded-lg overflow-hidden">
@@ -551,22 +506,22 @@ const ProductListPage = () => {
                         </div>
 
                         {/* Vendor */}
-                        <p className="mt-3 text-xs text-gray-500 mt-2">
+                        <p className="mt-3 text-xs text-gray-500 mt-2 line-clamp-1 overflow-hidden">
                           Brand: {product.brand} . Qty:{" "}
                           {product.defaultVariant?.stock}
                         </p>
 
-                        <hr className="mt-3 opacity-1" />
+                        <hr className="mt-3" />
 
                         {/* Product Details */}
                         <div className="mt-3">
                           <h4
-                            className="text-md font-semibold text-gray-900 line-clamp-2 overflow-hidden whitespace-nowrap text-ellipsis"
-                            data-tooltip-id={`tooltip-${product.id}`}
+                            className="text-md font-semibold text-gray-900 line-clamp-1 overflow-hidden"
+                            data-tooltip-id={`tooltip-${product._id}`}
                           >
                             {product.name}
                           </h4>
-                          <Tooltip id={`tooltip-${product.id}`} place="top">
+                          <Tooltip id={`tooltip-${product._id}`} place="top">
                             {product.name}
                           </Tooltip>
                           <p className="text-sm text-gray-600">
