@@ -117,6 +117,59 @@ export const fetchRecommendProducts = createAsyncThunk(
   }
 );
 
+// Async thunk to get all brands from using fetchAllProducts endpoint
+export const fetchBrands = createAsyncThunk(
+  "product/fetchBrands",
+  async (_, { rejectWithValue }) => {
+    try {
+      // Fetch the first page to get totalPages
+      const firstResponse = await axiosInstance.get("/v1/products/", {
+        params: { page: 1 },
+      });
+
+      const { products, paginationInfo } = firstResponse.data;
+      const totalPages = paginationInfo.totalPages;
+
+      // If only one page, return brands immediately
+      if (totalPages === 1) {
+        const uniqueBrands = extractUniqueBrands(products);
+        return ["All Brands", ...uniqueBrands];
+      }
+
+      // Create an array of promises to fetch all pages
+      const requests = [];
+      for (let page = 2; page <= totalPages; page++) {
+        requests.push(axiosInstance.get("/v1/products/", { params: { page } }));
+      }
+
+      // Fetch all remaining pages in parallel
+      const responses = await Promise.all(requests);
+
+      // Combine all products from all pages
+      const allProducts = responses.flatMap((res) => res.data.products);
+      allProducts.push(...products); // Include first page products
+
+      // Extract unique brands
+      const uniqueBrands = extractUniqueBrands(allProducts);
+
+      return ["All Brands", ...uniqueBrands];
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+// Helper function to extract unique brands
+const extractUniqueBrands = (products) => {
+  const brandsSet = new Set();
+  products.forEach((product) => {
+    if (product.brand) {
+      brandsSet.add(product.brand.trim());
+    }
+  });
+  return Array.from(brandsSet);
+};
+
 const productSlice = createSlice({
   name: "product",
   initialState: {
@@ -156,22 +209,6 @@ const productSlice = createSlice({
         state.loading = false;
         state.items = action.payload.products;
         state.pagination = action.payload.paginationInfo;
-        console.log(
-          "pagination-product-slice: ",
-          action.payload.paginationInfo
-        );
-        console.log("brand-action-load: ", action.payload.products);
-
-        //Exact unique brands only when products are fetched for the first time
-        if (state.brands.length === 0) {
-          const brandsSet = new Set(); // Set ensures each brand appears only once, removing duplicates.
-          action.payload.products.forEach((product) => {
-            if (product.brand) {
-              brandsSet.add(product.brand.trim());
-            }
-          });
-          state.brands = ["All Brands", ...Array.from(brandsSet)]; // Ensure "All Brands" is included
-        }
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
@@ -254,6 +291,20 @@ const productSlice = createSlice({
         state.recommendProducts = action.payload;
       })
       .addCase(fetchRecommendProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // For fetch all brands
+      .addCase(fetchBrands.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchBrands.fulfilled, (state, action) => {
+        state.loading = false;
+        state.brands = action.payload;
+        console.log("All-brands-product-slice : ", action.payload);
+      })
+      .addCase(fetchBrands.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
