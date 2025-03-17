@@ -4,6 +4,8 @@ import { Fragment } from "react";
 import HeaderOne from "../wrappers/header/HeaderOne";
 import FooterOne from "../wrappers/footer/FooterOne";
 import ScrollToTop from "../components/scroll-to-top";
+import { useSelector } from "react-redux";
+import AdminNavbar from "../pages/admin/components/AdminNavbar";
 
 const LayoutOne = ({
   children,
@@ -12,15 +14,20 @@ const LayoutOne = ({
   headerPaddingClass,
   headerPositionClass,
 }) => {
+  const { userInfo } = useSelector((state) => state.user);
   return (
     <Fragment>
       {/* <ToastContainer position="top-right" autoClose={3000} /> */}
-      <HeaderOne
-        layout={headerContainerClass}
-        top={headerTop}
-        headerPaddingClass={headerPaddingClass}
-        headerPositionClass={headerPositionClass}
-      />
+      {userInfo?.role === "admin" ? (
+        <AdminNavbar />
+      ) : (
+        <HeaderOne
+          layout={headerContainerClass}
+          top={headerTop}
+          headerPaddingClass={headerPaddingClass}
+          headerPositionClass={headerPositionClass}
+        />
+      )}
       {children}
       <FooterOne
         backgroundColorClass="bg-gray"
