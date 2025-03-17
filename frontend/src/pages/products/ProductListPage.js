@@ -4,6 +4,7 @@ import {
   clearProducts,
   fetchProducts,
   clearBrands,
+  fetchBrands,
 } from "../../store/slices/product-slice";
 import { fetchCategories } from "../../store/slices/category-slice";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -87,6 +88,11 @@ const ProductListPage = () => {
 
     return query;
   };
+
+  // Effect hook for fetch all brands
+  useEffect(() => {
+    dispatch(fetchBrands());
+  }, [dispatch]);
 
   // Effect hook to update categoryUrl inside filter when URL changes
   useEffect(() => {
@@ -283,9 +289,9 @@ const ProductListPage = () => {
             <div className="mt-6">
               <h4 className="text-xl font-bold mb-3">Filter by Brand</h4>
               <ul className="space-y-2">
-                {brands.map((brand) => (
+                {brands.map((brand, index) => (
                   <li
-                    key={brand}
+                    key={index}
                     className={`cursor-pointer px-4 py-2 rounded-lg text-sm ${
                       filters.brand === brand
                         ? "bg-purple-600 text-white font-semibold"
