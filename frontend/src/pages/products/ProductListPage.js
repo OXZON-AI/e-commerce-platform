@@ -376,7 +376,7 @@ const ProductListPage = () => {
 
             {/* Showing Results */}
             <p className="mb-6 text-gray-600 text-lg">
-              Showing {items?.length} results
+              Showing {pagination?.totalCount} results
             </p>
 
             {/* Product Grid View */}
@@ -410,7 +410,11 @@ const ProductListPage = () => {
                 </p>
               )}
               {items?.map((product) => (
-                <Link key={product._id} to={`/product/${product.slug}`} className="block">
+                <Link
+                  key={product._id}
+                  to={`/product/${product.slug}`}
+                  className="block"
+                >
                   <div
                     key={product._id}
                     className="border rounded-lg shadow-sm bg-white p-6 hover:shadow-lg transition-transform transform hover:scale-105 duration-300 ease-in-out"
