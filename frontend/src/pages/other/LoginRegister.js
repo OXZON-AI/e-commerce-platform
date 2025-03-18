@@ -10,6 +10,7 @@ import {
   loginUser,
   registerUser,
   clearError,
+  clearSuccess,
 } from "../../store/slices/user-slice";
 
 // Importing Toast Container and Toast Functions
@@ -214,6 +215,9 @@ const LoginRegister = () => {
       setFirstName("");
       setLastName("");
       setPhone("");
+
+      // clear success state after register success
+      dispatch(clearSuccess());
     }
   };
 
@@ -252,6 +256,9 @@ const LoginRegister = () => {
       setEmail("");
       setPassword("");
       setRememberMe(false);
+
+      // clear success state after login success
+      dispatch(clearSuccess());
     }
   };
 
