@@ -28,6 +28,11 @@ const MyAccount = () => {
   const [form2Errors, setForm2Errors] = useState({});
 
   useEffect(() => {
+    dispatch(clearSuccess()); // Reset success when MyAccount page loads
+  }, [dispatch]);
+  
+
+  useEffect(() => {
     if (success) {
       dispatch(clearSuccess());
       setPassword("");
@@ -58,6 +63,9 @@ const MyAccount = () => {
           theme: "colored",
         });
       }
+
+      // clear success state
+      dispatch(clearSuccess());
     }
   }, [success, dispatch, password, confirmPassword]);
 
@@ -122,30 +130,34 @@ const MyAccount = () => {
 
   // Handle user details update
   const handleDetailsSubmit = async (e) => {
-    e.preventDefault();
-    if (error) {
-      dispatch(clearError());
+    try {
+      e.preventDefault();
+      if (error) {
+        dispatch(clearError());
+      }
+      setSuccessMessage("");
+
+      // Check validation
+      if (!validateDetailsForm()) return;
+
+      // Combine firstName and lastName for the server
+      const fullName = `${firstName} ${lastName}`.trim();
+
+      const updatedData = {
+        name: fullName,
+        email,
+        phone,
+        // token: userInfo.token,
+      };
+
+      dispatch(updateUser({ userId: userInfo._id, userData: updatedData }));
+      setSuccessMessage("User Information updated successfully!");
+
+      // Clear form2 errors when success is achieved in form1
+      setForm2Errors({});
+    } catch (error) {
+      toast.error("Failed to update user information!");
     }
-    setSuccessMessage("");
-
-    // Check validation
-    if (!validateDetailsForm()) return;
-
-    // Combine firstName and lastName for the server
-    const fullName = `${firstName} ${lastName}`.trim();
-
-    const updatedData = {
-      name: fullName,
-      email,
-      phone,
-      // token: userInfo.token,
-    };
-
-    dispatch(updateUser({ userId: userInfo._id, userData: updatedData }));
-    setSuccessMessage("User Information updated successfully!");
-
-    // Clear form2 errors when success is achieved in form1
-    setForm2Errors({});
   };
 
   // Handle password update

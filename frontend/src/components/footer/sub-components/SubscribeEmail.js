@@ -2,7 +2,10 @@ import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import MailchimpSubscribe from "react-mailchimp-subscribe";
 import { useDispatch, useSelector } from "react-redux";
-import { subscribeToNewsletter } from "../../../store/slices/news-slice";
+import {
+  resetNewsStatus,
+  subscribeToNewsletter,
+} from "../../../store/slices/news-slice";
 import { MoonLoader } from "react-spinners";
 
 const CustomForm = ({ status, message, onValidated }) => {
@@ -35,6 +38,11 @@ const CustomForm = ({ status, message, onValidated }) => {
     setEmail("");
   };
 
+  useEffect(() => {
+    // Reset status on mount to prevent messages from appearing on page load
+    dispatch(resetNewsStatus());
+  }, [dispatch]);
+
   // Hide news status messages after 5 seconds and validation errors in 3 seconds
   useEffect(() => {
     let timer;
@@ -47,8 +55,9 @@ const CustomForm = ({ status, message, onValidated }) => {
     ) {
       setShowMessage(true);
       timer = setTimeout(() => setShowMessage(false), 5000);
-      return () => clearTimeout(timer);
     }
+
+    return () => clearTimeout(timer);
   }, [newsStatus, validationError]);
 
   return (

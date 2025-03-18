@@ -10,6 +10,7 @@ import {
   loginUser,
   registerUser,
   clearError,
+  clearSuccess,
 } from "../../store/slices/user-slice";
 
 // Importing Toast Container and Toast Functions
@@ -19,6 +20,7 @@ import "react-toastify/dist/ReactToastify.css"; // Import Toast CSS
 const LoginRegister = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -197,6 +199,16 @@ const LoginRegister = () => {
         .unwrap()
         .then(() => {
           toast.success("Registration successful!");
+
+          // clear form
+          setEmail("");
+          setPassword("");
+          setFirstName("");
+          setLastName("");
+          setPhone("");
+
+          // clear success state after register success
+          dispatch(clearSuccess());
         })
         .catch((err) => {
           // Corrected this line
@@ -232,10 +244,18 @@ const LoginRegister = () => {
       }
 
       // Await the dispatch call directly
-      await dispatch(loginUser({ email, password })).unwrap();
+      await dispatch(loginUser({ email, password, rememberMe })).unwrap();
 
       // If successful, show success toast
       toast.success("Login successful!");
+
+      // clear form
+      setEmail("");
+      setPassword("");
+      setRememberMe(false);
+
+      // clear success state after login success
+      dispatch(clearSuccess());
     } catch (err) {
       console.error("Login Error:", err);
       toast.error("Login failed. Please check your credentials."); // Display error message
@@ -355,8 +375,12 @@ const LoginRegister = () => {
 
                               <div className="button-box">
                                 <div className="login-toggle-btn">
-                                  <input type="checkbox" />
-                                  <label className="ml-10">Remember me</label>
+                                  <input
+                                    type="checkbox"
+                                    checked={rememberMe}
+                                    onClick={() => setRememberMe(!rememberMe)}
+                                  />
+                                  <label className="ml-2">Remember me</label>
                                   <Link
                                     to={
                                       process.env.PUBLIC_URL +
