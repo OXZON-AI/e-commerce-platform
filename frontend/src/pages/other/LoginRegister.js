@@ -199,6 +199,16 @@ const LoginRegister = () => {
         .unwrap()
         .then(() => {
           toast.success("Registration successful!");
+
+          // clear form
+          setEmail("");
+          setPassword("");
+          setFirstName("");
+          setLastName("");
+          setPhone("");
+
+          // clear success state after register success
+          dispatch(clearSuccess());
         })
         .catch((err) => {
           // Corrected this line
@@ -208,16 +218,6 @@ const LoginRegister = () => {
     } catch (error) {
       console.error("Unexpected Error:", error);
       toast.error("An unexpected error occurred. Please try again.");
-    } finally {
-      // clear form
-      setEmail("");
-      setPassword("");
-      setFirstName("");
-      setLastName("");
-      setPhone("");
-
-      // clear success state after register success
-      dispatch(clearSuccess());
     }
   };
 
@@ -248,10 +248,7 @@ const LoginRegister = () => {
 
       // If successful, show success toast
       toast.success("Login successful!");
-    } catch (err) {
-      console.error("Login Error:", err);
-      toast.error("Login failed. Please check your credentials."); // Display error message
-    } finally {
+
       // clear form
       setEmail("");
       setPassword("");
@@ -259,6 +256,9 @@ const LoginRegister = () => {
 
       // clear success state after login success
       dispatch(clearSuccess());
+    } catch (err) {
+      console.error("Login Error:", err);
+      toast.error("Login failed. Please check your credentials."); // Display error message
     }
   };
 
