@@ -128,6 +128,10 @@ const newsSlice = createSlice({
     resetImageUrl: (state) => {
       state.imageUrl = "";
     },
+    resetNewsStatus: (state) => {
+      state.status = "idle";
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -206,6 +210,6 @@ const newsSlice = createSlice({
   },
 });
 
-export const { resetImageUrl } = newsSlice.actions;
+export const { resetImageUrl, resetNewsStatus } = newsSlice.actions;
 
 export default newsSlice.reducer;
